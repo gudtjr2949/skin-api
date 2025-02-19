@@ -16,13 +16,13 @@ pipeline {
         }
         stage('Deployment') {
             steps {
-                // sshagent(credentials: ['ssh_key']) {
+                sshagent(credentials: ['ssh_key']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no ubuntu@3.238.121.86
                         scp /var/jenkins_home/workspace/skin-api/skin-api/build/libs/skin-api-0.0.1-SNAPSHOT.jar ubuntu@3.238.121.86:/home/ubuntu/api-server
                         ssh -t ubuntu@3.238.121.86 ./api.sh
                     '''
-                // }
+                }
             }
         }
     }
