@@ -1,0 +1,18 @@
+pipeline {
+    agent any
+    stages {
+        stage('build') {
+            steps {
+                dir("./skin-api") {
+                    sh "chmod +x ./gradlew"
+                    sh "./gradlew clean build -x test"
+                }
+            }
+        }
+        stage('deploy') {
+            steps {
+                sh "ssh -t ubuntu@3.238.121.86 ./api.sh"
+            }
+        }
+    }
+}
