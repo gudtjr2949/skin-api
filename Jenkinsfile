@@ -14,6 +14,7 @@ pipeline {
         }
         stage('Build Application') {
             steps {
+                sh 'cd skin-api/skin-api'
                 sh './gradlew clean build -x test'
             }
         }
