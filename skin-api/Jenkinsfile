@@ -1,18 +1,39 @@
 pipeline {
     agent any
+
+    environment {
+        APP_NAME = 'skin-api'
+        JAR_NAME = 'build/libs/skin-api.jar'
+    }
+
     stages {
-        stage('build') {
+        stage('Clone Repository') {
             steps {
-                dir("./skin-api") {
-                    sh "chmod +x ./gradlew"
-                    sh "./gradlew clean build -x test"
+                git branch: 'main', url: 'https://github.com/gudtjr2949/skin-api.git'
+            }
+        }
+        stage('Build Application') {
+            steps {
+                sh './gradlew clean build -x test'
+            }
+        }
+
+        stage('Deploy Application') {
+            steps {
+                script {
+                    sh 'fuser -k 9090/tcp || true'
+                    sh "nohup java -jar ${JAR_NAME} --server.port=9090"
                 }
             }
         }
-        stage('deploy') {
-            steps {
-                sh "ssh -t ubuntu@3.238.121.86 ./api.sh"
-            }
+    }
+
+    post {
+        success {
+            echo '✅ 배포 성공!'
+        }
+        failure {
+            echo '❌ 배포 실패!'
         }
     }
 }
