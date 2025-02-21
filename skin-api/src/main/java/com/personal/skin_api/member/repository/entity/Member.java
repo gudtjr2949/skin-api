@@ -22,7 +22,7 @@ public class Member extends BaseEntity {
     private MemberName memberName;
 
     @Column(name = "NICKNAME")
-    private String nickName;
+    private String nickname;
 
     @Column(name = "PHONE")
     private String phone;
@@ -36,10 +36,10 @@ public class Member extends BaseEntity {
     private MemberRole role;
 
     @Builder
-    private Member(String password, String memberName, String nickName, String phone, MemberStatus status, MemberRole role) {
+    private Member(String password, String memberName, String nickname, String phone, MemberStatus status, MemberRole role) {
         this.password = new Password(password);
         this.memberName = new MemberName(memberName);
-        this.nickName = nickName;
+        this.nickname = nickname;
         this.phone = phone;
         this.status = status;
         this.role = role;
