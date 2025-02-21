@@ -1,4 +1,4 @@
-package com.personal.skin_api.member.repository.entity;
+package com.personal.skin_api.member.repository.entity.password;
 
 import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.member.repository.entity.password.Password;

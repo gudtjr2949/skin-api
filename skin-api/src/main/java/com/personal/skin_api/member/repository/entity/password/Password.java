@@ -11,7 +11,7 @@ import java.util.List;
 public class Password {
     private static final List<PasswordValidationStrategy> passwordValidationStrategies = List.of(
             new PasswordNullStrategy(),
-            new PasswordSpaceStrategy(),
+            new PasswordBlankStrategy(),
             new PasswordLengthStrategy(),
             new PasswordFormatStrategy()
     );

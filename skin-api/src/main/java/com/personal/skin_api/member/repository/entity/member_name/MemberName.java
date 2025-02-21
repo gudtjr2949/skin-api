@@ -13,7 +13,7 @@ public class MemberName {
 
     private static final List<MemberNameValidationStrategy> memberNameValidationStrategies = List.of(
             new MemberNameNullStrategy(),
-            new MemberNameSpaceStrategy(),
+            new MemberNameBlankStrategy(),
             new MemberNameLengthStrategy(),
             new MemberNameFormatStrategy()
     );

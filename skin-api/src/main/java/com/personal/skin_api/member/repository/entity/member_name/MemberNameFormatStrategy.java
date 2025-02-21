@@ -4,7 +4,7 @@ import com.personal.skin_api.common.exception.RestApiException;
 
 import java.util.regex.Pattern;
 
-import static com.personal.skin_api.common.exception.MemberErrorCode.INVALID_NAME_TYPE;
+import static com.personal.skin_api.common.exception.member.MemberNameErrorCode.INVALID_NAME_FORMAT;
 
 class MemberNameFormatStrategy implements MemberNameValidationStrategy {
 
@@ -12,12 +12,12 @@ class MemberNameFormatStrategy implements MemberNameValidationStrategy {
             specialCharPattern = Pattern.compile("[!@?]");
 
     /**
-     * 사용자 이름엔 알파벳과 한글만 포함할 수 있다.
+     * 사용자 이름에 알파벳과 한글만 포함되어 있는지 검증한다.
      * @param memberName 포맷을 검증할 사용자 이름
      */
     @Override
     public void validate(final String memberName) {
         if (numberPattern.matcher(memberName).find() || specialCharPattern.matcher(memberName).find())
-            throw new RestApiException(INVALID_NAME_TYPE);
+            throw new RestApiException(INVALID_NAME_FORMAT);
     }
 }

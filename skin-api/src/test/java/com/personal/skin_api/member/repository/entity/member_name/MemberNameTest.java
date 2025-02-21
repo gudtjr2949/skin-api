@@ -1,8 +1,7 @@
-package com.personal.skin_api.member.repository.entity;
+package com.personal.skin_api.member.repository.entity.member_name;
 
 import com.personal.skin_api.common.exception.RestApiException;
-import com.personal.skin_api.member.repository.entity.member_name.MemberName;
-import com.personal.skin_api.member.repository.entity.password.Password;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
