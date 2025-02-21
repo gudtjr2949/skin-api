@@ -22,15 +22,24 @@ public class Password {
     @Column(name = "PASSWORD")
     private String password;
 
-    @Builder
-    private Password(final String password) {
+    public Password(final String password) {
         validate(password);
         this.password = password;
     }
 
     private void validate(String password) {
+        validatePasswordNull(password);
         validatePasswordLength(password);
         validatePasswordComplexity(password);
+    }
+
+    /**
+     * 비밀번호는 null 일 수 없다.
+     * @param password : null 을 검증할 비밀번호
+     */
+    private void validatePasswordNull(String password) {
+        if (password == null)
+            throw new RestApiException(PASSWORD_CANNOT_BE_NULL);
     }
 
     /**

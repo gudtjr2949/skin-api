@@ -12,7 +12,7 @@ import static com.personal.skin_api.common.exception.MemberErrorCode.*;
 
 @Embeddable
 @NoArgsConstructor
-public class Name {
+public class MemberName {
     private static final int NAME_MIN_LENGTH = 8, NAME_MAX_LENGTH = 20;
     private static final Pattern numberPattern = Pattern.compile("\\d"),
             specialCharPattern = Pattern.compile("[!@?]");
@@ -21,7 +21,7 @@ public class Name {
     private String name;
 
     @Builder
-    private Name(final String name) {
+    private MemberName(final String name) {
         validateName(name);
         this.name = name;
     }

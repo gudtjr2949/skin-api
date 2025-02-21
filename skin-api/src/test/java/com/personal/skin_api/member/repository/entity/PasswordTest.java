@@ -13,7 +13,16 @@ class PasswordTest {
         String nullPassword = null;
 
         // when & then
-        assertThatThrownBy(() -> Password.builder().password(nullPassword).build()).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> new Password(nullPassword)).isInstanceOf(RestApiException.class);
+    }
+
+    @Test
+    void 비밀번호에서_공백을_제외한_길이가_최소길이보다_작은_경우_예외가_발생한다() {
+        // given
+        String emptyPassword = " abcdefg "; // 공백 포함 8자
+
+        // when & then
+        assertThatThrownBy(() -> new Password(emptyPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test
@@ -22,7 +31,7 @@ class PasswordTest {
         String shortPassword = "";
 
         // when & then
-        assertThatThrownBy(() -> Password.builder().password(shortPassword).build()).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> new Password(shortPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test
@@ -31,7 +40,7 @@ class PasswordTest {
         String longPassword = "abcdefghijklmnopqrxtu";
 
         // when & then
-        assertThatThrownBy(() -> Password.builder().password(longPassword).build()).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> new Password(longPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test
@@ -40,7 +49,7 @@ class PasswordTest {
         String noAlphabetPassword = "1234567!";
 
         // when & then
-        assertThatThrownBy(() -> Password.builder().password(noAlphabetPassword).build()).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> new Password(noAlphabetPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test
@@ -49,7 +58,7 @@ class PasswordTest {
         String noNumberPassword = "abcdefgh!";
 
         // when & then
-        assertThatThrownBy(() -> Password.builder().password(noNumberPassword).build()).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> new Password(noNumberPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test
@@ -58,7 +67,7 @@ class PasswordTest {
         String noSpecialCharacterPassword = "asd12345";
 
         // when & then
-        assertThatThrownBy(() -> Password.builder().password(noSpecialCharacterPassword).build()).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> new Password(noSpecialCharacterPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test
@@ -67,9 +76,7 @@ class PasswordTest {
         String normalPassword = "asd1234!";
 
         // when
-        Password password = Password.builder()
-                .password(normalPassword)
-                .build();
+        Password password = new Password(normalPassword);
 
         // then
         assertThat(password.getPassword()).isEqualTo(normalPassword);
