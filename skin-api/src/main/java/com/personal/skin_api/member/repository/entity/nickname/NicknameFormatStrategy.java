@@ -11,7 +11,7 @@ class NicknameFormatStrategy implements NicknameValidationStrategy {
     private static final Pattern specialCharPattern = Pattern.compile("[!@?]");
 
     @Override
-    public void validate(String nickname) {
+    public void validate(final String nickname) {
         if (specialCharPattern.matcher(nickname).find())
             throw new RestApiException(INVALID_NICKNAME_FORMAT);
     }

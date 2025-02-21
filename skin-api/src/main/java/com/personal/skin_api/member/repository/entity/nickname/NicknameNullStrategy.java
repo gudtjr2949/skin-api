@@ -4,7 +4,7 @@ import com.personal.skin_api.common.exception.RestApiException;
 
 import static com.personal.skin_api.common.exception.member.NicknameErrorCode.*;
 
-public class NicknameNullStrategy implements NicknameValidationStrategy {
+class NicknameNullStrategy implements NicknameValidationStrategy {
 
     /**
      * 닉네임이 null 인지 검증한다.

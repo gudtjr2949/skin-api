@@ -1,7 +1,7 @@
 package com.personal.skin_api.member.repository.entity.nickname;
 
 import com.personal.skin_api.common.exception.RestApiException;
-import org.assertj.core.api.Assertions;
+
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
@@ -51,5 +51,17 @@ class NicknameTest {
 
         // when & then
         assertThatThrownBy(() -> new Nickname(containsSpecialCharacterNickname)).isInstanceOf(RestApiException.class);
+    }
+
+    @Test
+    void 닉네임이_정상적으로_생성된다() {
+        // given
+        String normalNickname = "꿀맛코딱지";
+
+        // when
+        Nickname nickname = new Nickname(normalNickname);
+
+        // then
+        assertThat(nickname.getNickname()).isEqualTo(normalNickname);
     }
 }

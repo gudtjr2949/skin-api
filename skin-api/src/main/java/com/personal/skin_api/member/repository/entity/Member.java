@@ -2,7 +2,9 @@ package com.personal.skin_api.member.repository.entity;
 
 import com.personal.skin_api.common.entity.BaseEntity;
 import com.personal.skin_api.member.repository.entity.member_name.MemberName;
+import com.personal.skin_api.member.repository.entity.nickname.Nickname;
 import com.personal.skin_api.member.repository.entity.password.Password;
+import com.personal.skin_api.member.repository.entity.phone.Phone;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -21,11 +23,11 @@ public class Member extends BaseEntity {
     @Embedded
     private MemberName memberName;
 
-    @Column(name = "NICKNAME")
-    private String nickname;
+    @Embedded
+    private Nickname nickname;
 
-    @Column(name = "PHONE")
-    private String phone;
+    @Embedded
+    private Phone phone;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "STATUS")
@@ -39,8 +41,8 @@ public class Member extends BaseEntity {
     private Member(String password, String memberName, String nickname, String phone, MemberStatus status, MemberRole role) {
         this.password = new Password(password);
         this.memberName = new MemberName(memberName);
-        this.nickname = nickname;
-        this.phone = phone;
+        this.nickname = new Nickname(nickname);
+        this.phone = new Phone(phone);
         this.status = status;
         this.role = role;
     }

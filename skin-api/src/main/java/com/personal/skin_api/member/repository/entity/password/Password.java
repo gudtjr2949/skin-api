@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+// TODO : 일반 문자열 형태의 비밀번호 암호화 & 복호화 기능 추가 필요
 @Embeddable
 @NoArgsConstructor
 public class Password {

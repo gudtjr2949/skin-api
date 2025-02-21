@@ -4,7 +4,7 @@ import com.personal.skin_api.common.exception.RestApiException;
 
 import static com.personal.skin_api.common.exception.member.NicknameErrorCode.*;
 
-public class NicknameBlankStrategy implements NicknameValidationStrategy {
+class NicknameBlankStrategy implements NicknameValidationStrategy {
 
     /**
      * 닉네임에 공백이 포함되어 있는지 검증한다.

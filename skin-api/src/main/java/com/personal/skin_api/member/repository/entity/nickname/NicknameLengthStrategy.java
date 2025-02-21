@@ -5,7 +5,7 @@ import com.personal.skin_api.common.exception.member.NicknameErrorCode;
 
 import static com.personal.skin_api.common.exception.member.NicknameErrorCode.*;
 
-public class NicknameLengthStrategy implements NicknameValidationStrategy {
+class NicknameLengthStrategy implements NicknameValidationStrategy {
     private static final int NICKNAME_MIN_LENGTH = 3, NICKNAME_MAX_LENGTH = 8;
 
     /**
@@ -13,7 +13,7 @@ public class NicknameLengthStrategy implements NicknameValidationStrategy {
      * @param nickname 길이 검증할 닉네임
      */
     @Override
-    public void validate(String nickname) {
+    public void validate(final String nickname) {
         if (nickname.length() < NICKNAME_MIN_LENGTH || nickname.length() > NICKNAME_MAX_LENGTH)
             throw new RestApiException(INVALID_NICKNAME_LENGTH);
     }

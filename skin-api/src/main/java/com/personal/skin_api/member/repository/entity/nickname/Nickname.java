@@ -8,7 +8,7 @@ import java.util.List;
 
 @Embeddable
 @NoArgsConstructor
-class Nickname {
+public class Nickname {
     private static final List<NicknameValidationStrategy> nicknameValidationStrategies = List.of(
             new NicknameNullStrategy(),
             new NicknameBlankStrategy(),
@@ -26,5 +26,9 @@ class Nickname {
 
     private void validate(String nickname) {
         nicknameValidationStrategies.stream().forEach(strategy -> strategy.validate(nickname));
+    }
+
+    public String getNickname() {
+        return nickname;
     }
 }
