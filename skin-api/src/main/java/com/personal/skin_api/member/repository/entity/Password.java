@@ -1,22 +1,36 @@
 package com.personal.skin_api.member.repository.entity;
 
-import com.personal.skin_api.common.exception.MemberErrorCode;
 import com.personal.skin_api.common.exception.RestApiException;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.regex.Pattern;
 
 import static com.personal.skin_api.common.exception.MemberErrorCode.*;
 
 @Embeddable
 @NoArgsConstructor
 public class Password {
-    private final int PASSWORD_MIN_LENGTH = 8, PASSWORD_MAX_LENGTH = 20;
+    private static final int PASSWORD_MIN_LENGTH = 8, PASSWORD_MAX_LENGTH = 20;
+    private static final Pattern alphabetPattern = Pattern.compile("[a-zA-Z]"),
+            numberPattern = Pattern.compile("\\d"),
+            specialCharPattern = Pattern.compile("[!@?]");
+
+    @Column(name = "PASSWORD")
     private String password;
 
+    @Builder
     private Password(final String password) {
-        validatePasswordLength(password);
-
+        validate(password);
         this.password = password;
+    }
+
+    private void validate(String password) {
+        validatePasswordLength(password);
+        validatePasswordComplexity(password);
     }
 
     /**
@@ -24,7 +38,7 @@ public class Password {
      * @param password : 길이 검증할 비밀번호
      */
     private void validatePasswordLength(String password) {
-        if (password.length() < PASSWORD_MIN_LENGTH || password.length() > PASSWORD_MAX_LENGTH)
+        if (password == null || password.length() < PASSWORD_MIN_LENGTH || password.length() > PASSWORD_MAX_LENGTH)
             throw new RestApiException(INVALID_PASSWORD_LENGTH);
     }
 
@@ -33,7 +47,13 @@ public class Password {
      * @param password : 복잡도를 검증할 비밀번호
      */
     private void validatePasswordComplexity(String password) {
-
+        if (!(alphabetPattern.matcher(password).find()
+                && numberPattern.matcher(password).find()
+                && specialCharPattern.matcher(password).find()))
+            throw new RestApiException(INVALID_PASSWORD_COMPLEXITY);
     }
 
+    public String getPassword() {
+        return password;
+    }
 }

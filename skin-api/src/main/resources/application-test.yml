@@ -1,0 +1,24 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    username: sa
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:tcp://localhost/~/test
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+    show-sql: true
+
+  h2:
+    console:
+      enabled: true
+  driver:
+    path: chromedriver

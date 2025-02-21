@@ -11,7 +11,8 @@ import static org.springframework.http.HttpStatus.*;
 public enum MemberErrorCode implements ErrorCode {
 
     INACTIVE_USER(FORBIDDEN, "비활성화된 사용자입니다."),
-    INVALID_PASSWORD_LENGTH(BAD_REQUEST, "패스워드의 길이가 올바르지 않습니다.")
+    INVALID_PASSWORD_LENGTH(BAD_REQUEST, "패스워드의 길이가 올바르지 않습니다."),
+    INVALID_PASSWORD_COMPLEXITY(BAD_REQUEST, "패스워드는 최소 1개의 알파벳, 숫자, 특수문자(!, @, ? 만)를 포함해야 합니다.."),
     ;
 
     private final HttpStatus httpStatus;
