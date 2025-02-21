@@ -20,16 +20,21 @@ public class MemberName {
     @Column(name = "NAME")
     private String name;
 
-    @Builder
-    private MemberName(final String name) {
+    MemberName(final String name) {
         validateName(name);
         this.name = name;
     }
 
     private void validateName(final String name) {
         validateNameNull(name);
+        validateNameContainsSpace(name);
         validateNameLength(name);
         validateNameFormat(name);
+    }
+
+    private void validateNameContainsSpace(String name) {
+        if (name.contains(" "))
+            throw new RestApiException(NAME_CANNOT_CONTAINS_SPACE);
     }
 
     private void validateNameFormat(final String name) {
@@ -43,7 +48,7 @@ public class MemberName {
     }
 
     private void validateNameNull(final String name) {
-        if (name.isBlank())
+        if (name == null)
             throw new RestApiException(NAME_CANNOT_BE_NULL);
     }
 }

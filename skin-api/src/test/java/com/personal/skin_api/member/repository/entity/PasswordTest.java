@@ -1,10 +1,13 @@
 package com.personal.skin_api.member.repository.entity;
 
 import com.personal.skin_api.common.exception.RestApiException;
+import com.personal.skin_api.member.repository.entity.password.Password;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.*;
 
+@ActiveProfiles("test")
 class PasswordTest {
 
     @Test

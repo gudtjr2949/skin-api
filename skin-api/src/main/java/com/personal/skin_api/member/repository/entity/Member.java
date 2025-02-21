@@ -1,6 +1,7 @@
 package com.personal.skin_api.member.repository.entity;
 
 import com.personal.skin_api.common.entity.BaseEntity;
+import com.personal.skin_api.member.repository.entity.password.Password;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -34,9 +35,9 @@ public class Member extends BaseEntity {
     private MemberRole role;
 
     @Builder
-    private Member(String password, MemberName memberName, String nickName, String phone, MemberStatus status, MemberRole role) {
+    private Member(String password, String memberName, String nickName, String phone, MemberStatus status, MemberRole role) {
         this.password = new Password(password);
-        this.memberName = memberName;
+        this.memberName = new MemberName(memberName);
         this.nickName = nickName;
         this.phone = phone;
         this.status = status;
