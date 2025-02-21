@@ -13,11 +13,14 @@ public class Member extends BaseEntity {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "PASSWORD")
+    @Embedded
     private Password password;
 
-    @Column(name = "NICKNAME")
+    @Column(name = "NAME")
     private String name;
+
+    @Column(name = "NICKNAME")
+    private String nickName;
 
     @Column(name = "PHONE")
     private String phone;
@@ -31,9 +34,10 @@ public class Member extends BaseEntity {
     private MemberRole role;
 
     @Builder
-    private Member(Password password, String name, String phone, MemberStatus status, MemberRole role) {
+    private Member(Password password, String name, String nickName, String phone, MemberStatus status, MemberRole role) {
         this.password = password;
         this.name = name;
+        this.nickName = nickName;
         this.phone = phone;
         this.status = status;
         this.role = role;

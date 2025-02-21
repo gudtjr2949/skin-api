@@ -34,11 +34,11 @@ public class Password {
     }
 
     /**
-     *
+     * 비밀번호의 길이는 PASSWORD_MIN_LENGTH 이상 PASSWORD_MAX_LENGTH 이하여야 한다.
      * @param password : 길이 검증할 비밀번호
      */
     private void validatePasswordLength(String password) {
-        if (password == null || password.length() < PASSWORD_MIN_LENGTH || password.length() > PASSWORD_MAX_LENGTH)
+        if (password.isBlank() || password.length() < PASSWORD_MIN_LENGTH || password.length() > PASSWORD_MAX_LENGTH)
             throw new RestApiException(INVALID_PASSWORD_LENGTH);
     }
 
