@@ -11,7 +11,7 @@ class PasswordNullStrategy implements PasswordValidationStrategy {
      * @param password null 을 검증할 비밀번호
      */
     @Override
-    public void validate(String password) {
+    public void validate(final String password) {
         if (password == null)
             throw new RestApiException(PASSWORD_CANNOT_BE_NULL);
     }

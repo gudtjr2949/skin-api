@@ -11,7 +11,7 @@ class PasswordSpaceStrategy implements PasswordValidationStrategy {
      * @param password 공백 포함 여부를 검증할 비밀번호
      */
     @Override
-    public void validate(String password) {
+    public void validate(final String password) {
         if (password.contains(" "))
             throw new RestApiException(NAME_CANNOT_CONTAINS_SPACE);
     }

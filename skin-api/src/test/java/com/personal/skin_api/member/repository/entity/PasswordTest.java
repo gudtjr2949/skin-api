@@ -20,12 +20,12 @@ class PasswordTest {
     }
 
     @Test
-    void 비밀번호에서_공백을_제외한_길이가_최소길이보다_작은_경우_예외가_발생한다() {
+    void 비밀번호에_공백이_포함된_경우_예외가_발생한다() {
         // given
-        String emptyPassword = " abcdefg "; // 공백 포함 8자
+        String containsBlankPassword = " abcdefg "; // 공백 포함 8자
 
         // when & then
-        assertThatThrownBy(() -> new Password(emptyPassword)).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> new Password(containsBlankPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test

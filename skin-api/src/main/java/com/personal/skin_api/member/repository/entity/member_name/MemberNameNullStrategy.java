@@ -11,7 +11,7 @@ class MemberNameNullStrategy implements MemberNameValidationStrategy {
      * @param memberName null 여부를 판별할 사용자 이름
      */
     @Override
-    public void validate(String memberName) {
+    public void validate(final String memberName) {
         if (memberName == null)
             throw new RestApiException(PASSWORD_CANNOT_BE_NULL);
     }

@@ -16,7 +16,7 @@ class MemberNameFormatStrategy implements MemberNameValidationStrategy {
      * @param memberName 포맷을 검증할 사용자 이름
      */
     @Override
-    public void validate(String memberName) {
+    public void validate(final String memberName) {
         if (numberPattern.matcher(memberName).find() || specialCharPattern.matcher(memberName).find())
             throw new RestApiException(INVALID_NAME_TYPE);
     }

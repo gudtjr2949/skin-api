@@ -11,7 +11,7 @@ class MemberNameSpaceStrategy implements MemberNameValidationStrategy {
      * @param memberName 공백을 확인할 사용자 이름
      */
     @Override
-    public void validate(String memberName) {
+    public void validate(final String memberName) {
         if (memberName.contains(" "))
             throw new RestApiException(NAME_CANNOT_CONTAINS_SPACE);
     }

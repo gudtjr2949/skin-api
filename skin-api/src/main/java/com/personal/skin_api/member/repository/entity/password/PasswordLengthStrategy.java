@@ -12,7 +12,7 @@ class PasswordLengthStrategy implements PasswordValidationStrategy {
      * @param password 길이 검증할 비밀번호
      */
     @Override
-    public void validate(String password) {
+    public void validate(final String password) {
         if (password.length() < PASSWORD_MIN_LENGTH || password.length() > PASSWORD_MAX_LENGTH)
             throw new RestApiException(INVALID_PASSWORD_LENGTH);
     }

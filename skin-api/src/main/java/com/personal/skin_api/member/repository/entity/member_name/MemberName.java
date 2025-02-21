@@ -1,7 +1,5 @@
 package com.personal.skin_api.member.repository.entity.member_name;
 
-import com.personal.skin_api.common.exception.RestApiException;
-import com.personal.skin_api.member.repository.entity.password.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
@@ -30,5 +28,9 @@ public class MemberName {
 
     private void validateName(final String memberName) {
         memberNameValidationStrategies.stream().forEach(strategy -> strategy.validate(memberName));
+    }
+
+    public String getMemberName() {
+        return memberName;
     }
 }

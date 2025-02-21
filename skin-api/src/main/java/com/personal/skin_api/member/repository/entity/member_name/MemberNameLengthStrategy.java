@@ -5,7 +5,7 @@ import com.personal.skin_api.common.exception.RestApiException;
 import static com.personal.skin_api.common.exception.MemberErrorCode.INVALID_NAME_LENGTH;
 
 class MemberNameLengthStrategy implements MemberNameValidationStrategy {
-    private static final int NAME_MIN_LENGTH = 8, NAME_MAX_LENGTH = 20;
+    private static final int NAME_MIN_LENGTH = 2, NAME_MAX_LENGTH = 20;
 
     /**
      * 사용자 이름 길이는 NAME_MIN_LENGTH 이상, NAME_MAX_LENGTH 이하여야 한다.

@@ -16,7 +16,7 @@ class PasswordFormatStrategy implements PasswordValidationStrategy {
      * @param password 포맷을 검증할 비밀번호
      */
     @Override
-    public void validate(String password) {
+    public void validate(final String password) {
         if (!(alphabetPattern.matcher(password).find()
                 && numberPattern.matcher(password).find()
                 && specialCharPattern.matcher(password).find()))

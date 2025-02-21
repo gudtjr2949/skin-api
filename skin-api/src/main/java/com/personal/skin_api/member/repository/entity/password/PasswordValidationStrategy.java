@@ -1,5 +1,5 @@
 package com.personal.skin_api.member.repository.entity.password;
 
 interface PasswordValidationStrategy {
-    void validate(String password);
+    void validate(final String password);
 }
