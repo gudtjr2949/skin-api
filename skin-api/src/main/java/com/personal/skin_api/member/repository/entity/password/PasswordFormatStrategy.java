@@ -6,14 +6,14 @@ import java.util.regex.Pattern;
 
 import static com.personal.skin_api.common.exception.MemberErrorCode.INVALID_PASSWORD_COMPLEXITY;
 
-class ComplexityValidationStrategy implements PasswordValidationStrategy {
+class PasswordFormatStrategy implements PasswordValidationStrategy {
     private static final Pattern alphabetPattern = Pattern.compile("[a-zA-Z]"),
             numberPattern = Pattern.compile("\\d"),
             specialCharPattern = Pattern.compile("[!@?]");
 
     /**
      * 비밀번호에 알파벳, 숫자, 특수문자가 모두 포함되어야 한다.
-     * @param password : 복잡도를 검증할 비밀번호
+     * @param password 포맷을 검증할 비밀번호
      */
     @Override
     public void validate(String password) {

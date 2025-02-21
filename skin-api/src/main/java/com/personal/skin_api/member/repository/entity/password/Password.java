@@ -1,10 +1,7 @@
 package com.personal.skin_api.member.repository.entity.password;
 
-import com.personal.skin_api.common.exception.RestApiException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -13,10 +10,10 @@ import java.util.List;
 @NoArgsConstructor
 public class Password {
     private static final List<PasswordValidationStrategy> passwordValidationStrategies = List.of(
-            new NullValidationStrategy(),
-            new SpaceValidationStrategy(),
-            new LengthValidationStrategy(),
-            new ComplexityValidationStrategy()
+            new PasswordNullStrategy(),
+            new PasswordSpaceStrategy(),
+            new PasswordLengthStrategy(),
+            new PasswordFormatStrategy()
     );
 
     @Column(name = "PASSWORD")

@@ -4,12 +4,12 @@ import com.personal.skin_api.common.exception.RestApiException;
 
 import static com.personal.skin_api.common.exception.MemberErrorCode.INVALID_PASSWORD_LENGTH;
 
-class LengthValidationStrategy implements PasswordValidationStrategy {
+class PasswordLengthStrategy implements PasswordValidationStrategy {
     private static final int PASSWORD_MIN_LENGTH = 8, PASSWORD_MAX_LENGTH = 20;
 
     /**
      * 비밀번호의 길이는 PASSWORD_MIN_LENGTH 이상 PASSWORD_MAX_LENGTH 이하여야 한다.
-     * @param password : 길이 검증할 비밀번호
+     * @param password 길이 검증할 비밀번호
      */
     @Override
     public void validate(String password) {

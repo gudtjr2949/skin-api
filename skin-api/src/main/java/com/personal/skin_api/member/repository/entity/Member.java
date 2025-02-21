@@ -1,6 +1,7 @@
 package com.personal.skin_api.member.repository.entity;
 
 import com.personal.skin_api.common.entity.BaseEntity;
+import com.personal.skin_api.member.repository.entity.member_name.MemberName;
 import com.personal.skin_api.member.repository.entity.password.Password;
 import jakarta.persistence.*;
 import lombok.Builder;

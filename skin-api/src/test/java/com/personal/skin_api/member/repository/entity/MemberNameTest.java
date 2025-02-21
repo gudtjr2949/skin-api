@@ -1,7 +1,7 @@
 package com.personal.skin_api.member.repository.entity;
 
 import com.personal.skin_api.common.exception.RestApiException;
-import org.assertj.core.api.Assertions;
+import com.personal.skin_api.member.repository.entity.member_name.MemberName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
