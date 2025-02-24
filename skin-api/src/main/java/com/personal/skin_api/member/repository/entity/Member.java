@@ -1,11 +1,13 @@
 package com.personal.skin_api.member.repository.entity;
 
 import com.personal.skin_api.common.entity.BaseEntity;
+import com.personal.skin_api.member.repository.entity.email.Email;
 import com.personal.skin_api.member.repository.entity.member_name.MemberName;
 import com.personal.skin_api.member.repository.entity.nickname.Nickname;
 import com.personal.skin_api.member.repository.entity.password.Password;
 import com.personal.skin_api.member.repository.entity.phone.Phone;
 import jakarta.persistence.*;
+
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +18,9 @@ public class Member extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
+
+    @Embedded
+    private Email email;
 
     @Embedded
     private Password password;
@@ -45,5 +50,9 @@ public class Member extends BaseEntity {
         this.phone = new Phone(phone);
         this.status = status;
         this.role = role;
+    }
+
+    public String getMemberName() {
+        return memberName.getMemberName();
     }
 }
