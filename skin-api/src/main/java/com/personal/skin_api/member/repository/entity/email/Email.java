@@ -12,7 +12,8 @@ public class Email {
 
     private static final List<EmailValidationStrategy> emailValidationStrategies = List.of(
             new EmailNullStrategy(),
-            new EmailBlankStrategy()
+            new EmailBlankStrategy(),
+            new EmailFormatStrategy()
     );
 
     @Column(name = "EMAIL")

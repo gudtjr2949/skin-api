@@ -4,6 +4,8 @@ import com.personal.skin_api.common.exception.RestApiException;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 
 class EmailTest {
@@ -24,5 +26,20 @@ class EmailTest {
 
         // when & then
         assertThatThrownBy(() -> new Email(containsBlankEmail)).isInstanceOf(RestApiException.class);
+    }
+    
+    @Test
+    void 이메일_포맷이_올바르지_않은_경우_예외가_발생한다() {
+        // given
+        List<String> invalidEmails = List.of(
+                "abc$123@naver.com",
+                "user@domain",
+                "@nodomain.com",
+                "user@.com"
+        );
+
+        // when & then
+        invalidEmails.stream()
+                .forEach(invalidEmail -> assertThatThrownBy(() -> new Email(invalidEmail)).isInstanceOf(RestApiException.class));
     }
 }
