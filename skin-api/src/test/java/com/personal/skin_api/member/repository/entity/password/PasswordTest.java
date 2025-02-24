@@ -1,7 +1,6 @@
 package com.personal.skin_api.member.repository.entity.password;
 
 import com.personal.skin_api.common.exception.RestApiException;
-import com.personal.skin_api.member.repository.entity.password.Password;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -85,4 +84,38 @@ class PasswordTest {
         assertThat(password.getPassword()).isEqualTo(normalPassword);
     }
 
+    @Test
+    void 비밀번호를_재설정할_때_이전에_사용했던_비밀번호를_재사용하려는_경우_예외가_발생한다() {
+        // given
+        String beforePassword = "asd1234!";
+        Password password = new Password(beforePassword);
+
+        // when & then
+        assertThatThrownBy(() -> password.modifyPassword(beforePassword)).isInstanceOf(RestApiException.class);
+    }
+
+    @Test
+    void 비밀번호를_수정할_때_이전에_사용한_비밀번호가_아니지만_기존_비밀번호_기준에_부합하지_않는_경우_예외가_발생한다() {
+        // given
+        String beforePassword = "asd1234!";
+        Password password = new Password(beforePassword);
+        String newAndShortPassword = "asd123";
+
+        // when & then
+        assertThatThrownBy(() -> password.modifyPassword(newAndShortPassword)).isInstanceOf(RestApiException.class);
+    }
+
+    @Test
+    void 비밀번호가_정상적으로_수정된다() {
+        // given
+        String beforePassword = "asd1234!";
+        Password password = new Password(beforePassword);
+        String newPassword = "asd4567!";
+
+        // when
+        Password modifiedPassword = password.modifyPassword(newPassword);
+
+        // then
+        assertThat(modifiedPassword.getPassword()).isEqualTo(newPassword);
+    }
 }

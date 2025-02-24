@@ -42,8 +42,12 @@ public class Member extends BaseEntity {
     @Column(nullable = false, name = "ROLE")
     private MemberRole role;
 
-    @Builder
-    private Member(String password, String memberName, String nickname, String phone, MemberStatus status, MemberRole role) {
+    public static Member signUpGeneralMember(String email, String password, String memberName, String nickname, String phone) {
+        return new Member(email, password, memberName, nickname, phone, MemberStatus.ACTIVE, MemberRole.GENERAL);
+    }
+
+    private Member(String email, String password, String memberName, String nickname, String phone, MemberStatus status, MemberRole role) {
+        this.email = new Email(email);
         this.password = new Password(password);
         this.memberName = new MemberName(memberName);
         this.nickname = new Nickname(nickname);
@@ -52,7 +56,23 @@ public class Member extends BaseEntity {
         this.role = role;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getMemberName() {
         return memberName.getMemberName();
+    }
+
+    public String getEmail() {
+        return email.getEmail();
+    }
+
+    public String getPassword() {
+        return password.getPassword();
+    }
+
+    public String getPhone() {
+        return phone.getPhone();
     }
 }

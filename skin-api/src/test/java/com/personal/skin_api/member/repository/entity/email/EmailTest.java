@@ -61,4 +61,16 @@ class EmailTest {
                 .forEach(invalidEmail -> assertThatThrownBy(() -> new Email(invalidEmail)).isInstanceOf(RestApiException.class));
     }
 
+    @Test
+    void 이메일이_정상이라면_이메일_객체가_생성된다() {
+        // given
+        String normalEmail = "asd123@naver.com";
+
+        // when
+        Email email = new Email(normalEmail);
+
+        // then
+        assertThat(email.getEmail()).isEqualTo(normalEmail);
+    }
+
 }

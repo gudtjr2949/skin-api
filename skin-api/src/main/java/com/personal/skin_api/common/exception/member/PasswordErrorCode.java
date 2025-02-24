@@ -15,6 +15,7 @@ public enum PasswordErrorCode implements ErrorCode {
     PASSWORD_CANNOT_CONTAINS_BLANK(BAD_REQUEST, "비밀번호에 공백을 포함할 수 없습니다."),
     INVALID_PASSWORD_LENGTH(BAD_REQUEST, "비밀번호의 길이가 올바르지 않습니다."),
     INVALID_PASSWORD_FORMAT(BAD_REQUEST, "비밀번호는 최소 1개의 알파벳, 숫자, 특수문자(!, @, ? 만)를 포함해야 합니다."),
+    PASSWORD_REUSE_FORBIDDEN(BAD_REQUEST, "비밀번호 변경 시, 이전에 사용하던 비밀번호를 그대로 사용할 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;

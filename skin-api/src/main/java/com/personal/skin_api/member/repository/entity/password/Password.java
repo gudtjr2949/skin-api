@@ -17,6 +17,10 @@ public class Password {
             new PasswordFormatStrategy()
     );
 
+    private static final List<ModifyPasswordValidationStrategy> modifyPasswordValidationStrategies = List.of(
+            new ModifyPasswordReuseStrategy()
+    );
+
     @Column(name = "PASSWORD")
     private String password;
 
@@ -31,5 +35,14 @@ public class Password {
 
     public String getPassword() {
         return password;
+    }
+
+    Password modifyPassword(final String newPassword) {
+        validateNewPassword(newPassword);
+        return new Password(newPassword);
+    }
+
+    private void validateNewPassword(String newPassword) {
+        modifyPasswordValidationStrategies.stream().forEach(strategy -> strategy.validate(this.password, newPassword));
     }
 }

@@ -28,4 +28,8 @@ public class Email {
     private void validate(final String email) {
         emailValidationStrategies.stream().forEach(strategy -> strategy.validate(email));
     }
+
+    public String getEmail() {
+        return email;
+    }
 }
