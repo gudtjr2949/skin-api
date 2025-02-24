@@ -1,9 +1,11 @@
 package com.personal.skin_api.member.repository;
 
-import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.member.repository.entity.Member;
+import com.personal.skin_api.member.repository.entity.MemberRole;
+import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.member.repository.entity.email.Email;
 import com.personal.skin_api.member.repository.entity.member_name.MemberName;
+import com.personal.skin_api.member.repository.entity.nickname.Nickname;
 import com.personal.skin_api.member.repository.entity.password.Password;
 
 import com.personal.skin_api.member.repository.entity.phone.Phone;
@@ -35,6 +37,51 @@ class MemberRepositoryTest {
         // then
         assertThat(findMember).isPresent();
         assertThat(findMember.get().getId()).isEqualTo(member.getId());
+    }
+
+    @Test
+    void 이메일을_통해_사용자_정보를_조회한다() {
+        // given
+        Member member = createMember();
+        memberRepository.save(member);
+
+        // when
+        Optional<Member> findMember = memberRepository.findMemberByEmail(new Email(member.getEmail()));
+
+        // then
+        assertThat(findMember).isPresent();
+        assertThat(findMember.get().getEmail()).isEqualTo(member.getEmail());
+        assertThat(findMember.get().getMemberName()).isEqualTo(member.getMemberName());
+    }
+    
+    @Test
+    void 닉네임을_통해_사용자_정보를_조회한다() {
+        // given
+        Member member = createMember();
+        memberRepository.save(member);
+
+        // when
+        Optional<Member> findMember = memberRepository.findMemberByNickname(new Nickname(member.getNickname()));
+        
+        // then
+        assertThat(findMember).isPresent();
+        assertThat(findMember.get().getEmail()).isEqualTo(member.getEmail());
+        assertThat(findMember.get().getMemberName()).isEqualTo(member.getMemberName());
+    }
+
+    @Test
+    void 전화번호를_통해_사용자_정보를_조회한다() {
+        // given
+        Member member = createMember();
+        memberRepository.save(member);
+
+        // when
+        Optional<Member> findMember = memberRepository.findMemberByPhone(new Phone(member.getPhone()));
+
+        // then
+        assertThat(findMember).isPresent();
+        assertThat(findMember.get().getEmail()).isEqualTo(member.getEmail());
+        assertThat(findMember.get().getMemberName()).isEqualTo(member.getMemberName());
     }
 
     @Test
@@ -84,10 +131,30 @@ class MemberRepositoryTest {
     @Test
     void 비밀번호를_재설정한다() {
         // given
+        Member member = createMember();
+        memberRepository.save(member);
+        String newPassword = "asd5678!";
+
+        // when
+        member.modifyPassword(newPassword);
+        Optional<Member> findMember = memberRepository.findById(member.getId());
+
+        // then
+        assertThat(findMember).isPresent();
+        assertThat(findMember.get().getPassword()).isEqualTo(newPassword);
+    }
+    
+    @Test
+    void 회원탈퇴를_할_경우_회원상태가_WITHDRAW로_변경된다() {
+        // given
+        Member member = createMember();
+        memberRepository.save(member);
         
         // when
+        member.withdraw();
         
         // then
+        assertThat(member.getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
     }
 
     private Member createMember() {
@@ -96,7 +163,17 @@ class MemberRepositoryTest {
         String memberName = "홍길동";
         String nickname = "길동짱짱";
         String phone = "01012345678";
+        MemberStatus status = MemberStatus.ACTIVE;
+        MemberRole role = MemberRole.GENERAL;
 
-        return Member.signUpGeneralMember(email, password, memberName, nickname, phone);
+        return Member.builder()
+                .email(email)
+                .password(password)
+                .memberName(memberName)
+                .nickname(nickname)
+                .phone(phone)
+                .status(status)
+                .role(role)
+                .build();
     }
 }

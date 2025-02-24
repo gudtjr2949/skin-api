@@ -37,7 +37,7 @@ public class Password {
         return password;
     }
 
-    Password modifyPassword(final String newPassword) {
+    public Password modifyPassword(final String newPassword) {
         validateNewPassword(newPassword);
         return new Password(newPassword);
     }

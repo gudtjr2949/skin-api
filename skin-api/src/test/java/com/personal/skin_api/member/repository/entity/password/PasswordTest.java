@@ -110,7 +110,7 @@ class PasswordTest {
         // given
         String beforePassword = "asd1234!";
         Password password = new Password(beforePassword);
-        String newPassword = "asd4567!";
+        String newPassword = "asd5678!";
 
         // when
         Password modifiedPassword = password.modifyPassword(newPassword);
