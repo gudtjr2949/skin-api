@@ -10,7 +10,7 @@ class EmailNullStrategy implements EmailValidationStrategy {
      * @param email null 여부를 검증할 이메일
      */
     @Override
-    public void validate(String email) {
+    public void validate(final String email) {
         if (email == null) throw new RestApiException(EmailErrorCode.EMAIL_CANNOT_BE_NULL);
     }
 }

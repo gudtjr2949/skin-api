@@ -27,7 +27,25 @@ class EmailTest {
         // when & then
         assertThatThrownBy(() -> new Email(containsBlankEmail)).isInstanceOf(RestApiException.class);
     }
-    
+
+    @Test
+    void 이메일_길이가_최소길이보다_작은_경우_예외가_발생한다() {
+        // given
+        String shortEmail = "a@a.a";
+
+        // when & then
+        assertThatThrownBy(() -> new Email(shortEmail)).isInstanceOf(RestApiException.class);
+    }
+
+    @Test
+    void 이메일_길이가_최대길이보다_큰_경우_예외가_발생한다() {
+        // given
+        String longEmail = "a@naver.".repeat(EmailLengthStrategy.EMAIL_MAX_LENGTH - 7);
+
+        // when & then
+        assertThatThrownBy(() -> new Email(longEmail)).isInstanceOf(RestApiException.class);
+    }
+
     @Test
     void 이메일_포맷이_올바르지_않은_경우_예외가_발생한다() {
         // given
@@ -42,4 +60,5 @@ class EmailTest {
         invalidEmails.stream()
                 .forEach(invalidEmail -> assertThatThrownBy(() -> new Email(invalidEmail)).isInstanceOf(RestApiException.class));
     }
+
 }

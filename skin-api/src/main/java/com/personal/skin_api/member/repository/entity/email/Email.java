@@ -13,6 +13,7 @@ public class Email {
     private static final List<EmailValidationStrategy> emailValidationStrategies = List.of(
             new EmailNullStrategy(),
             new EmailBlankStrategy(),
+            new EmailLengthStrategy(),
             new EmailFormatStrategy()
     );
 
