@@ -11,7 +11,8 @@ import java.util.List;
 public class Email {
 
     private static final List<EmailValidationStrategy> emailValidationStrategies = List.of(
-            new EmailNullStrategy()
+            new EmailNullStrategy(),
+            new EmailBlankStrategy()
     );
 
     @Column(name = "EMAIL")

@@ -16,4 +16,13 @@ class EmailTest {
         // when & then
         assertThatThrownBy(() -> new Email(nullEmail)).isInstanceOf(RestApiException.class);
     }
+    
+    @Test
+    void 이메일에_공백이_포함될_경우_예외가_발생한다() {
+        // given
+        String containsBlankEmail = "ab c123@naver.com";
+
+        // when & then
+        assertThatThrownBy(() -> new Email(containsBlankEmail)).isInstanceOf(RestApiException.class);
+    }
 }
