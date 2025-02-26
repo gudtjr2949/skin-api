@@ -77,37 +77,40 @@ class MemberServiceImpl implements MemberService {
      * @return 회원정보
      */
     @Override
-    public MemberLoginServiceResponse login(MemberLoginServiceRequest request) {
+    public MemberLoginResponse login(MemberLoginServiceRequest request) {
         Member loginMember = memberRepository.findMemberByEmailAndPassword(new Email(request.getEmail()), new Password(request.getPassword()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
-        return MemberLoginServiceResponse.builder()
+        return MemberLoginResponse.builder()
                 .member(loginMember)
                 .build();
     }
 
+
+    // TODO : 인증 번호 확인 로직 필요
     /**
-     * 이메일을 찾기 위해 입력된 회원 이름과 전화번호를 검증한다.
-     * @param request 이메일을 찾기 위해 입력한 회원 이름과 전화번호
+     * 이메일을 찾기 위해 입력된 회원 이름과 전화번호, 인증 번호를 검증한다.
+     * @param request 이메일을 찾기 위해 입력한 회원 이름, 전화번호, 인증 번호
      * @return 회원가입에 입력했던 이메일
      */
     @Override
-    public MemberFindEmailServiceResponse findEmail(MemberFindEmailServiceRequest request) {
-        Member findmember = memberRepository.findMemberByMemberNameAndPhone(new MemberName(request.getMemberName()),
-                new Phone(request.getPhone())).orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+    public MemberFindEmailResponse findEmail(MemberFindEmailServiceRequest request) {
+        Member findmember = memberRepository.findMemberByEmailAndMemberName(new Email(request.getMemberName()), new MemberName(request.getMemberName()))
+                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
-        return MemberFindEmailServiceResponse.builder()
+        return MemberFindEmailResponse.builder()
                 .email(findmember.getEmail())
                 .build();
     }
 
+    // TODO : 인증 번호 확인 로직 필요
     /**
-     * 비밀번호를 재설정을 진행할 회원 정보를 검증한다.
-     * @param request 비밀번호를 재설정을 진행할 회원 정보 검증을 위해 입력한 이메일과 전화번호
+     * 비밀번호를 재설정하기 위해 입력된 이메일과 회원 이름, 인증 번호를 검증한다.
+     * @param request 비밀번호를 재설정을 진행할 회원 정보 검증을 위해 입력한 이메일, 이름, 인증번호
      */
     @Override
     public void findPassword(MemberFindPasswordServiceRequest request) {
-        memberRepository.findMemberByEmailAndPhone(new Email(request.getEmail()), new Phone(request.getPhone()))
+        memberRepository.findMemberByEmailAndMemberName(new Email(request.getEmail()), new MemberName(request.getMemberName()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
     }
 
@@ -130,11 +133,11 @@ class MemberServiceImpl implements MemberService {
      * @return 회원 상세 정보
      */
     @Override
-    public MemberDetailServiceResponse findMemberDetail(MemberFindDetailServiceRequest request) {
+    public MemberDetailResponse findMemberDetail(MemberFindDetailServiceRequest request) {
         Member findMember = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
-        return MemberDetailServiceResponse.builder()
+        return MemberDetailResponse.builder()
                 .member(findMember)
                 .build();
     }

@@ -7,15 +7,15 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class MemberModifyDetailRequest {
-    private String memberName;
-    private String nickname;
-    private String phone;
+    private String newMemberName;
+    private String newNickname;
+    private String newPhone;
 
-    private MemberModifyDetailServiceRequest toService() {
+    public MemberModifyDetailServiceRequest toService() {
         return MemberModifyDetailServiceRequest.builder()
-                .memberName(memberName)
-                .nickname(nickname)
-                .phone(phone)
+                .memberName(newMemberName)
+                .nickname(newNickname)
+                .phone(newPhone)
                 .build();
     }
 }

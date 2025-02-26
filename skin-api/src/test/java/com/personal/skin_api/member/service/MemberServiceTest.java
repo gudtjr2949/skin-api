@@ -7,9 +7,9 @@ import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.member.repository.entity.email.Email;
 import com.personal.skin_api.member.repository.entity.password.Password;
 import com.personal.skin_api.member.service.dto.request.*;
-import com.personal.skin_api.member.service.dto.response.MemberDetailServiceResponse;
-import com.personal.skin_api.member.service.dto.response.MemberFindEmailServiceResponse;
-import com.personal.skin_api.member.service.dto.response.MemberLoginServiceResponse;
+import com.personal.skin_api.member.service.dto.response.MemberDetailResponse;
+import com.personal.skin_api.member.service.dto.response.MemberFindEmailResponse;
+import com.personal.skin_api.member.service.dto.response.MemberLoginResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,7 +127,7 @@ class MemberServiceTest {
         MemberLoginServiceRequest loginRequest = createLoginMember(signUpRequest.getEmail(), signUpRequest.getPassword());
 
         // when
-        MemberLoginServiceResponse loginMember = memberService.login(loginRequest);
+        MemberLoginResponse loginMember = memberService.login(loginRequest);
 
         // then
         assertThat(loginMember.getMemberName()).isEqualTo(signUpRequest.getMemberName());
@@ -165,7 +165,7 @@ class MemberServiceTest {
                 createFindEmailRequest(signUpRequest.getMemberName(), signUpRequest.getPhone());
 
         // when
-        MemberFindEmailServiceResponse findEmail = memberService.findEmail(findEmailRequest);
+        MemberFindEmailResponse findEmail = memberService.findEmail(findEmailRequest);
 
         // then
         assertThat(findEmail.getEmail()).isEqualTo(signUpRequest.getEmail());
@@ -245,7 +245,7 @@ class MemberServiceTest {
         memberService.signUp(signUpRequest);
 
         // when
-        MemberDetailServiceResponse memberDetail = memberService.findMemberDetail(MemberFindDetailServiceRequest.builder()
+        MemberDetailResponse memberDetail = memberService.findMemberDetail(MemberFindDetailServiceRequest.builder()
                 .email(signUpRequest.getEmail())
                 .build());
 

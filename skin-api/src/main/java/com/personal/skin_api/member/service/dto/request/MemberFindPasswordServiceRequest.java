@@ -6,11 +6,13 @@ import lombok.Getter;
 @Getter
 public class MemberFindPasswordServiceRequest {
     private final String email;
-    private final String phone;
+    private final String memberName;
+    private final String authNumber;
 
     @Builder
-    private MemberFindPasswordServiceRequest(final String email, final String phone) {
+    private MemberFindPasswordServiceRequest(final String email, final String memberName, final String authNumber) {
         this.email = email;
-        this.phone = phone;
+        this.memberName = memberName;
+        this.authNumber = authNumber;
     }
 }

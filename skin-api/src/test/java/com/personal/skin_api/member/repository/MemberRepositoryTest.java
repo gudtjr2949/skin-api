@@ -100,14 +100,13 @@ class MemberRepositoryTest {
     }
 
     @Test
-    void 이름과_전화번호를_사용해_회원정보를_조회한다() {
+    void 이메일과_이름을_사용해_회원정보를_조회한다() {
         // given
         Member member = createMember();
         memberRepository.save(member);
 
         // when
-        Optional<Member> findMember = memberRepository.findMemberByMemberNameAndPhone(new MemberName(member.getMemberName()),
-                new Phone(member.getPhone()));
+        Optional<Member> findMember = memberRepository.findMemberByEmailAndMemberName(new Email(member.getEmail()), new MemberName(member.getMemberName()));
 
         // then
         assertThat(findMember).isPresent();

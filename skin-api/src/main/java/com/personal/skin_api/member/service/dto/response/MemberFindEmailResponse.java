@@ -4,11 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class MemberFindEmailServiceResponse {
+public class MemberFindEmailResponse {
     private final String email;
 
     @Builder
-    private MemberFindEmailServiceResponse(final String email) {
+    private MemberFindEmailResponse(final String email) {
         this.email = email;
     }
 }

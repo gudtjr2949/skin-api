@@ -5,13 +5,13 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class MemberLoginServiceResponse {
+public class MemberLoginResponse {
     private final String email;
     private final String memberName;
     private final String nickname;
 
     @Builder
-    private MemberLoginServiceResponse(final Member member) {
+    private MemberLoginResponse(final Member member) {
         this.email = member.getEmail();
         this.memberName = member.getMemberName();
         this.nickname = member.getNickname();
