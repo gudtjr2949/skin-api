@@ -10,7 +10,7 @@ class NicknameStrategyContext {
             new NicknameFormatStrategy()
     );
 
-    void runStrategy(String nickname) {
+    static void runStrategy(String nickname) {
         nicknameValidationStrategies.stream().forEach(strategy -> strategy.validate(nickname));
     }
 }

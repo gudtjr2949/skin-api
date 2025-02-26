@@ -9,7 +9,6 @@ import java.util.List;
 @Embeddable
 @NoArgsConstructor
 public class Nickname {
-    private static final NicknameStrategyContext nicknameStrategyContext = new NicknameStrategyContext();
 
     @Column(name = "NICKNAME")
     private String nickname;
@@ -20,7 +19,7 @@ public class Nickname {
     }
 
     private void validate(final String nickname) {
-        nicknameStrategyContext.runStrategy(nickname);
+        NicknameStrategyContext.runStrategy(nickname);
     }
 
     public String getNickname() {
