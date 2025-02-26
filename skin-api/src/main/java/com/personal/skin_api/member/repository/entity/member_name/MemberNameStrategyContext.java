@@ -10,7 +10,7 @@ class MemberNameStrategyContext {
             new MemberNameFormatStrategy()
     );
 
-    void runStrategy(final String memberName) {
+    static void runStrategy(final String memberName) {
         memberNameValidationStrategies.stream().forEach(strategy -> strategy.validate(memberName));
     }
 }

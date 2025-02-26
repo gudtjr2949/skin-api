@@ -11,8 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 public class MemberName {
 
-    private static final MemberNameStrategyContext memberNameStrategyContext = new MemberNameStrategyContext();
-
     @Column(name = "NAME")
     private String memberName;
 
@@ -22,7 +20,7 @@ public class MemberName {
     }
 
     private void validateName(final String memberName) {
-        memberNameStrategyContext.runStrategy(memberName);
+        MemberNameStrategyContext.runStrategy(memberName);
     }
 
     public String getMemberName() {
