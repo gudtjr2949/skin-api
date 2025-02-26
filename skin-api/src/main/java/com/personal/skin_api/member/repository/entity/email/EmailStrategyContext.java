@@ -10,7 +10,7 @@ class EmailStrategyContext {
             new EmailFormatStrategy()
     );
 
-    void runStrategy(final String email) {
+    static void runStrategy(final String email) {
         emailValidationStrategies.stream().forEach(strategy -> strategy.validate(email));
     }
 }

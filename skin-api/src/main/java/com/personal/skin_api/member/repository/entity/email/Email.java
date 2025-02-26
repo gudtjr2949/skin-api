@@ -10,8 +10,6 @@ import java.util.List;
 @NoArgsConstructor
 public class Email {
 
-    private static final EmailStrategyContext emailStrategyContext = new EmailStrategyContext();
-
     @Column(name = "EMAIL")
     private String email;
 
@@ -21,7 +19,7 @@ public class Email {
     }
 
     private void validate(final String email) {
-        emailStrategyContext.runStrategy(email);
+        EmailStrategyContext.runStrategy(email);
     }
 
     public String getEmail() {
