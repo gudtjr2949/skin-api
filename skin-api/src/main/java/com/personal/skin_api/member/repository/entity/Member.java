@@ -7,6 +7,7 @@ import com.personal.skin_api.member.repository.entity.member_name.MemberName;
 import com.personal.skin_api.member.repository.entity.nickname.Nickname;
 import com.personal.skin_api.member.repository.entity.password.Password;
 import com.personal.skin_api.member.repository.entity.phone.Phone;
+import com.personal.skin_api.member.service.dto.request.MemberModifyDetailServiceRequest;
 import com.personal.skin_api.member.service.dto.request.MemberSignUpServiceRequest;
 import jakarta.persistence.*;
 
@@ -72,6 +73,12 @@ public class Member extends BaseEntity {
 
     public void modifyPassword(final String newPassword) {
         this.password = this.password.modifyPassword(newPassword);
+    }
+
+    public void modifyMemberInfo(final MemberModifyDetailServiceRequest request) {
+        this.memberName = new MemberName(request.getMemberName());
+        this.nickname = new Nickname(request.getNickname());
+        this.phone = new Phone(request.getPhone());
     }
 
     public void withdraw() {

@@ -4,11 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class MemberWithdrawServiceRequest {
+public class MemberFindDetailServiceRequest {
     private final String email;
 
     @Builder
-    private MemberWithdrawServiceRequest(final String email) {
+    private MemberFindDetailServiceRequest(final String email) {
         this.email = email;
     }
 }

@@ -14,7 +14,7 @@ interface MemberService {
     MemberFindEmailServiceResponse findEmail(MemberFindEmailServiceRequest request);
     void findPassword(MemberFindPasswordServiceRequest request);
     void modifyPassword(MemberModifyPasswordServiceRequest request);
-    MemberDetailServiceResponse findMemberDetail(MemberDetailServiceRequest request);
-    MemberModifyDetailServiceResponse modifyMemberDetail(MemberModifyDetailServiceRequest request);
+    MemberDetailServiceResponse findMemberDetail(MemberFindDetailServiceRequest request);
+    void modifyMemberDetail(MemberModifyDetailServiceRequest request);
     void withdraw(MemberWithdrawServiceRequest request);
 }

@@ -3,9 +3,11 @@ package com.personal.skin_api.member.service;
 import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
+import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.member.repository.entity.email.Email;
 import com.personal.skin_api.member.repository.entity.password.Password;
 import com.personal.skin_api.member.service.dto.request.*;
+import com.personal.skin_api.member.service.dto.response.MemberDetailServiceResponse;
 import com.personal.skin_api.member.service.dto.response.MemberFindEmailServiceResponse;
 import com.personal.skin_api.member.service.dto.response.MemberLoginServiceResponse;
 import org.junit.jupiter.api.AfterEach;
@@ -226,37 +228,139 @@ class MemberServiceTest {
     @Test
     void 마이페이지_조회_시_입력된_이메일이_없는_정보인_경우_예외가_발생한다() {
         // given
-        
-        // when
-        
-        // then
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+        String wrongEmail = "zxc123@naver.com";
+
+        // when & then
+        assertThatThrownBy(() -> memberService.findMemberDetail(MemberFindDetailServiceRequest.builder()
+                .email(wrongEmail)
+                .build())).isInstanceOf(RestApiException.class);
     }
     
     @Test
     void 마이페이지에_사용할_회원정보를_이메일을_통해_조회한다() {
         // given
-        
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+
         // when
-        
+        MemberDetailServiceResponse memberDetail = memberService.findMemberDetail(MemberFindDetailServiceRequest.builder()
+                .email(signUpRequest.getEmail())
+                .build());
+
         // then
+        assertThat(memberDetail.getEmail()).isEqualTo(signUpRequest.getEmail());
+        assertThat(memberDetail.getMemberName()).isEqualTo(signUpRequest.getMemberName());
+        assertThat(memberDetail.getNickname()).isEqualTo(signUpRequest.getNickname());
+        assertThat(memberDetail.getPhone()).isEqualTo(signUpRequest.getPhone());
     }
     
     @Test
-    void 회원정보를_수정한다() {
+    void 수정_가능한_모든_회원정보를_수정한다() {
         // given
-        
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+        String newMemberName = "김영희";
+        String newNickname = "홍길동전";
+        String newPhone = "01098765432";
+
         // when
-        
+        MemberModifyDetailServiceRequest modifyRequest = createModifyDetailRequest(signUpRequest.getEmail(), newMemberName, newNickname, newPhone);
+        memberService.modifyMemberDetail(modifyRequest);
+
+        Optional<Member> findMember = memberRepository.findMemberByEmail(new Email(signUpRequest.getEmail()));
+
         // then
+        assertThat(findMember).isPresent();
+        assertThat(findMember.get().getMemberName()).isEqualTo(newMemberName);
+        assertThat(findMember.get().getNickname()).isEqualTo(newNickname);
+        assertThat(findMember.get().getPhone()).isEqualTo(newPhone);
     }
+
+    @Test
+    void 회원이름만_수정한다() {
+        // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+        String newMemberName = "김영희";
+
+        // when
+        MemberModifyDetailServiceRequest modifyRequest = createModifyDetailRequest(signUpRequest.getEmail(), newMemberName, signUpRequest.getNickname(), signUpRequest.getPhone());
+        memberService.modifyMemberDetail(modifyRequest);
+        Optional<Member> findMember = memberRepository.findMemberByEmail(new Email(signUpRequest.getEmail()));
+
+        // then
+        assertThat(findMember).isPresent();
+        assertThat(findMember.get().getMemberName()).isEqualTo(newMemberName);
+        assertThat(findMember.get().getNickname()).isEqualTo(signUpRequest.getNickname());
+        assertThat(findMember.get().getPhone()).isEqualTo(signUpRequest.getPhone());
+    }
+
+    @Test
+    void 닉네임만_수정한다() {
+        // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+        String newNickname = "홍길동전";
+
+        // when
+        MemberModifyDetailServiceRequest modifyRequest = createModifyDetailRequest(signUpRequest.getEmail(), signUpRequest.getMemberName(), newNickname, signUpRequest.getPhone());
+        memberService.modifyMemberDetail(modifyRequest);
+        Optional<Member> findMember = memberRepository.findMemberByEmail(new Email(signUpRequest.getEmail()));
+
+        // then
+        assertThat(findMember).isPresent();
+        assertThat(findMember.get().getMemberName()).isEqualTo(signUpRequest.getMemberName());
+        assertThat(findMember.get().getNickname()).isEqualTo(newNickname);
+        assertThat(findMember.get().getPhone()).isEqualTo(signUpRequest.getPhone());
+    }
+
+    @Test
+    void 전화번호만_수정한다() {
+        // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+        String newPhone = "01098765432";
+
+        // when
+        MemberModifyDetailServiceRequest modifyRequest = createModifyDetailRequest(signUpRequest.getEmail(), signUpRequest.getMemberName(), signUpRequest.getNickname(), newPhone);
+        memberService.modifyMemberDetail(modifyRequest);
+        Optional<Member> findMember = memberRepository.findMemberByEmail(new Email(signUpRequest.getEmail()));
+
+        // then
+        assertThat(findMember).isPresent();
+        assertThat(findMember.get().getMemberName()).isEqualTo(signUpRequest.getMemberName());
+        assertThat(findMember.get().getNickname()).isEqualTo(signUpRequest.getNickname());
+        assertThat(findMember.get().getPhone()).isEqualTo(newPhone);
+    }
+
 
     @Test
     void 회원_탈퇴한다() {
         // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+        MemberWithdrawServiceRequest withdrawRequest = MemberWithdrawServiceRequest.builder()
+                .email(signUpRequest.getEmail())
+                .build();
 
         // when
+        memberService.withdraw(withdrawRequest);
+        Optional<Member> findMember = memberRepository.findMemberByEmail(new Email(signUpRequest.getEmail()));
 
         // then
+        assertThat(findMember).isPresent();
+        assertThat(findMember.get().getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
+    }
+
+    private static MemberModifyDetailServiceRequest createModifyDetailRequest(String email, String memberName, String nickname, String phone) {
+        return MemberModifyDetailServiceRequest.builder()
+                .email(email)
+                .memberName(memberName)
+                .nickname(nickname)
+                .phone(phone)
+                .build();
     }
 
     private static MemberFindPasswordServiceRequest createFindPasswordRequest(String email, String phone) {

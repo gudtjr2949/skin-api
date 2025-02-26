@@ -1,7 +1,7 @@
 package com.personal.skin_api.member.service;
 
 import com.personal.skin_api.common.exception.RestApiException;
-import com.personal.skin_api.common.exception.member.MemberErrorCode;
+
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.*;
 import com.personal.skin_api.member.repository.entity.email.Email;
@@ -15,6 +15,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import static com.personal.skin_api.common.exception.member.MemberErrorCode.*;
+
 @Service
 @RequiredArgsConstructor
 class MemberServiceImpl implements MemberService {
@@ -27,7 +29,7 @@ class MemberServiceImpl implements MemberService {
      */
     @Override
     public void checkEmailDuplicated(String email) {
-        if (memberRepository.findMemberByEmail(new Email(email)).isPresent()) throw new RestApiException(MemberErrorCode.DUPLICATE_MEMBER);
+        if (memberRepository.findMemberByEmail(new Email(email)).isPresent()) throw new RestApiException(DUPLICATE_MEMBER);
     }
 
     /**
@@ -36,7 +38,7 @@ class MemberServiceImpl implements MemberService {
      */
     @Override
     public void checkNicknameDuplicated(String nickname) {
-        if (memberRepository.findMemberByNickname(new Nickname(nickname)).isPresent()) throw new RestApiException(MemberErrorCode.DUPLICATE_MEMBER);
+        if (memberRepository.findMemberByNickname(new Nickname(nickname)).isPresent()) throw new RestApiException(DUPLICATE_MEMBER);
     }
 
     /**
@@ -45,7 +47,7 @@ class MemberServiceImpl implements MemberService {
      */
     @Override
     public void checkPhoneDuplicated(String phone) {
-        if (memberRepository.findMemberByPhone(new Phone(phone)).isPresent()) throw new RestApiException(MemberErrorCode.DUPLICATE_MEMBER);
+        if (memberRepository.findMemberByPhone(new Phone(phone)).isPresent()) throw new RestApiException(DUPLICATE_MEMBER);
     }
 
     /**
@@ -77,7 +79,7 @@ class MemberServiceImpl implements MemberService {
     @Override
     public MemberLoginServiceResponse login(MemberLoginServiceRequest request) {
         Member loginMember = memberRepository.findMemberByEmailAndPassword(new Email(request.getEmail()), new Password(request.getPassword()))
-                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
         return MemberLoginServiceResponse.builder()
                 .member(loginMember)
@@ -92,7 +94,7 @@ class MemberServiceImpl implements MemberService {
     @Override
     public MemberFindEmailServiceResponse findEmail(MemberFindEmailServiceRequest request) {
         Member findmember = memberRepository.findMemberByMemberNameAndPhone(new MemberName(request.getMemberName()),
-                new Phone(request.getPhone())).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+                new Phone(request.getPhone())).orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
         return MemberFindEmailServiceResponse.builder()
                 .email(findmember.getEmail())
@@ -106,7 +108,7 @@ class MemberServiceImpl implements MemberService {
     @Override
     public void findPassword(MemberFindPasswordServiceRequest request) {
         memberRepository.findMemberByEmailAndPhone(new Email(request.getEmail()), new Phone(request.getPhone()))
-                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
     }
 
     /**
@@ -117,23 +119,48 @@ class MemberServiceImpl implements MemberService {
     @Transactional
     public void modifyPassword(MemberModifyPasswordServiceRequest request) {
         Member findMember = memberRepository.findMemberByEmail(new Email(request.getEmail()))
-                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
         findMember.modifyPassword(request.getNewPassword());
     }
 
+    /**
+     * 회원정보를 상세조회한다.
+     * @param request 회원정보 조회에 필요한 이메일
+     * @return 회원 상세 정보
+     */
     @Override
-    public MemberDetailServiceResponse findMemberDetail(MemberDetailServiceRequest request) {
-        return null;
+    public MemberDetailServiceResponse findMemberDetail(MemberFindDetailServiceRequest request) {
+        Member findMember = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+
+        return MemberDetailServiceResponse.builder()
+                .member(findMember)
+                .build();
     }
 
+    /**
+     * 회원정보를 수정한다.
+     * @param request 회원정보 수정에 필요한 수정정보
+     */
     @Override
-    public MemberModifyDetailServiceResponse modifyMemberDetail(MemberModifyDetailServiceRequest request) {
-        return null;
+    @Transactional
+    public void modifyMemberDetail(MemberModifyDetailServiceRequest request) {
+        Member findMember = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+        findMember.modifyMemberInfo(request);
     }
 
+    /**
+     * 회원탈퇴를 진행한다.
+     * @param request 회원탈퇴에 필요한 정보
+     */
     @Override
+    @Transactional
     public void withdraw(MemberWithdrawServiceRequest request) {
+        Member findMember = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
+        findMember.withdraw();
     }
 }
