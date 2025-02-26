@@ -9,12 +9,7 @@ import java.util.List;
 @Embeddable
 @NoArgsConstructor
 public class Nickname {
-    private static final List<NicknameValidationStrategy> nicknameValidationStrategies = List.of(
-            new NicknameNullStrategy(),
-            new NicknameBlankStrategy(),
-            new NicknameLengthStrategy(),
-            new NicknameFormatStrategy()
-    );
+    private static final NicknameStrategyContext nicknameStrategyContext = new NicknameStrategyContext();
 
     @Column(name = "NICKNAME")
     private String nickname;
@@ -24,8 +19,8 @@ public class Nickname {
         this.nickname = nickname;
     }
 
-    private void validate(String nickname) {
-        nicknameValidationStrategies.stream().forEach(strategy -> strategy.validate(nickname));
+    private void validate(final String nickname) {
+        nicknameStrategyContext.runStrategy(nickname);
     }
 
     public String getNickname() {
