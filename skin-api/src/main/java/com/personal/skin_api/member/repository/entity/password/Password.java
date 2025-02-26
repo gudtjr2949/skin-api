@@ -10,12 +10,6 @@ import java.util.List;
 @Embeddable
 @NoArgsConstructor
 public class Password {
-    private static final List<PasswordValidationStrategy> passwordValidationStrategies = List.of(
-            new PasswordNullStrategy(),
-            new PasswordBlankStrategy(),
-            new PasswordLengthStrategy(),
-            new PasswordFormatStrategy()
-    );
 
     private static final List<ModifyPasswordValidationStrategy> modifyPasswordValidationStrategies = List.of(
             new ModifyPasswordReuseStrategy()
@@ -29,8 +23,8 @@ public class Password {
         this.password = password;
     }
 
-    private void validate(String password) {
-        passwordValidationStrategies.stream().forEach(strategy -> strategy.validate(password));
+    private void validate(final String password) {
+         PasswordStrategyContext.runStrategy(password);
     }
 
     public String getPassword() {
