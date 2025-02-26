@@ -11,10 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 public class Password {
 
-    private static final List<ModifyPasswordValidationStrategy> modifyPasswordValidationStrategies = List.of(
-            new ModifyPasswordReuseStrategy()
-    );
-
     @Column(name = "PASSWORD")
     private String password;
 
@@ -36,7 +32,7 @@ public class Password {
         return new Password(newPassword);
     }
 
-    private void validateNewPassword(String newPassword) {
-        modifyPasswordValidationStrategies.stream().forEach(strategy -> strategy.validate(this.password, newPassword));
+    private void validateNewPassword(final String newPassword) {
+        ModifyPasswordStrategyContext.runStrategy(this.password, newPassword);
     }
 }
