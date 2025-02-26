@@ -10,12 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Email {
 
-    private static final List<EmailValidationStrategy> emailValidationStrategies = List.of(
-            new EmailNullStrategy(),
-            new EmailBlankStrategy(),
-            new EmailLengthStrategy(),
-            new EmailFormatStrategy()
-    );
+    private static EmailStrategyContext emailStrategyContext = new EmailStrategyContext();
 
     @Column(name = "EMAIL")
     private String email;
@@ -26,7 +21,7 @@ public class Email {
     }
 
     private void validate(final String email) {
-        emailValidationStrategies.stream().forEach(strategy -> strategy.validate(email));
+        emailStrategyContext.runStrategy(email);
     }
 
     public String getEmail() {
