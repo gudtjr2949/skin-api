@@ -5,7 +5,9 @@ import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.email.Email;
 import com.personal.skin_api.member.repository.entity.password.Password;
-import com.personal.skin_api.member.service.dto.request.MemberSignUpServiceRequest;
+import com.personal.skin_api.member.service.dto.request.*;
+import com.personal.skin_api.member.service.dto.response.MemberFindEmailServiceResponse;
+import com.personal.skin_api.member.service.dto.response.MemberLoginServiceResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,8 +101,183 @@ class MemberServiceTest {
     @Test
     void 로그인_시도_시_입력한_이메일_비밀번호와_일치하는_회원정보가_없는_경우_예외가_발생한다() {
         // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+
+        String wrongEmail = "zxc456@naver.com";
+        MemberLoginServiceRequest wrongEmailRequest = createLoginMember(wrongEmail, signUpRequest.getPassword());
+
+        String wrongPassword = "zxc4567!";
+        MemberLoginServiceRequest wrongPasswordRequest = createLoginMember(signUpRequest.getEmail(), wrongPassword);
+
+        List<MemberLoginServiceRequest> loginRequests = List.of(wrongEmailRequest, wrongPasswordRequest);
 
         // when & then
+        loginRequests.stream().forEach(request -> assertThatThrownBy(() -> memberService.login(request))
+                .isInstanceOf(RestApiException.class));
+    }
+
+    @Test
+    void 입력한_이메일과_비밀번호가_존재한다면_회원정보를_반환한다() {
+        // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+        MemberLoginServiceRequest loginRequest = createLoginMember(signUpRequest.getEmail(), signUpRequest.getPassword());
+
+        // when
+        MemberLoginServiceResponse loginMember = memberService.login(loginRequest);
+
+        // then
+        assertThat(loginMember.getMemberName()).isEqualTo(signUpRequest.getMemberName());
+        assertThat(loginMember.getNickname()).isEqualTo(signUpRequest.getNickname());
+    }
+    
+    @Test
+    void 이메일을_찾기_위해_입력한_이름과_전화번호가_회원정보에_없는_경우_예외가_발생한다() {
+        // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+
+        String wrongMemberName = "김영희";
+        MemberFindEmailServiceRequest findEmailWithWrongMemberNameRequest = createFindEmailRequest(wrongMemberName, signUpRequest.getPhone());
+
+        String wrongPhone = "01098765432";
+        MemberFindEmailServiceRequest findEmailWithWrongPhoneRequest = createFindEmailRequest(signUpRequest.getMemberName(), wrongPhone);
+
+        List<MemberFindEmailServiceRequest> findEmailRequests
+                = List.of(findEmailWithWrongMemberNameRequest, findEmailWithWrongPhoneRequest);
+
+        // when & then
+        findEmailRequests.stream().forEach(request ->
+                assertThatThrownBy(() -> memberService.findEmail(request))
+                        .isInstanceOf(RestApiException.class));
+    }
+    
+    @Test
+    void 이메일을_찾기_위해_입력한_이름과_전화번호가_존재하다면_이메일을_반환한다() {
+        // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+
+        MemberFindEmailServiceRequest findEmailRequest =
+                createFindEmailRequest(signUpRequest.getMemberName(), signUpRequest.getPhone());
+
+        // when
+        MemberFindEmailServiceResponse findEmail = memberService.findEmail(findEmailRequest);
+
+        // then
+        assertThat(findEmail.getEmail()).isEqualTo(signUpRequest.getEmail());
+    }
+    
+    @Test
+    void 비밀번호를_찾기_위해_입력한_이메일과_전화번호가_회원정보에_없는_경우_예외가_발생한다() {
+        // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+
+        String wrongEmail = "zxc456@naver.com";
+        MemberFindPasswordServiceRequest findPasswordWithWrongEmailRequest = createFindPasswordRequest(wrongEmail, signUpRequest.getPhone());
+
+        String wrongPhone = "01098765432";
+        MemberFindPasswordServiceRequest findPasswordWithWrongPhoneRequest = createFindPasswordRequest(signUpRequest.getEmail(), wrongPhone);
+
+        List<MemberFindPasswordServiceRequest> findPasswordRequests
+                = List.of(findPasswordWithWrongEmailRequest, findPasswordWithWrongPhoneRequest);
+
+        // when & then
+        findPasswordRequests.stream().forEach(request ->
+                assertThatThrownBy(() -> memberService.findPassword(request))
+                .isInstanceOf(RestApiException.class));
+    }
+
+    @Test
+    void 비밀번호를_재설정하기_위해_입력한_이메일과_전화번호가_존재하다면_정상처리한다() {
+        // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+        MemberFindPasswordServiceRequest findPasswordRequest = createFindPasswordRequest(signUpRequest.getEmail(), signUpRequest.getPhone());
+
+        // when & then
+        assertThatNoException().isThrownBy(() -> memberService.findPassword(findPasswordRequest));
+    }
+    
+    @Test
+    void 비밀번호를_재설정한다() {
+        // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+        String newPassword = "zxc1234!";
+
+        MemberModifyPasswordServiceRequest modifyPasswordRequest = MemberModifyPasswordServiceRequest.builder()
+                .email(signUpRequest.getEmail())
+                .newPassword(newPassword)
+                .build();
+
+        // when
+        memberService.modifyPassword(modifyPasswordRequest);
+        Optional<Member> findMember = memberRepository.findMemberByEmail(new Email(signUpRequest.getEmail()));
+
+        // then
+        assertThat(findMember).isPresent();
+        assertThat(findMember.get().getPassword()).isEqualTo(newPassword);
+    }
+    
+    
+    @Test
+    void 마이페이지_조회_시_입력된_이메일이_없는_정보인_경우_예외가_발생한다() {
+        // given
+        
+        // when
+        
+        // then
+    }
+    
+    @Test
+    void 마이페이지에_사용할_회원정보를_이메일을_통해_조회한다() {
+        // given
+        
+        // when
+        
+        // then
+    }
+    
+    @Test
+    void 회원정보를_수정한다() {
+        // given
+        
+        // when
+        
+        // then
+    }
+
+    @Test
+    void 회원_탈퇴한다() {
+        // given
+
+        // when
+
+        // then
+    }
+
+    private static MemberFindPasswordServiceRequest createFindPasswordRequest(String email, String phone) {
+        return MemberFindPasswordServiceRequest.builder()
+                .email(email)
+                .phone(phone)
+                .build();
+    }
+
+    private static MemberFindEmailServiceRequest createFindEmailRequest(String memberName, String phone) {
+        return MemberFindEmailServiceRequest.builder()
+                .memberName(memberName)
+                .phone(phone)
+                .build();
+    }
+
+    private static MemberLoginServiceRequest createLoginMember(String email, String password) {
+        return MemberLoginServiceRequest.builder()
+                .email(email)
+                .password(password)
+                .build();
     }
 
     private static MemberSignUpServiceRequest createSignUpNeedParameterRequest(String email, String password, String memberName, String nickname, String phone) {

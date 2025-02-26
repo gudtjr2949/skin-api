@@ -1,9 +1,8 @@
 package com.personal.skin_api.member.repository.entity.phone;
 
 import com.personal.skin_api.common.exception.RestApiException;
-import com.personal.skin_api.member.repository.entity.nickname.Nickname;
+
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.parameters.P;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

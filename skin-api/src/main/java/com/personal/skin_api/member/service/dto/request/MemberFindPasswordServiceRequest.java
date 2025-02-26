@@ -4,13 +4,13 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class MemberLoginServiceRequest {
+public class MemberFindPasswordServiceRequest {
     private final String email;
-    private final String password;
+    private final String phone;
 
     @Builder
-    private MemberLoginServiceRequest(final String email, final String password) {
+    private MemberFindPasswordServiceRequest(final String email, final String phone) {
         this.email = email;
-        this.password = password;
+        this.phone = phone;
     }
 }

@@ -1,8 +1,7 @@
 package com.personal.skin_api.member.service;
 
-import com.personal.skin_api.member.service.dto.request.MemberLoginServiceRequest;
-import com.personal.skin_api.member.service.dto.request.MemberSignUpServiceRequest;
-import com.personal.skin_api.member.service.dto.response.MemberLoginServiceResponse;
+import com.personal.skin_api.member.service.dto.request.*;
+import com.personal.skin_api.member.service.dto.response.*;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,4 +11,10 @@ interface MemberService {
     void checkPhoneDuplicated(String phone);
     void signUp(MemberSignUpServiceRequest request);
     MemberLoginServiceResponse login(MemberLoginServiceRequest request);
+    MemberFindEmailServiceResponse findEmail(MemberFindEmailServiceRequest request);
+    void findPassword(MemberFindPasswordServiceRequest request);
+    void modifyPassword(MemberModifyPasswordServiceRequest request);
+    MemberDetailServiceResponse findMemberDetail(MemberDetailServiceRequest request);
+    MemberModifyDetailServiceResponse modifyMemberDetail(MemberModifyDetailServiceRequest request);
+    void withdraw(MemberWithdrawServiceRequest request);
 }
