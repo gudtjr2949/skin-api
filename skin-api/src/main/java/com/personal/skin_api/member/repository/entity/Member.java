@@ -76,9 +76,9 @@ public class Member extends BaseEntity {
     }
 
     public void modifyMemberInfo(final MemberModifyDetailServiceRequest request) {
-        this.memberName = new MemberName(request.getMemberName());
-        this.nickname = new Nickname(request.getNickname());
-        this.phone = new Phone(request.getPhone());
+        this.memberName = new MemberName(request.getNewMemberName());
+        this.nickname = new Nickname(request.getNewNickname());
+        this.phone = new Phone(request.getNewPhone());
     }
 
     public void withdraw() {

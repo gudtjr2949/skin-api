@@ -95,7 +95,7 @@ class MemberServiceImpl implements MemberService {
      */
     @Override
     public MemberFindEmailResponse findEmail(MemberFindEmailServiceRequest request) {
-        Member findmember = memberRepository.findMemberByEmailAndMemberName(new Email(request.getMemberName()), new MemberName(request.getMemberName()))
+        Member findmember = memberRepository.findMemberByMemberNameAndPhone(new MemberName(request.getMemberName()), new Phone(request.getPhone()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
         return MemberFindEmailResponse.builder()

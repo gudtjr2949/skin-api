@@ -1,6 +1,5 @@
 package com.personal.skin_api.member.service.dto.request;
 
-import com.personal.skin_api.member.controller.request.MemberModifyDetailRequest;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,15 +8,15 @@ import lombok.Getter;
 public class MemberModifyDetailServiceRequest {
 
     private final String email;
-    private final String memberName;
-    private final String nickname;
-    private final String phone;
+    private final String newMemberName;
+    private final String newNickname;
+    private final String newPhone;
 
     @Builder
-    private MemberModifyDetailServiceRequest(final String email, final String memberName, String nickname, String phone) {
+    private MemberModifyDetailServiceRequest(final String email, final String newMemberName, String newNickname, String newPhone) {
         this.email = email;
-        this.memberName = memberName;
-        this.nickname = nickname;
-        this.phone = phone;
+        this.newMemberName = newMemberName;
+        this.newNickname = newNickname;
+        this.newPhone = newPhone;
     }
 }

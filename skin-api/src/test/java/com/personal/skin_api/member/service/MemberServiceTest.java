@@ -197,7 +197,7 @@ class MemberServiceTest {
         // given
         MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
         memberService.signUp(signUpRequest);
-        MemberFindPasswordServiceRequest findPasswordRequest = createFindPasswordRequest(signUpRequest.getEmail(), signUpRequest.getPhone());
+        MemberFindPasswordServiceRequest findPasswordRequest = createFindPasswordRequest(signUpRequest.getEmail(), signUpRequest.getMemberName());
 
         // when & then
         assertThatNoException().isThrownBy(() -> memberService.findPassword(findPasswordRequest));
@@ -357,16 +357,16 @@ class MemberServiceTest {
     private static MemberModifyDetailServiceRequest createModifyDetailRequest(String email, String memberName, String nickname, String phone) {
         return MemberModifyDetailServiceRequest.builder()
                 .email(email)
-                .memberName(memberName)
-                .nickname(nickname)
-                .phone(phone)
+                .newMemberName(memberName)
+                .newNickname(nickname)
+                .newPhone(phone)
                 .build();
     }
 
-    private static MemberFindPasswordServiceRequest createFindPasswordRequest(String email, String phone) {
+    private static MemberFindPasswordServiceRequest createFindPasswordRequest(String email, String memberName) {
         return MemberFindPasswordServiceRequest.builder()
                 .email(email)
-                .phone(phone)
+                .memberName(memberName)
                 .build();
     }
 

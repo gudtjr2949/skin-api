@@ -38,14 +38,14 @@ public class MemberController {
         return ResponseEntity.ok().body(null);
     }
 
-    @PostMapping("modify-password")
+    @PostMapping("/modify-password")
     public ResponseEntity<Object> modifyPassword(@RequestBody MemberModifyPasswordRequest request) {
         memberService.modifyPassword(request.toService());
         return ResponseEntity.ok().body(null);
     }
     
     // TODO : Security Context 적용 후 구현
-    @GetMapping("")
+    @GetMapping("/detail")
     public ResponseEntity<Object> findMemberDetail() {
 
         return ResponseEntity.ok().body(null);
@@ -59,7 +59,7 @@ public class MemberController {
     }
 
     // TODO : Security Context 적용 후 구현
-    @GetMapping("")
+    @GetMapping("/withdraw")
     public ResponseEntity<Object> withdraw() {
 
         return ResponseEntity.ok().body(null);

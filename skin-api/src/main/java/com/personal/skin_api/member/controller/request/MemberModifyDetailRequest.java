@@ -13,9 +13,9 @@ public class MemberModifyDetailRequest {
 
     public MemberModifyDetailServiceRequest toService() {
         return MemberModifyDetailServiceRequest.builder()
-                .memberName(newMemberName)
-                .nickname(newNickname)
-                .phone(newPhone)
+                .newMemberName(newMemberName)
+                .newNickname(newNickname)
+                .newPhone(newPhone)
                 .build();
     }
 }

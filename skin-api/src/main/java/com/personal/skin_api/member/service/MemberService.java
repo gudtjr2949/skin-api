@@ -2,9 +2,7 @@ package com.personal.skin_api.member.service;
 
 import com.personal.skin_api.member.service.dto.request.*;
 import com.personal.skin_api.member.service.dto.response.*;
-import org.springframework.stereotype.Service;
 
-@Service
 public interface MemberService {
     void checkEmailDuplicated(String email);
     void checkNicknameDuplicated(String nickname);
