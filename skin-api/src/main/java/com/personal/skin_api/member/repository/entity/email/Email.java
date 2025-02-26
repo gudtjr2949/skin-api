@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Email {
 
-    private static EmailStrategyContext emailStrategyContext = new EmailStrategyContext();
+    private static final EmailStrategyContext emailStrategyContext = new EmailStrategyContext();
 
     @Column(name = "EMAIL")
     private String email;

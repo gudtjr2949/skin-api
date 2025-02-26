@@ -11,12 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class MemberName {
 
-    private static final List<MemberNameValidationStrategy> memberNameValidationStrategies = List.of(
-            new MemberNameNullStrategy(),
-            new MemberNameBlankStrategy(),
-            new MemberNameLengthStrategy(),
-            new MemberNameFormatStrategy()
-    );
+    private static final MemberNameStrategyContext memberNameStrategyContext = new MemberNameStrategyContext();
 
     @Column(name = "NAME")
     private String memberName;
@@ -27,7 +22,7 @@ public class MemberName {
     }
 
     private void validateName(final String memberName) {
-        memberNameValidationStrategies.stream().forEach(strategy -> strategy.validate(memberName));
+        memberNameStrategyContext.runStrategy(memberName);
     }
 
     public String getMemberName() {
