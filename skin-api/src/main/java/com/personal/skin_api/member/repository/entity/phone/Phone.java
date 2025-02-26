@@ -9,12 +9,6 @@ import java.util.List;
 @Embeddable
 @NoArgsConstructor
 public class Phone {
-    private static final List<PhoneValidationStrategy> phoneValidationStrategies = List.of(
-            new PhoneNullStrategy(),
-            new PhoneBlankStrategy(),
-            new PhoneLengthStrategy(),
-            new PhoneFormatStrategy()
-    );
 
     @Column(name = "PHONE")
     private String phone;
@@ -25,7 +19,7 @@ public class Phone {
     }
 
     private void validate(final String phone) {
-        phoneValidationStrategies.stream().forEach(strategy -> strategy.validate(phone));
+        PhoneStrategyContext.runStrategy(phone);
     }
 
     public String getPhone() {
