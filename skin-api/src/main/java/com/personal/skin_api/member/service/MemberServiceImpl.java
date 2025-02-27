@@ -62,6 +62,16 @@ class MemberServiceImpl implements MemberService {
     }
 
     /**
+     * 입력된 정보가 회원정보에 존재하는 이메일인지 확인한다.
+     * @param request 존재 여부를 확인할 정보
+     */
+    @Override
+    public void checkEmailForCertification(MemberCertificationForFindPasswordServiceRequest request) {
+        Member findMember = memberRepository.findMemberByEmailAndMemberName(new Email(request.getEmail()), new MemberName(request.getMemberName()))
+                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+    }
+
+    /**
      * 회원가입 최종 확인을 위해, 이메일, 닉네임, 전화번호 중복확인을 진행한다.
      * @param request 중복 확인에 필요한 이메일, 닉네임, 전화번호
      */
