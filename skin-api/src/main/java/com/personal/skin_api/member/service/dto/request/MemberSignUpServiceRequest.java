@@ -1,7 +1,11 @@
 package com.personal.skin_api.member.service.dto.request;
 
+import com.personal.skin_api.member.repository.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
+
+import static com.personal.skin_api.member.repository.entity.MemberRole.GENERAL;
+import static com.personal.skin_api.member.repository.entity.MemberStatus.ACTIVE;
 
 @Getter
 public class MemberSignUpServiceRequest {
@@ -18,5 +22,17 @@ public class MemberSignUpServiceRequest {
         this.memberName = memberName;
         this.nickname = nickname;
         this.phone = phone;
+    }
+
+    public Member toEntity() {
+        return Member.builder()
+                .email(email)
+                .password(password)
+                .memberName(memberName)
+                .nickname(nickname)
+                .phone(phone)
+                .status(ACTIVE)
+                .role(GENERAL)
+                .build();
     }
 }

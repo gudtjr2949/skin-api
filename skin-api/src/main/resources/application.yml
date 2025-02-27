@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/test
+    url: jdbc:mysql://localhost:3306/testDB
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: sa
+    username: root
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect	# 이 부분 주의!
     properties:

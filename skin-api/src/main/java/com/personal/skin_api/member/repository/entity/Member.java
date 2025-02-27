@@ -48,18 +48,6 @@ public class Member extends BaseEntity {
     @Column(nullable = false, name = "ROLE")
     private MemberRole role;
 
-    public static Member signUpGeneralMember(final MemberSignUpServiceRequest request) {
-        return Member.builder()
-                .email(request.getEmail())
-                .password(request.getPassword())
-                .memberName(request.getMemberName())
-                .nickname(request.getNickname())
-                .phone(request.getPhone())
-                .status(ACTIVE)
-                .role(GENERAL)
-                .build();
-    }
-
     @Builder
     private Member(final String email, final String password, final String memberName, final String nickname, final String phone, final MemberStatus status, final MemberRole role) {
         this.email = new Email(email);

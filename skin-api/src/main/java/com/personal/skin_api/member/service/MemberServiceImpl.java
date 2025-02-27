@@ -51,13 +51,13 @@ class MemberServiceImpl implements MemberService {
     }
 
     /**
-     * 회원가입을 진행한다.
-     * @param request 회원가입에 필요한 정보
+     * 일반 사용자 회원가입을 진행한다.
+     * @param request 일반 사용자 회원가입에 필요한 정보
      */
     @Override
     public void signUp(final MemberSignUpServiceRequest request) {
         checkDuplicatedMemberInfo(request);
-        Member signUpMember = Member.signUpGeneralMember(request);
+        Member signUpMember = request.toEntity();
         memberRepository.save(signUpMember);
     }
 
