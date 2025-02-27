@@ -29,6 +29,9 @@ spring:
     path: chromedriver
 
 naver:
-  email: ${NAVER_EMAIL}
-  password: ${NAVER_PASSWORD}
   name: ${NAVER_NAME}
+  password: ${NAVER_PASSWORD}
+
+sample:
+  email: ${SAMPLE_EMAIL}
+  member-name: ${SAMPLE_MEMBER_NAME}

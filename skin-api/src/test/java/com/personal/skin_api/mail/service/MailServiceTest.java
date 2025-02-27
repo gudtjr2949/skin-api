@@ -24,23 +24,21 @@ class MailServiceTest {
     @Autowired
     private MemberService memberService;
 
-    @Value("${naver.email}")
+    @Value("${sample.email}")
     private String email;
 
-    @Value("${naver.name}")
+    @Value("${sample.member-name}")
     private String memberName;
+
 
     @Test
     void 비밀번호를_찾기_위해_입력된_이메일에_메일을_전송한다() {
         // given
         memberService.signUp(createSignUpNoParameterRequest());
 
-        String email = "gudtjr2949@naver.com";
-        String memberName = this.memberName;
-
         MailCertificationServiceRequest sendMailRequest = MailCertificationServiceRequest.builder()
-                .memberName(memberName)
                 .email(email)
+                .memberName(memberName)
                 .build();
 
         // when & then
@@ -49,7 +47,7 @@ class MailServiceTest {
 
     private MemberSignUpServiceRequest createSignUpNoParameterRequest() {
         return MemberSignUpServiceRequest.builder()
-                .email("gudtjr2949@naver.com")
+                .email(email)
                 .password("asd1234!")
                 .memberName(memberName)
                 .nickname("길동짱짱")

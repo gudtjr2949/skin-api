@@ -9,7 +9,7 @@ import jakarta.mail.Message;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -22,9 +22,6 @@ public class MailServiceImpl implements MailService {
 
     private final JavaMailSender javaMailSender;
     private final MemberService memberService;
-
-    @Value("${naver.email}")
-    private String email;
 
     @Override
     public long sendCertificationMailForFindPassword(MailCertificationServiceRequest request) {

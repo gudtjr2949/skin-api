@@ -11,8 +11,8 @@ import java.util.Properties;
 @Configuration
 public class MailConfig {
 
-    @Value("${naver.email}")
-    private String email;
+    @Value("${naver.name}")
+    private String name;
 
     @Value("${naver.password}")
     private String password;
@@ -22,7 +22,7 @@ public class MailConfig {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
 
         javaMailSender.setHost("smtp.naver.com");
-        javaMailSender.setUsername(email);
+        javaMailSender.setUsername(name);
         javaMailSender.setPassword(password);
 
         javaMailSender.setPort(465);
