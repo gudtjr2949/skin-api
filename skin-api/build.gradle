@@ -38,9 +38,11 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok:1.18.30'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 
+	// 저장소 관련
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.mysql:mysql-connector-j'
-
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//	testImplementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 tasks.named('test') {

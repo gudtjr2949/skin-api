@@ -2,11 +2,16 @@ spring:
   config:
     activate:
       on-profile: test
+
   datasource:
     username: sa
     driver-class-name: org.h2.Driver
     url: jdbc:h2:tcp://localhost/~/test
 
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -16,7 +21,6 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.H2Dialect
     show-sql: true
-
   h2:
     console:
       enabled: true
