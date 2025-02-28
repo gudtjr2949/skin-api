@@ -25,11 +25,6 @@ public class MailServiceImpl implements MailService {
     private final JavaMailSender javaMailSender;
 
     @Override
-    public void checkCertificationCodeForCheckEmail(String code) {
-
-    }
-
-    @Override
     public void sendCertMail(MailSendCertServiceRequest request) {
         try {
             MimeMessage message = createMessage(request);
