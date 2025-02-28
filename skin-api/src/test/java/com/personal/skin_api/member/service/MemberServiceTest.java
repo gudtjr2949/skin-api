@@ -63,7 +63,7 @@ class MemberServiceTest {
         String duplicatedEmail = signUpRequest.getEmail();
         
         // when & then
-        assertThatThrownBy(() -> memberService.checkEmailDuplicated(duplicatedEmail)).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> memberService.sendCertMailForCheckEmail(duplicatedEmail)).isInstanceOf(RestApiException.class);
     }
 
     @Test
