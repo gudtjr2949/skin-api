@@ -2,7 +2,7 @@ package com.personal.skin_api.mail.service;
 
 import com.personal.skin_api.common.exception.MailErrorCode;
 import com.personal.skin_api.common.exception.RestApiException;
-import com.personal.skin_api.mail.service.dto.request.MailSendCertificationForPasswordServiceRequest;
+import com.personal.skin_api.mail.service.dto.request.MailSendCertServiceRequest;
 import com.personal.skin_api.member.service.MemberService;
 import jakarta.mail.Message;
 import jakarta.mail.internet.MimeMessage;
@@ -23,59 +23,35 @@ public class MailServiceImpl implements MailService {
     private final String MAIL_MESSAGE = "인증 코드 : ";
 
     private final JavaMailSender javaMailSender;
-    private final MemberService memberService;
-
-    // TODO : Redis 에 인증코드 저장 필요
-    @Override
-    public void sendCertificationMailForCheckEmail(String email) {
-        try {
-            String code = createCertificationCode();
-            sendMail(code, email, CHECK_EMAIL_SUBJECTS);
-        } catch (Exception e) {
-            throw new RestApiException(MailErrorCode.MAIL_SERVER_ERROR);
-        }
-    }
 
     @Override
     public void checkCertificationCodeForCheckEmail(String code) {
 
     }
 
-    // TODO : Redis 에 인증코드 저장 필요
     @Override
-    public void sendCertificationMailForFindPassword(MailSendCertificationForPasswordServiceRequest request) {
-        memberService.checkEmailForCertification(request.toMemberService());
-
+    public void sendCertMail(MailSendCertServiceRequest request) {
         try {
-            String code = createCertificationCode();
-            sendMail(code, request.getEmail(), FIND_PASSWORD_SUBJECTS);
+            MimeMessage message = createMessage(request);
+            javaMailSender.send(message);
         } catch (Exception e) {
             throw new RestApiException(MailErrorCode.MAIL_SERVER_ERROR);
         }
     }
 
-    private static String createCertificationCode() {
-        return UUID.randomUUID().toString().substring(0, 6);
-    }
-
-    public void sendMail(String code, String email, String purpose) throws Exception {
+    public MimeMessage createMessage(MailSendCertServiceRequest request) throws Exception {
         try {
-            MimeMessage mimeMessage = createMessage(code, email, purpose);
-            javaMailSender.send(mimeMessage);
+            MimeMessage message = javaMailSender.createMimeMessage();
+
+            message.addRecipients(Message.RecipientType.TO, request.getEmail());
+            message.setSubject(MAIL_MAIN_SUBJECT + " - " + request.getPurpose());
+            message.setText(MAIL_MESSAGE + request.getCode());
+            message.setFrom(request.getEmail());
+
+            return message;
         } catch (MailException mailException){
             mailException.printStackTrace();
             throw new IllegalAccessException();
         }
-    }
-
-    private MimeMessage createMessage(String code, String email, String purpose) throws Exception {
-        MimeMessage message = javaMailSender.createMimeMessage();
-
-        message.addRecipients(Message.RecipientType.TO, email);
-        message.setSubject(MAIL_MAIN_SUBJECT + " - " + purpose);
-        message.setText(MAIL_MESSAGE + code);
-        message.setFrom(email);
-
-        return message;
     }
 }

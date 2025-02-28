@@ -4,12 +4,12 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class MemberCertificationForFindPasswordServiceRequest {
+public class MemberCertForFindPasswordServiceRequest {
     private final String email;
     private final String memberName;
 
     @Builder
-    private MemberCertificationForFindPasswordServiceRequest(final String email, final String memberName) {
+    private MemberCertForFindPasswordServiceRequest(final String email, final String memberName) {
         this.email = email;
         this.memberName = memberName;
     }

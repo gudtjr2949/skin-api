@@ -8,10 +8,10 @@ public interface MemberService {
     void checkNicknameDuplicated(String nickname);
     void checkPhoneDuplicated(String phone);
     void signUp(MemberSignUpServiceRequest request);
-    void checkEmailForCertification(MemberCertificationForFindPasswordServiceRequest request);
+    void checkEmailForCertification(MemberCertForFindPasswordServiceRequest request);
     MemberLoginResponse login(MemberLoginServiceRequest request);
     MemberFindEmailResponse findEmail(MemberFindEmailServiceRequest request);
-    void sendCertMailForFindPassword(String email);
+    String sendCertMailForFindPassword(String email);
     void findPassword(MemberFindPasswordServiceRequest request);
     void modifyPassword(MemberModifyPasswordServiceRequest request);
     MemberDetailResponse findMemberDetail(MemberFindDetailServiceRequest request);
