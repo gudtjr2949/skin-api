@@ -30,6 +30,7 @@ class MemberServiceImpl implements MemberService {
     private final RedisService redisService;
     private final CertCodeGenerator codeGenerator;
 
+
     /**
      * 회원가입에 입력된 이메일 중복 여부를 확인한다.
      * @param email 중복 여부를 확인할 이메일
@@ -69,6 +70,16 @@ class MemberServiceImpl implements MemberService {
     }
 
     /**
+     * 입력된 정보가 회원정보에 존재하는 이메일인지 확인한다.
+     * @param request 존재 여부를 확인할 정보
+     */
+    @Override
+    public void checkEmailForCertification(MemberCertificationForFindPasswordServiceRequest request) {
+        Member findMember = memberRepository.findMemberByEmailAndMemberName(new Email(request.getEmail()), new MemberName(request.getMemberName()))
+                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+    }
+
+    /**
      * 회원가입 최종 확인을 위해, 이메일, 닉네임, 전화번호 중복확인을 진행한다.
      * @param request 중복 확인에 필요한 이메일, 닉네임, 전화번호
      */
@@ -94,7 +105,7 @@ class MemberServiceImpl implements MemberService {
     }
 
 
-    // TODO : 전화 인증 로직 필요
+    // TODO : 전화번호 인증 로직 필요
     /**
      * 이메일을 찾기 위해 입력된 회원 이름과 전화번호, 인증코드를 검증한다.
      * @param request 이메일을 찾기 위해 입력한 회원 이름, 전화번호, 인증코드
@@ -124,7 +135,7 @@ class MemberServiceImpl implements MemberService {
                 .build());
     }
 
-
+    // TODO : 이메일 인증 로직 필요
     /**
      * 비밀번호를 재설정하기 위해 입력된 이메일과 회원 이름, 인증코드를 검증한다.
      * @param request 비밀번호를 재설정을 진행할 회원 정보 검증을 위해 입력한 이메일, 이름, 인증코드
