@@ -34,8 +34,8 @@ class MemberServiceImpl implements MemberService {
 
 
     /**
-     * 회원가입에 입력된 이메일 중복 여부를 확인한다.
-     * @param email 중복 여부를 확인할 이메일
+     * 회원가입에 입력된 이메일에 인증코드를 전송한다.
+     * @param email 인증코드를 전송할 이메일
      */
     @Override
     public String sendCertMailForCheckEmail(String email) {
@@ -48,14 +48,18 @@ class MemberServiceImpl implements MemberService {
                 .build());
 
         redisService.saveMailCertification(RedisSaveMailCertServiceRequest.builder()
-                        .purpose(MailPurpose.CHECK_EMAIL)
-                        .email(email)
-                        .code(code)
+                .purpose(MailPurpose.CHECK_EMAIL)
+                .email(email)
+                .code(code)
                 .build());
 
         return code;
     }
 
+    /**
+     * 이메일 검증에 입력한 인증코드를 확인한다.
+     * @param request 인증코드 검증에 필요한 정보
+     */
     @Override
     public void findCertMailForCheckEmail(MemberCheckCertMailForCheckMailRequest request) {
         RedisFindMailCertServiceRequest findCodeRequest = RedisFindMailCertServiceRequest.builder()
