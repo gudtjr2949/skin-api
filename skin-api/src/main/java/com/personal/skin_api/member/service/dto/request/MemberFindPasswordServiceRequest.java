@@ -7,12 +7,12 @@ import lombok.Getter;
 public class MemberFindPasswordServiceRequest {
     private final String email;
     private final String memberName;
-    private final String authNumber;
+    private final String code;
 
     @Builder
-    private MemberFindPasswordServiceRequest(final String email, final String memberName, final String authNumber) {
+    private MemberFindPasswordServiceRequest(final String email, final String memberName, final String code) {
         this.email = email;
         this.memberName = memberName;
-        this.authNumber = authNumber;
+        this.code = code;
     }
 }

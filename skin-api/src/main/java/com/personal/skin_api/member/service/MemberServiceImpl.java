@@ -2,6 +2,10 @@ package com.personal.skin_api.member.service;
 
 import com.personal.skin_api.common.exception.RestApiException;
 
+import com.personal.skin_api.common.redis.service.RedisService;
+import com.personal.skin_api.common.redis.service.dto.request.RedisFindMailCertServiceRequest;
+import com.personal.skin_api.common.redis.service.dto.request.RedisSaveMailCertServiceRequest;
+import com.personal.skin_api.common.util.CertCodeGenerator;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.*;
 import com.personal.skin_api.member.repository.entity.email.Email;
@@ -20,8 +24,11 @@ import static com.personal.skin_api.common.exception.member.MemberErrorCode.*;
 @Service
 @RequiredArgsConstructor
 class MemberServiceImpl implements MemberService {
-
+    private static final String FIND_PASSWORD_PURPOSE = "find-password";
+    private static final String CHECK_EMAIL_PURPOSE = "check-email";
     private final MemberRepository memberRepository;
+    private final RedisService redisService;
+    private final CertCodeGenerator codeGenerator;
 
     /**
      * 회원가입에 입력된 이메일 중복 여부를 확인한다.
@@ -87,10 +94,10 @@ class MemberServiceImpl implements MemberService {
     }
 
 
-    // TODO : 인증 번호 확인 로직 필요
+    // TODO : 전화 인증 로직 필요
     /**
-     * 이메일을 찾기 위해 입력된 회원 이름과 전화번호, 인증 번호를 검증한다.
-     * @param request 이메일을 찾기 위해 입력한 회원 이름, 전화번호, 인증 번호
+     * 이메일을 찾기 위해 입력된 회원 이름과 전화번호, 인증코드를 검증한다.
+     * @param request 이메일을 찾기 위해 입력한 회원 이름, 전화번호, 인증코드
      * @return 회원가입에 입력했던 이메일
      */
     @Override
@@ -103,15 +110,39 @@ class MemberServiceImpl implements MemberService {
                 .build();
     }
 
-    // TODO : 인증 번호 확인 로직 필요
+    @Override
+    public void sendCertMailForFindPassword(String email) {
+        String code = codeGenerator.createCertCodeAtMail();
+
+        // 인증 메일 전송
+
+        // Redis에 저장
+        redisService.saveMailCertification(RedisSaveMailCertServiceRequest.builder()
+                .purpose(FIND_PASSWORD_PURPOSE)
+                .email(email)
+                .code(code)
+                .build());
+    }
+
+
     /**
-     * 비밀번호를 재설정하기 위해 입력된 이메일과 회원 이름, 인증 번호를 검증한다.
-     * @param request 비밀번호를 재설정을 진행할 회원 정보 검증을 위해 입력한 이메일, 이름, 인증번호
+     * 비밀번호를 재설정하기 위해 입력된 이메일과 회원 이름, 인증코드를 검증한다.
+     * @param request 비밀번호를 재설정을 진행할 회원 정보 검증을 위해 입력한 이메일, 이름, 인증코드
      */
     @Override
     public void findPassword(MemberFindPasswordServiceRequest request) {
         memberRepository.findMemberByEmailAndMemberName(new Email(request.getEmail()), new MemberName(request.getMemberName()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+
+        RedisFindMailCertServiceRequest findCodeRequest = RedisFindMailCertServiceRequest.builder()
+                .purpose(FIND_PASSWORD_PURPOSE)
+                .email(request.getEmail())
+                .build();
+
+        String findCode = redisService.findMailCertification(findCodeRequest);
+
+        if (!request.getCode().equals(findCode))
+            throw new RestApiException(NOT_FOUND_CERTIFICATION_CODE);
     }
 
     /**
