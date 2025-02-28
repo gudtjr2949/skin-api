@@ -1,4 +1,4 @@
-package com.personal.skin_api.config.redis;
+package com.personal.skin_api.common.redis.config;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

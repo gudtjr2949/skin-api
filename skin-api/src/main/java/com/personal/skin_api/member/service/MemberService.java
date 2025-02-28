@@ -10,6 +10,7 @@ public interface MemberService {
     void signUp(MemberSignUpServiceRequest request);
     MemberLoginResponse login(MemberLoginServiceRequest request);
     MemberFindEmailResponse findEmail(MemberFindEmailServiceRequest request);
+    void sendCertMailForFindPassword(String email);
     void findPassword(MemberFindPasswordServiceRequest request);
     void modifyPassword(MemberModifyPasswordServiceRequest request);
     MemberDetailResponse findMemberDetail(MemberFindDetailServiceRequest request);
