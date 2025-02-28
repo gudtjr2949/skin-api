@@ -56,14 +56,30 @@ class MemberServiceTest {
     }
     
     @Test
-    void 이메일_중복_체크_시_이미_가입된_이메일이라면_예외가_발생한다() {
+    void 회원가입에_입력한_이메일에_검증용_인증코드를_전송한다() {
         // given
         MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
         memberService.signUp(signUpRequest);
-        String duplicatedEmail = signUpRequest.getEmail();
-        
+
         // when & then
-        assertThatThrownBy(() -> memberService.sendCertMailForCheckEmail(duplicatedEmail)).isInstanceOf(RestApiException.class);
+        assertThatNoException().isThrownBy(() -> memberService.sendCertMailForCheckEmail(signUpRequest.getEmail()));
+    }
+
+    @Test
+    void 이메일_검증용_인증코드를_검증한다() {
+        // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+
+        String code = memberService.sendCertMailForCheckEmail(signUpRequest.getEmail());
+
+        MemberCheckCertMailForCheckMailRequest mailCheckMailRequest = MemberCheckCertMailForCheckMailRequest.builder()
+                .email(signUpRequest.getEmail())
+                .code(code)
+                .build();
+
+        // when & then
+        assertThatNoException().isThrownBy(() -> memberService.checkCertMailForCheckEmail(mailCheckMailRequest));
     }
 
     @Test
@@ -94,10 +110,12 @@ class MemberServiceTest {
         MemberSignUpServiceRequest firstSignUpRequest = createSignUpNoParameterRequest();
         memberService.signUp(firstSignUpRequest);
 
-        MemberSignUpServiceRequest sameEmailSignUpRequest = createSignUpNeedParameterRequest("asd123@naver.com", "asd1234!", "홍길동", "홍길동전", "01011112222");
-        MemberSignUpServiceRequest sameNicknameSignUpRequest = createSignUpNeedParameterRequest("zxc321@naver.com", "asd1234!", "홍길동", "길동짱짱", "01011112222");
-        MemberSignUpServiceRequest samePhoneSignUpRequest = createSignUpNeedParameterRequest("zxc321@naver.com", "asd1234!", "홍길동", "홍길동전", "01012345678");
-        List<MemberSignUpServiceRequest> signUpRequests = List.of(sameEmailSignUpRequest, sameNicknameSignUpRequest, samePhoneSignUpRequest);
+        MemberSignUpServiceRequest sameEmailSignUpRequest = createSignUpNeedParameterRequest(firstSignUpRequest.getEmail(), "asd1234!", "홍길동", "홍길동전", "01011112222");
+        MemberSignUpServiceRequest sameNicknameSignUpRequest = createSignUpNeedParameterRequest("zxc321@naver.com", "asd1234!", "홍길동", firstSignUpRequest.getNickname(), "01011112222");
+        MemberSignUpServiceRequest samePhoneSignUpRequest = createSignUpNeedParameterRequest("zxc321@naver.com", "asd1234!", "홍길동", "홍길동전", firstSignUpRequest.getPhone());
+
+        List<MemberSignUpServiceRequest> signUpRequests =
+                List.of(sameEmailSignUpRequest, sameNicknameSignUpRequest, samePhoneSignUpRequest);
 
         // when & then
         signUpRequests.stream().forEach(request ->

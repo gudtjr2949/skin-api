@@ -50,7 +50,7 @@ class MemberServiceImpl implements MemberService {
         redisService.saveMailCertification(RedisSaveMailCertServiceRequest.builder()
                 .purpose(MailPurpose.CHECK_EMAIL)
                 .email(email)
-                .code(code)
+                        .code(code)
                 .build());
 
         return code;
@@ -61,7 +61,7 @@ class MemberServiceImpl implements MemberService {
      * @param request 인증코드 검증에 필요한 정보
      */
     @Override
-    public void findCertMailForCheckEmail(MemberCheckCertMailForCheckMailRequest request) {
+    public void checkCertMailForCheckEmail(MemberCheckCertMailForCheckMailRequest request) {
         RedisFindMailCertServiceRequest findCodeRequest = RedisFindMailCertServiceRequest.builder()
                 .purpose(MailPurpose.CHECK_EMAIL)
                 .email(request.getEmail())
@@ -100,16 +100,6 @@ class MemberServiceImpl implements MemberService {
         checkDuplicatedMemberInfo(request);
         Member signUpMember = request.toEntity();
         memberRepository.save(signUpMember);
-    }
-
-    /**
-     * 입력된 정보가 회원정보에 존재하는 이메일인지 확인한다.
-     * @param request 존재 여부를 확인할 정보
-     */
-    @Override
-    public void checkEmailForCertification(MemberCertForFindPasswordServiceRequest request) {
-        Member findMember = memberRepository.findMemberByEmailAndMemberName(new Email(request.getEmail()), new MemberName(request.getMemberName()))
-                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
     }
 
     /**

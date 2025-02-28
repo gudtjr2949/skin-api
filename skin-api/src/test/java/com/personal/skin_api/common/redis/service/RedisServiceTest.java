@@ -4,6 +4,7 @@ import com.personal.skin_api.common.redis.service.dto.request.RedisFindMailCertS
 import com.personal.skin_api.common.redis.service.dto.request.RedisSaveMailCertServiceRequest;
 import com.personal.skin_api.common.util.CertCodeGenerator;
 
+import com.personal.skin_api.mail.service.MailPurpose;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,18 +23,18 @@ class RedisServiceTest {
     private CertCodeGenerator codeGenerator;
 
     @Test
-    void 메일_인증코드를_Redis에_저장하고_조회한다() {
+    void 이메일_인증용_인증코드를_Redis에_저장하고_조회한다() {
         // given
         String code = codeGenerator.createCertCodeAtMail();
         String email = "asd123@naver.com";
         RedisSaveMailCertServiceRequest saveMailRequest = RedisSaveMailCertServiceRequest.builder()
-                .purpose("purpose")
+                .purpose(MailPurpose.CHECK_EMAIL)
                 .email(email)
                 .code(code)
                 .build();
 
         RedisFindMailCertServiceRequest findMailRequest = RedisFindMailCertServiceRequest.builder()
-                .purpose("purpose")
+                .purpose(MailPurpose.CHECK_EMAIL)
                 .email(email)
                 .build();
 
