@@ -23,6 +23,7 @@ class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
 
+
     /**
      * 회원가입에 입력된 이메일 중복 여부를 확인한다.
      * @param email 중복 여부를 확인할 이메일
@@ -97,7 +98,7 @@ class MemberServiceImpl implements MemberService {
     }
 
 
-    // TODO : 인증 번호 확인 로직 필요
+    // TODO : 전화번호 인증 로직 필요
     /**
      * 이메일을 찾기 위해 입력된 회원 이름과 전화번호, 인증 번호를 검증한다.
      * @param request 이메일을 찾기 위해 입력한 회원 이름, 전화번호, 인증 번호
@@ -113,7 +114,7 @@ class MemberServiceImpl implements MemberService {
                 .build();
     }
 
-    // TODO : 인증 번호 확인 로직 필요
+    // TODO : 이메일 인증 로직 필요
     /**
      * 비밀번호를 재설정하기 위해 입력된 이메일과 회원 이름, 인증 번호를 검증한다.
      * @param request 비밀번호를 재설정을 진행할 회원 정보 검증을 위해 입력한 이메일, 이름, 인증번호
@@ -122,6 +123,8 @@ class MemberServiceImpl implements MemberService {
     public void findPassword(MemberFindPasswordServiceRequest request) {
         memberRepository.findMemberByEmailAndMemberName(new Email(request.getEmail()), new MemberName(request.getMemberName()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+
+
     }
 
     /**

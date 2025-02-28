@@ -1,8 +1,9 @@
 package com.personal.skin_api.mail.service;
 
-import com.personal.skin_api.mail.service.dto.request.MailCertificationServiceRequest;
-import org.springframework.stereotype.Service;
+import com.personal.skin_api.mail.service.dto.request.MailSendCertificationForPasswordServiceRequest;
 
 public interface MailService {
-    long sendCertificationMailForFindPassword(MailCertificationServiceRequest request);
+    void sendCertificationMailForCheckEmail(String email);
+    void checkCertificationCodeForCheckEmail(String code);
+    void sendCertificationMailForFindPassword(MailSendCertificationForPasswordServiceRequest request);
 }

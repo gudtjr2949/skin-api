@@ -5,12 +5,12 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class MailCertificationServiceRequest {
+public class MailSendCertificationForPasswordServiceRequest {
     private final String email;
     private final String memberName;
 
     @Builder
-    private MailCertificationServiceRequest(String email, String memberName) {
+    private MailSendCertificationForPasswordServiceRequest(String email, String memberName) {
         this.email = email;
         this.memberName = memberName;
     }
