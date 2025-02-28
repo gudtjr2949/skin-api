@@ -27,8 +27,6 @@ import static com.personal.skin_api.common.exception.member.MemberErrorCode.*;
 @Service
 @RequiredArgsConstructor
 class MemberServiceImpl implements MemberService {
-    private static final String FIND_PASSWORD_PURPOSE = "find-password";
-    private static final String CHECK_EMAIL_PURPOSE = "check-email";
     private final MemberRepository memberRepository;
     private final MailService mailService;
     private final RedisService redisService;
@@ -36,12 +34,43 @@ class MemberServiceImpl implements MemberService {
 
 
     /**
-     * 회원가입에 입력된 이메일 중복 여부를 확인한다.
-     * @param email 중복 여부를 확인할 이메일
+     * 회원가입에 입력된 이메일에 인증코드를 전송한다.
+     * @param email 인증코드를 전송할 이메일
      */
     @Override
-    public void checkEmailDuplicated(String email) {
-        if (memberRepository.findMemberByEmail(new Email(email)).isPresent()) throw new RestApiException(DUPLICATE_MEMBER);
+    public String sendCertMailForCheckEmail(String email) {
+        String code = codeGenerator.createCertCodeAtMail();
+
+        mailService.sendCertMail(MailSendCertServiceRequest.builder()
+                .purpose(MailPurpose.CHECK_EMAIL)
+                .email(email)
+                .code(code)
+                .build());
+
+        redisService.saveMailCertification(RedisSaveMailCertServiceRequest.builder()
+                .purpose(MailPurpose.CHECK_EMAIL)
+                .email(email)
+                        .code(code)
+                .build());
+
+        return code;
+    }
+
+    /**
+     * 이메일 검증에 입력한 인증코드를 확인한다.
+     * @param request 인증코드 검증에 필요한 정보
+     */
+    @Override
+    public void checkCertMailForCheckEmail(MemberCheckCertMailForCheckMailRequest request) {
+        RedisFindMailCertServiceRequest findCodeRequest = RedisFindMailCertServiceRequest.builder()
+                .purpose(MailPurpose.CHECK_EMAIL)
+                .email(request.getEmail())
+                .build();
+
+        String findCode = redisService.findMailCertification(findCodeRequest);
+
+        if (!request.getCode().equals(findCode))
+            throw new RestApiException(NOT_FOUND_CERTIFICATION_CODE);
     }
 
     /**
@@ -74,16 +103,6 @@ class MemberServiceImpl implements MemberService {
     }
 
     /**
-     * 입력된 정보가 회원정보에 존재하는 이메일인지 확인한다.
-     * @param request 존재 여부를 확인할 정보
-     */
-    @Override
-    public void checkEmailForCertification(MemberCertForFindPasswordServiceRequest request) {
-        Member findMember = memberRepository.findMemberByEmailAndMemberName(new Email(request.getEmail()), new MemberName(request.getMemberName()))
-                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
-    }
-
-    /**
      * 회원가입 최종 확인을 위해, 이메일, 닉네임, 전화번호 중복확인을 진행한다.
      * @param request 중복 확인에 필요한 이메일, 닉네임, 전화번호
      */
@@ -91,6 +110,10 @@ class MemberServiceImpl implements MemberService {
         checkEmailDuplicated(request.getEmail());
         checkNicknameDuplicated(request.getNickname());
         checkPhoneDuplicated(request.getPhone());
+    }
+
+    private void checkEmailDuplicated(final String email) {
+        if (memberRepository.findMemberByEmail(new Email(email)).isPresent()) throw new RestApiException(DUPLICATE_MEMBER);
     }
 
     /**
@@ -142,7 +165,7 @@ class MemberServiceImpl implements MemberService {
 
         // Redis에 저장
         redisService.saveMailCertification(RedisSaveMailCertServiceRequest.builder()
-                .purpose(FIND_PASSWORD_PURPOSE)
+                .purpose(MailPurpose.FIND_PASSWORD)
                 .email(email)
                 .code(code)
                 .build());
@@ -160,7 +183,7 @@ class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
         RedisFindMailCertServiceRequest findCodeRequest = RedisFindMailCertServiceRequest.builder()
-                .purpose(FIND_PASSWORD_PURPOSE)
+                .purpose(MailPurpose.FIND_PASSWORD)
                 .email(request.getEmail())
                 .build();
 

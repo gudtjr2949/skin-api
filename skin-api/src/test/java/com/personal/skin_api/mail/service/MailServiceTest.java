@@ -32,9 +32,6 @@ class MailServiceTest {
     @Value("${sample.email}")
     private String email;
 
-    @Value("${sample.member-name}")
-    private String memberName;
-
     @AfterEach
     void tearDown() {
         memberRepository.deleteAllInBatch();
@@ -44,26 +41,24 @@ class MailServiceTest {
     void 회원가입에_입력한_이메일에_인증코드를_전송한다() {
         // given
         memberService.signUp(createSignUpRequest());
-        String email = this.email;
+        String code = "test";
+
+        MailSendCertServiceRequest sendMailRequest = MailSendCertServiceRequest.builder()
+                .email(email)
+                .code(code)
+                .purpose(MailPurpose.CHECK_EMAIL)
+                .build();
 
         // when & then
-    }
-
-    @Test
-    void 회원가입에서_입력한_이메일_인증코드를_검증한다() {
-        // given
-
-        // when
-
-        // then
+        assertThatNoException().isThrownBy(() -> mailService.sendCertMail(sendMailRequest));
     }
 
     @Test
     void 비밀번호를_찾기_위해_입력된_이메일에_인증코드를_전송한다() {
         // given
-        String code = "testCode";
-
         memberService.signUp(createSignUpRequest());
+        String code = "test";
+
         MailSendCertServiceRequest sendMailRequest = MailSendCertServiceRequest.builder()
                 .email(email)
                 .code(code)
@@ -79,7 +74,7 @@ class MailServiceTest {
         return MemberSignUpServiceRequest.builder()
                 .email(email)
                 .password("asd1234!")
-                .memberName(memberName)
+                .memberName("홍길동")
                 .nickname("길동짱짱")
                 .phone("01012345678")
                 .build();

@@ -18,7 +18,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void saveMailCertification(RedisSaveMailCertServiceRequest request) {
-        String key = generateKey(request.getPurpose(), request.getEmail());
+        String key = generateKey(request.getPurpose().toString(), request.getEmail());
 
         try {
             redisTemplate.opsForValue().set(key, request.getCode(), Duration.ofMinutes(MAIL_TTL));
@@ -29,7 +29,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public String findMailCertification(RedisFindMailCertServiceRequest request) {
-        String key = generateKey(request.getPurpose(), request.getEmail());
+        String key = generateKey(request.getPurpose().toString(), request.getEmail());
 
         try {
             String findCode = redisTemplate.opsForValue().get(key).toString();
@@ -46,6 +46,6 @@ public class RedisServiceImpl implements RedisService {
      * @return Redis에 저장할 키
      */
     private static String generateKey(String firstKey, String secondKey) {
-        return String.join(firstKey, ":", secondKey);
+        return String.join(":", firstKey, secondKey);
     }
 }
