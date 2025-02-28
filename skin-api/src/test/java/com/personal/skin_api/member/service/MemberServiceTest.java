@@ -13,6 +13,7 @@ import com.personal.skin_api.member.service.dto.response.MemberLoginResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -30,6 +31,9 @@ class MemberServiceTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Value("${sample.email}")
+    private String email;
 
     @AfterEach
     void tearDown() {
@@ -171,18 +175,30 @@ class MemberServiceTest {
         assertThat(findEmail.getEmail()).isEqualTo(signUpRequest.getEmail());
     }
 
-    /* TODO : 인증코드 확인 로직 추가
     @Test
-    void 비밀번호를_찾기_위해_입력한_이메일과_전화번호가_회원정보에_없는_경우_예외가_발생한다() {
+    void 비밀번호_재설정용_인증코드를_전송한다() {
         // given
         MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
         memberService.signUp(signUpRequest);
 
+        // when & then
+        assertThatNoException().isThrownBy(() -> memberService.sendCertMailForFindPassword(signUpRequest.getEmail()));
+    }
+
+    @Test
+    void 비밀번호를_찾기_위해_입력한_사용자_이름_이메일중_하나라도_회원정보에_없는_경우_예외가_발생한다() {
+        // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+        String code = memberService.sendCertMailForFindPassword(signUpRequest.getEmail());
+
         String wrongEmail = "zxc456@naver.com";
-        MemberFindPasswordServiceRequest findPasswordWithWrongEmailRequest = createFindPasswordRequest(wrongEmail, signUpRequest.getPhone());
+        MemberFindPasswordServiceRequest findPasswordWithWrongEmailRequest =
+                createFindPasswordRequest(wrongEmail, signUpRequest.getPhone(), code);
 
         String wrongPhone = "01098765432";
-        MemberFindPasswordServiceRequest findPasswordWithWrongPhoneRequest = createFindPasswordRequest(signUpRequest.getEmail(), wrongPhone);
+        MemberFindPasswordServiceRequest findPasswordWithWrongPhoneRequest =
+                createFindPasswordRequest(signUpRequest.getEmail(), wrongPhone, code);
 
         List<MemberFindPasswordServiceRequest> findPasswordRequests
                 = List.of(findPasswordWithWrongEmailRequest, findPasswordWithWrongPhoneRequest);
@@ -192,21 +208,38 @@ class MemberServiceTest {
                 assertThatThrownBy(() -> memberService.findPassword(request))
                 .isInstanceOf(RestApiException.class));
     }
-    */
 
-
-    /* TODO : 인증코드 확인 로직 추가
     @Test
-    void 비밀번호를_재설정하기_위해_입력한_이메일과_전화번호가_존재하다면_정상처리한다() {
+    void 비밀번호를_찾기_위해_입력한_인증코드가_다른_경우_예외가_발생한다() {
         // given
         MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
         memberService.signUp(signUpRequest);
-        MemberFindPasswordServiceRequest findPasswordRequest = createFindPasswordRequest(signUpRequest.getEmail(), signUpRequest.getMemberName());
+        String code = memberService.sendCertMailForFindPassword(signUpRequest.getEmail());
+
+        String wrongCode = code + "!";
+
+        MemberFindPasswordServiceRequest findPasswordWithWrongCodeRequest =
+                createFindPasswordRequest(signUpRequest.getEmail(), signUpRequest.getPhone(), wrongCode);
+
+        // when & then
+        assertThatThrownBy(() -> memberService.findPassword(findPasswordWithWrongCodeRequest))
+                .isInstanceOf(RestApiException.class);
+    }
+
+
+    @Test
+    void 비밀번호를_재설정하기_위해_입력한_사용자_이름_이메일_인증코드가_존재한다면_정상처리한다() {
+        // given
+        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        memberService.signUp(signUpRequest);
+        String code = memberService.sendCertMailForFindPassword(signUpRequest.getEmail());
+
+        MemberFindPasswordServiceRequest findPasswordRequest =
+                createFindPasswordRequest(signUpRequest.getEmail(), signUpRequest.getMemberName(), code);
 
         // when & then
         assertThatNoException().isThrownBy(() -> memberService.findPassword(findPasswordRequest));
     }
-    */
 
     @Test
     void 비밀번호를_재설정한다() {
@@ -400,9 +433,9 @@ class MemberServiceTest {
                 .build();
     }
 
-    private static MemberSignUpServiceRequest createSignUpNoParameterRequest() {
+    private MemberSignUpServiceRequest createSignUpNoParameterRequest() {
         return MemberSignUpServiceRequest.builder()
-                .email("asd123@naver.com")
+                .email(this.email)
                 .password("asd1234!")
                 .memberName("홍길동")
                 .nickname("길동짱짱")

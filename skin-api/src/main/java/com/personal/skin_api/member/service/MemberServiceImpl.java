@@ -6,6 +6,9 @@ import com.personal.skin_api.common.redis.service.RedisService;
 import com.personal.skin_api.common.redis.service.dto.request.RedisFindMailCertServiceRequest;
 import com.personal.skin_api.common.redis.service.dto.request.RedisSaveMailCertServiceRequest;
 import com.personal.skin_api.common.util.CertCodeGenerator;
+import com.personal.skin_api.mail.service.MailPurpose;
+import com.personal.skin_api.mail.service.MailService;
+import com.personal.skin_api.mail.service.dto.request.MailSendCertServiceRequest;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.*;
 import com.personal.skin_api.member.repository.entity.email.Email;
@@ -27,6 +30,7 @@ class MemberServiceImpl implements MemberService {
     private static final String FIND_PASSWORD_PURPOSE = "find-password";
     private static final String CHECK_EMAIL_PURPOSE = "check-email";
     private final MemberRepository memberRepository;
+    private final MailService mailService;
     private final RedisService redisService;
     private final CertCodeGenerator codeGenerator;
 
@@ -74,7 +78,7 @@ class MemberServiceImpl implements MemberService {
      * @param request 존재 여부를 확인할 정보
      */
     @Override
-    public void checkEmailForCertification(MemberCertificationForFindPasswordServiceRequest request) {
+    public void checkEmailForCertification(MemberCertForFindPasswordServiceRequest request) {
         Member findMember = memberRepository.findMemberByEmailAndMemberName(new Email(request.getEmail()), new MemberName(request.getMemberName()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
     }
@@ -121,11 +125,20 @@ class MemberServiceImpl implements MemberService {
                 .build();
     }
 
+    /**
+     * 비밀번호를 찾기 위해 인증번호를 전송한다.
+     * @param email 인증코드를 전송할 이메일
+     */
     @Override
-    public void sendCertMailForFindPassword(String email) {
+    public String sendCertMailForFindPassword(String email) {
         String code = codeGenerator.createCertCodeAtMail();
 
         // 인증 메일 전송
+        mailService.sendCertMail(MailSendCertServiceRequest.builder()
+                .purpose(MailPurpose.FIND_PASSWORD)
+                .email(email)
+                .code(code)
+                .build());
 
         // Redis에 저장
         redisService.saveMailCertification(RedisSaveMailCertServiceRequest.builder()
@@ -133,9 +146,10 @@ class MemberServiceImpl implements MemberService {
                 .email(email)
                 .code(code)
                 .build());
+
+        return code;
     }
 
-    // TODO : 이메일 인증 로직 필요
     /**
      * 비밀번호를 재설정하기 위해 입력된 이메일과 회원 이름, 인증코드를 검증한다.
      * @param request 비밀번호를 재설정을 진행할 회원 정보 검증을 위해 입력한 이메일, 이름, 인증코드

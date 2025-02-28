@@ -1,7 +1,7 @@
 package com.personal.skin_api.mail.service;
 
 
-import com.personal.skin_api.mail.service.dto.request.MailSendCertificationForPasswordServiceRequest;
+import com.personal.skin_api.mail.service.dto.request.MailSendCertServiceRequest;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.service.MemberService;
 import com.personal.skin_api.member.service.dto.request.MemberSignUpServiceRequest;
@@ -47,7 +47,6 @@ class MailServiceTest {
         String email = this.email;
 
         // when & then
-        assertThatNoException().isThrownBy(() -> mailService.sendCertificationMailForCheckEmail(email));
     }
 
     @Test
@@ -62,14 +61,17 @@ class MailServiceTest {
     @Test
     void 비밀번호를_찾기_위해_입력된_이메일에_인증코드를_전송한다() {
         // given
+        String code = "testCode";
+
         memberService.signUp(createSignUpRequest());
-        MailSendCertificationForPasswordServiceRequest sendMailRequest = MailSendCertificationForPasswordServiceRequest.builder()
+        MailSendCertServiceRequest sendMailRequest = MailSendCertServiceRequest.builder()
                 .email(email)
-                .memberName(memberName)
+                .code(code)
+                .purpose(MailPurpose.FIND_PASSWORD)
                 .build();
 
         // when & then
-        assertThatNoException().isThrownBy(() -> mailService.sendCertificationMailForFindPassword(sendMailRequest));
+        assertThatNoException().isThrownBy(() -> mailService.sendCertMail(sendMailRequest));
     }
 
 

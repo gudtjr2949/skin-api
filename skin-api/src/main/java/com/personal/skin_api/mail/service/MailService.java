@@ -1,9 +1,8 @@
 package com.personal.skin_api.mail.service;
 
-import com.personal.skin_api.mail.service.dto.request.MailSendCertificationForPasswordServiceRequest;
+import com.personal.skin_api.mail.service.dto.request.MailSendCertServiceRequest;
 
 public interface MailService {
-    void sendCertificationMailForCheckEmail(String email);
     void checkCertificationCodeForCheckEmail(String code);
-    void sendCertificationMailForFindPassword(MailSendCertificationForPasswordServiceRequest request);
+    void sendCertMail(MailSendCertServiceRequest request);
 }
