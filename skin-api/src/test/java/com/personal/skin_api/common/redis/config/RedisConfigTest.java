@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class RedisTest {
+class RedisConfigTest {
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
