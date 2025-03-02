@@ -21,4 +21,8 @@ public class MemberFindEmailServiceRequest {
     public String getPhone() {
         return phone.getPhone();
     }
+
+    public String getMemberName() {
+        return memberName.getMemberName();
+    }
 }

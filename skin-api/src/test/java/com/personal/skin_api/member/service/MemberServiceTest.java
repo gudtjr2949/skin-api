@@ -8,7 +8,6 @@ import com.personal.skin_api.member.repository.entity.email.Email;
 import com.personal.skin_api.member.repository.entity.password.Password;
 import com.personal.skin_api.member.service.dto.request.*;
 import com.personal.skin_api.member.service.dto.response.MemberDetailResponse;
-import com.personal.skin_api.member.service.dto.response.MemberFindEmailResponse;
 import com.personal.skin_api.member.service.dto.response.MemberLoginResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -73,7 +72,7 @@ class MemberServiceTest {
 
         String code = memberService.sendCertMailForCheckEmail(signUpRequest.getEmail());
 
-        MemberCheckCertMailForCheckMailRequest mailCheckMailRequest = MemberCheckCertMailForCheckMailRequest.builder()
+        MemberCheckCertMailForCheckMailServiceRequest mailCheckMailRequest = MemberCheckCertMailForCheckMailServiceRequest.builder()
                 .email(signUpRequest.getEmail())
                 .code(code)
                 .build();

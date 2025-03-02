@@ -6,8 +6,8 @@ import com.personal.skin_api.member.service.dto.response.*;
 public interface MemberService {
     String sendCertMailForCheckEmail(String email);
     String sendCertMailForCheckPhone(String phone);
-    void checkCertMailForCheckEmail(MemberCheckCertMailForCheckMailRequest request);
-    void checkCertSmsForCheckPhone(MemberCheckCertSmsForCheckPhoneRequest request);
+    void checkCertMailForCheckEmail(MemberCheckCertMailForCheckMailServiceRequest request);
+    void checkCertSmsForCheckPhone(MemberCheckCertSmsForCheckPhoneServiceRequest request);
     void checkNicknameDuplicated(String nickname);
     void checkPhoneDuplicated(String phone);
     void signUp(MemberSignUpServiceRequest request);

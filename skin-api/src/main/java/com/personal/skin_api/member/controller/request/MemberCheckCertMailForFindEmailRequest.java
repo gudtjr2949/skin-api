@@ -6,16 +6,16 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class MemberFindEmailRequest {
+public class MemberCheckCertMailForFindEmailRequest {
     private String memberName;
     private String phone;
-    private String authNumber;
+    private String code;
 
     public MemberFindEmailServiceRequest toService() {
         return MemberFindEmailServiceRequest.builder()
                 .memberName(memberName)
                 .phone(phone)
-                .authNumber(authNumber)
+                .code(code)
                 .build();
     }
 }

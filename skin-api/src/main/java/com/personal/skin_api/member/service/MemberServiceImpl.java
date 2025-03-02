@@ -85,7 +85,7 @@ class MemberServiceImpl implements MemberService {
      * @param request 인증코드 검증에 필요한 정보
      */
     @Override
-    public void checkCertMailForCheckEmail(MemberCheckCertMailForCheckMailRequest request) {
+    public void checkCertMailForCheckEmail(MemberCheckCertMailForCheckMailServiceRequest request) {
         RedisFindMailCertServiceRequest findCodeRequest = RedisFindMailCertServiceRequest.builder()
                 .purpose(MailPurpose.CHECK_EMAIL)
                 .email(request.getEmail())
@@ -98,7 +98,7 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void checkCertSmsForCheckPhone(MemberCheckCertSmsForCheckPhoneRequest request) {
+    public void checkCertSmsForCheckPhone(MemberCheckCertSmsForCheckPhoneServiceRequest request) {
         RedisFindSmsCertServiceRequest findCodeRequest = RedisFindSmsCertServiceRequest.builder()
                 .purpose(SmsPurpose.CHECK_PHONE)
                 .phone(request.getPhone())
@@ -194,7 +194,7 @@ class MemberServiceImpl implements MemberService {
      */
     @Override
     public MemberFindEmailResponse findEmail(MemberFindEmailServiceRequest request) {
-        Member findmember = memberRepository.findMemberByMemberNameAndPhone(request.getMemberName(), new Phone(request.getPhone()))
+        Member findmember = memberRepository.findMemberByMemberNameAndPhone(new MemberName(request.getMemberName()), new Phone(request.getPhone()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
         String findCode = redisService.findSmsCertification(RedisFindSmsCertServiceRequest.builder()
