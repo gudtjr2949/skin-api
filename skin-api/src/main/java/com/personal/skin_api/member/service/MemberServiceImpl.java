@@ -4,7 +4,9 @@ import com.personal.skin_api.common.exception.RestApiException;
 
 import com.personal.skin_api.common.redis.service.RedisService;
 import com.personal.skin_api.common.redis.service.dto.request.RedisFindMailCertServiceRequest;
+import com.personal.skin_api.common.redis.service.dto.request.RedisFindSmsCertServiceRequest;
 import com.personal.skin_api.common.redis.service.dto.request.RedisSaveMailCertServiceRequest;
+import com.personal.skin_api.common.redis.service.dto.request.RedisSaveSmsCertServiceRequest;
 import com.personal.skin_api.common.util.CertCodeGenerator;
 import com.personal.skin_api.mail.service.MailPurpose;
 import com.personal.skin_api.mail.service.MailService;
@@ -18,6 +20,9 @@ import com.personal.skin_api.member.repository.entity.password.Password;
 import com.personal.skin_api.member.repository.entity.phone.Phone;
 import com.personal.skin_api.member.service.dto.request.*;
 import com.personal.skin_api.member.service.dto.response.*;
+import com.personal.skin_api.sms.service.SmsPurpose;
+import com.personal.skin_api.sms.service.SmsService;
+import com.personal.skin_api.sms.service.dto.SmsSendCertServiceRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +34,7 @@ import static com.personal.skin_api.common.exception.member.MemberErrorCode.*;
 class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final MailService mailService;
+    private final SmsService smsService;
     private final RedisService redisService;
     private final CertCodeGenerator codeGenerator;
 
@@ -56,6 +62,24 @@ class MemberServiceImpl implements MemberService {
         return code;
     }
 
+    @Override
+    public String sendCertMailForCheckPhone(String phone) {
+        String code = codeGenerator.createCertCodeAtMail();
+
+        smsService.sendSMS(SmsSendCertServiceRequest.builder()
+                .phone(phone)
+                .code(code)
+                .build());
+
+        redisService.saveSmsCertification(RedisSaveSmsCertServiceRequest.builder()
+                .purpose(SmsPurpose.CHECK_PHONE)
+                .phone(phone)
+                .code(code)
+                .build());
+
+        return code;
+    }
+
     /**
      * 이메일 검증에 입력한 인증코드를 확인한다.
      * @param request 인증코드 검증에 필요한 정보
@@ -71,6 +95,18 @@ class MemberServiceImpl implements MemberService {
 
         if (!request.getCode().equals(findCode))
             throw new RestApiException(NOT_FOUND_CERTIFICATION_CODE);
+    }
+
+    @Override
+    public void checkCertSmsForCheckPhone(MemberCheckCertSmsForCheckPhoneRequest request) {
+        RedisFindSmsCertServiceRequest findCodeRequest = RedisFindSmsCertServiceRequest.builder()
+                .purpose(SmsPurpose.CHECK_PHONE)
+                .phone(request.getPhone())
+                .build();
+
+        String findCode = redisService.findSmsCertification(findCodeRequest);
+
+        if (!request.getCode().equals(findCode)) throw new RestApiException(NOT_FOUND_CERTIFICATION_CODE);
     }
 
     /**
@@ -131,6 +167,24 @@ class MemberServiceImpl implements MemberService {
                 .build();
     }
 
+    @Override
+    public String sendCertSmsForFindEmail(String phone) {
+        String code = codeGenerator.createCertCodeAtMail();
+
+        smsService.sendSMS(SmsSendCertServiceRequest.builder()
+                .phone(phone)
+                .code(code)
+                .build());
+
+        redisService.saveSmsCertification(RedisSaveSmsCertServiceRequest.builder()
+                .purpose(SmsPurpose.FIND_EMAIL)
+                .phone(phone)
+                .code(code)
+                .build());
+
+        return code;
+    }
+
 
     // TODO : 전화번호 인증 로직 필요
     /**
@@ -140,8 +194,16 @@ class MemberServiceImpl implements MemberService {
      */
     @Override
     public MemberFindEmailResponse findEmail(MemberFindEmailServiceRequest request) {
-        Member findmember = memberRepository.findMemberByMemberNameAndPhone(request.getMemberName(), request.getPhone())
+        Member findmember = memberRepository.findMemberByMemberNameAndPhone(request.getMemberName(), new Phone(request.getPhone()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+
+        String findCode = redisService.findSmsCertification(RedisFindSmsCertServiceRequest.builder()
+                .phone(request.getPhone())
+                .purpose(SmsPurpose.FIND_EMAIL)
+                .build());
+
+        if (!request.getCode().equals(findCode))
+            throw new RestApiException(NOT_FOUND_CERTIFICATION_CODE);
 
         return MemberFindEmailResponse.builder()
                 .email(findmember.getEmail())
