@@ -50,7 +50,7 @@ class MemberServiceImpl implements MemberService {
         redisService.saveMailCertification(RedisSaveMailCertServiceRequest.builder()
                 .purpose(MailPurpose.CHECK_EMAIL)
                 .email(email)
-                        .code(code)
+                .code(code)
                 .build());
 
         return code;
@@ -140,7 +140,7 @@ class MemberServiceImpl implements MemberService {
      */
     @Override
     public MemberFindEmailResponse findEmail(MemberFindEmailServiceRequest request) {
-        Member findmember = memberRepository.findMemberByMemberNameAndPhone(new MemberName(request.getMemberName()), new Phone(request.getPhone()))
+        Member findmember = memberRepository.findMemberByMemberNameAndPhone(request.getMemberName(), request.getPhone())
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
         return MemberFindEmailResponse.builder()
