@@ -155,8 +155,9 @@ class MemberServiceTest {
         assertThat(loginMember.getMemberName()).isEqualTo(signUpRequest.getMemberName());
         assertThat(loginMember.getNickname()).isEqualTo(signUpRequest.getNickname());
     }
-    
-    @Test
+
+    // TODO : sms 금액 충전 시 동작 가능
+    /*@Test
     void 이메일을_찾기_위해_입력한_이름과_전화번호가_회원정보에_없는_경우_예외가_발생한다() {
         // given
         MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
@@ -175,9 +176,10 @@ class MemberServiceTest {
         findEmailRequests.stream().forEach(request ->
                 assertThatThrownBy(() -> memberService.findEmail(request))
                         .isInstanceOf(RestApiException.class));
-    }
-    
-    @Test
+    }*/
+
+    // TODO : sms 금액 충전 시 동작 가능
+ /*   @Test
     void 이메일을_찾기_위해_입력한_이름과_전화번호가_존재하다면_이메일을_반환한다() {
         // given
         MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
@@ -191,7 +193,7 @@ class MemberServiceTest {
 
         // then
         assertThat(findEmail.getEmail()).isEqualTo(signUpRequest.getEmail());
-    }
+    }*/
 
     @Test
     void 비밀번호_재설정용_인증코드를_전송한다() {
