@@ -95,7 +95,7 @@ public class MemberController {
     }
 
     // TODO : Security Context 적용 후 구현
-    @DeleteMapping("/withdraw")
+    @PostMapping("/withdraw")
     public ResponseEntity<Object> withdraw() {
         return ResponseEntity.ok().body(null);
     }
