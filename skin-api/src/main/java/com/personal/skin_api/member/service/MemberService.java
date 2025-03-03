@@ -4,12 +4,15 @@ import com.personal.skin_api.member.service.dto.request.*;
 import com.personal.skin_api.member.service.dto.response.*;
 
 public interface MemberService {
-    void checkEmailDuplicated(String email);
+    String sendCertMailForCheckEmail(String email);
+    String sendCertMailForCheckPhone(String phone);
+    void checkCertMailForCheckEmail(MemberCheckCertMailForCheckMailServiceRequest request);
+    void checkCertSmsForCheckPhone(MemberCheckCertSmsForCheckPhoneServiceRequest request);
     void checkNicknameDuplicated(String nickname);
     void checkPhoneDuplicated(String phone);
     void signUp(MemberSignUpServiceRequest request);
-    void checkEmailForCertification(MemberCertForFindPasswordServiceRequest request);
     MemberLoginResponse login(MemberLoginServiceRequest request);
+    String sendCertSmsForFindEmail(String phone);
     MemberFindEmailResponse findEmail(MemberFindEmailServiceRequest request);
     String sendCertMailForFindPassword(String email);
     void findPassword(MemberFindPasswordServiceRequest request);

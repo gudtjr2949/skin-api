@@ -1,0 +1,20 @@
+package com.personal.skin_api.member.controller.request;
+
+import com.personal.skin_api.member.service.dto.request.MemberCheckCertMailForCheckMailServiceRequest;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor
+public class MemberCheckCertMailForCheckMailRequest {
+
+    private String email;
+    private String code;
+
+    public MemberCheckCertMailForCheckMailServiceRequest toService() {
+        return MemberCheckCertMailForCheckMailServiceRequest.builder()
+                .email(email)
+                .code(code)
+                .build();
+    }
+}

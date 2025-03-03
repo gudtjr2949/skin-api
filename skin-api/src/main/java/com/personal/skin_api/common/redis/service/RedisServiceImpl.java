@@ -3,7 +3,9 @@ package com.personal.skin_api.common.redis.service;
 import com.personal.skin_api.common.exception.CommonErrorCode;
 import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.common.redis.service.dto.request.RedisFindMailCertServiceRequest;
+import com.personal.skin_api.common.redis.service.dto.request.RedisFindSmsCertServiceRequest;
 import com.personal.skin_api.common.redis.service.dto.request.RedisSaveMailCertServiceRequest;
+import com.personal.skin_api.common.redis.service.dto.request.RedisSaveSmsCertServiceRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -14,11 +16,12 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class RedisServiceImpl implements RedisService {
     private static final long MAIL_TTL = 3;
+    private static final long SMS_TTL = 3;
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public void saveMailCertification(RedisSaveMailCertServiceRequest request) {
-        String key = generateKey(request.getPurpose(), request.getEmail());
+        String key = generateKey(request.getPurpose().toString(), request.getEmail());
 
         try {
             redisTemplate.opsForValue().set(key, request.getCode(), Duration.ofMinutes(MAIL_TTL));
@@ -28,8 +31,31 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    public void saveSmsCertification(RedisSaveSmsCertServiceRequest request) {
+        String key = generateKey(request.getPurpose().toString(), request.getPhone());
+
+        try {
+            redisTemplate.opsForValue().set(key, request.getCode(), Duration.ofMinutes(SMS_TTL));
+        } catch (Exception e) {
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
     public String findMailCertification(RedisFindMailCertServiceRequest request) {
-        String key = generateKey(request.getPurpose(), request.getEmail());
+        String key = generateKey(request.getPurpose().toString(), request.getEmail());
+
+        try {
+            String findCode = redisTemplate.opsForValue().get(key).toString();
+            return findCode;
+        } catch (Exception e) {
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public String findSmsCertification(RedisFindSmsCertServiceRequest request) {
+        String key = generateKey(request.getPurpose().toString(), request.getPhone());
 
         try {
             String findCode = redisTemplate.opsForValue().get(key).toString();
@@ -46,6 +72,6 @@ public class RedisServiceImpl implements RedisService {
      * @return Redis에 저장할 키
      */
     private static String generateKey(String firstKey, String secondKey) {
-        return String.join(firstKey, ":", secondKey);
+        return String.join(":", firstKey, secondKey);
     }
 }

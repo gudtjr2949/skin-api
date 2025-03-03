@@ -18,16 +18,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
     private final String MAIL_MAIN_SUBJECT = "스킨 거래 플랫폼";
-    private final String CHECK_EMAIL_SUBJECTS = "이메일 인증 코드";
-    private final String FIND_PASSWORD_SUBJECTS = "비밀번호 찾기 인증 코드";
     private final String MAIL_MESSAGE = "인증 코드 : ";
 
     private final JavaMailSender javaMailSender;
-
-    @Override
-    public void checkCertificationCodeForCheckEmail(String code) {
-
-    }
 
     @Override
     public void sendCertMail(MailSendCertServiceRequest request) {

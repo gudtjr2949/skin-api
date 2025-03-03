@@ -4,16 +4,18 @@ import com.personal.skin_api.member.service.dto.request.MemberFindPasswordServic
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor
-public class MemberFindPasswordRequest {
+public class MemberCheckCertSmsForFindPasswordRequest {
     private String email;
     private String memberName;
-    private String authNumber;
+    private String code;
 
     public MemberFindPasswordServiceRequest toService() {
         return MemberFindPasswordServiceRequest.builder()
                 .email(email)
                 .memberName(memberName)
+                .code(code)
                 .build();
     }
 }

@@ -21,6 +21,13 @@ spring:
     hibernate:
       ddl-auto: create-drop
 
+coolsms:
+  api:
+    key: ${COOLSMS_API_KEY}
+    secret: ${COOLSMS_API_SECRET}
+  from:
+    phone: ${COOLSMS_FROM_PHONE}
+
 naver:
   name: ${NAVER_NAME}
   password: ${NAVER_PASSWORD}
@@ -28,3 +35,4 @@ naver:
 sample:
   email: ${SAMPLE_EMAIL}
   member-name: ${SAMPLE_MEMBER_NAME}
+  phone: ${SAMPLE_PHONE}
