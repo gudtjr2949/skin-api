@@ -11,8 +11,9 @@ public class MemberModifyDetailRequest {
     private String newNickname;
     private String newPhone;
 
-    public MemberModifyDetailServiceRequest toService() {
+    public MemberModifyDetailServiceRequest toService(String email) {
         return MemberModifyDetailServiceRequest.builder()
+                .email(email)
                 .newMemberName(newMemberName)
                 .newNickname(newNickname)
                 .newPhone(newPhone)

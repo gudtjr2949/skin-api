@@ -11,20 +11,24 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.personal.skin_api.common.security.JwtTokenConstant.secretKey;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -58,8 +62,12 @@ public class JwtFilter extends OncePerRequestFilter {
             String email = getEmailFromToken(token);
 
             List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(MemberRole.GENERAL.toString()));
+            UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                    email,
+                    "null",
+                    authorities);
 
-            Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, authorities);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
 
             // 접근한 유저의 authentication 객체를 SecurityContextHolder 에 저장함
             SecurityContextHolder.getContext().setAuthentication(authentication);

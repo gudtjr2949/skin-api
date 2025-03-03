@@ -3,12 +3,17 @@ package com.personal.skin_api.member.controller;
 import com.personal.skin_api.common.security.JwtTokenConstant;
 import com.personal.skin_api.member.controller.request.*;
 import com.personal.skin_api.member.service.MemberService;
+import com.personal.skin_api.member.service.dto.request.MemberFindDetailServiceRequest;
+import com.personal.skin_api.member.service.dto.request.MemberWithdrawServiceRequest;
+import com.personal.skin_api.member.service.dto.response.MemberDetailResponse;
 import com.personal.skin_api.member.service.dto.response.MemberFindEmailResponse;
 import com.personal.skin_api.member.service.dto.response.MemberLoginResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -98,24 +103,29 @@ public class MemberController {
         memberService.modifyPassword(request.toService());
         return ResponseEntity.ok().body(null);
     }
-    
-    // TODO : Security Context 적용 후 구현
+
     @GetMapping("/detail")
-    public ResponseEntity<Object> findMemberDetail() {
+    public ResponseEntity<Object> findMemberDetail(@AuthenticationPrincipal UserDetails userDetails) {
+        MemberDetailResponse response = memberService.findMemberDetail(MemberFindDetailServiceRequest.builder()
+                .email(userDetails.getUsername())
+                .build());
 
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(response);
     }
 
-    // TODO : Security Context 적용 후, MemberModifyDetailRequest 에 Email 추가 필요
     @PostMapping("/modify-detail")
-    public ResponseEntity<Object> modifyMemberDetail(@RequestBody MemberModifyDetailRequest request) {
-        memberService.modifyMemberDetail(request.toService());
+    public ResponseEntity<Object> modifyMemberDetail(@RequestBody MemberModifyDetailRequest request,
+                                                     @AuthenticationPrincipal UserDetails userDetails) {
+        memberService.modifyMemberDetail(request.toService(userDetails.getUsername()));
         return ResponseEntity.ok().body(null);
     }
 
-    // TODO : Security Context 적용 후 구현
     @PostMapping("/withdraw")
-    public ResponseEntity<Object> withdraw() {
+    public ResponseEntity<Object> withdraw(@AuthenticationPrincipal UserDetails userDetails) {
+        memberService.withdraw(MemberWithdrawServiceRequest.builder()
+                .email(userDetails.getUsername())
+                .build());
+
         return ResponseEntity.ok().body(null);
     }
 }
