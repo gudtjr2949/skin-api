@@ -1,9 +1,12 @@
 package com.personal.skin_api.member.controller;
 
+import com.personal.skin_api.common.security.JwtTokenConstant;
 import com.personal.skin_api.member.controller.request.*;
 import com.personal.skin_api.member.service.MemberService;
 import com.personal.skin_api.member.service.dto.response.MemberFindEmailResponse;
 import com.personal.skin_api.member.service.dto.response.MemberLoginResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,9 +48,25 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest request) {
-        MemberLoginResponse response = memberService.login(request.toService());
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest request,
+                                                     HttpServletResponse response) {
+        MemberLoginResponse loginResponse = memberService.login(request.toService());
+
+        // accessToken 헤더에 담기
+        Cookie accessTokenCookie = new Cookie("accessToken", loginResponse.getAccessToken());
+
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(true);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(1800);
+
+        // 쿠키를 응답에 추가
+        response.addCookie(accessTokenCookie);
+
+        // 쿠키 만든 후, 응답 Body에 있는 AccessToken 제거
+        loginResponse.removeAccessToken();
+
+        return ResponseEntity.ok().body(loginResponse);
     }
 
     @GetMapping("/request-cert-code-find-email")

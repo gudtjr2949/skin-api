@@ -1,6 +1,7 @@
 package com.personal.skin_api.mail.service;
 
 
+import com.personal.skin_api.common.redis.MailPurpose;
 import com.personal.skin_api.mail.service.dto.request.MailSendCertServiceRequest;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.service.MemberService;

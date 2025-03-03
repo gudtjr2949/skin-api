@@ -7,10 +7,12 @@ import lombok.Getter;
 public class MemberLoginServiceRequest {
     private final String email;
     private final String password;
+    private String accessToken;
 
     @Builder
-    private MemberLoginServiceRequest(final String email, final String password) {
+    private MemberLoginServiceRequest(final String email, final String password, final String accessToken) {
         this.email = email;
         this.password = password;
+        this.accessToken = accessToken;
     }
 }

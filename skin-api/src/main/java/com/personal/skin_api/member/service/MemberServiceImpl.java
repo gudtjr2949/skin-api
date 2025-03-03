@@ -2,13 +2,13 @@ package com.personal.skin_api.member.service;
 
 import com.personal.skin_api.common.exception.RestApiException;
 
+import com.personal.skin_api.common.redis.TokenPurpose;
 import com.personal.skin_api.common.redis.service.RedisService;
-import com.personal.skin_api.common.redis.service.dto.request.RedisFindMailCertServiceRequest;
-import com.personal.skin_api.common.redis.service.dto.request.RedisFindSmsCertServiceRequest;
-import com.personal.skin_api.common.redis.service.dto.request.RedisSaveMailCertServiceRequest;
-import com.personal.skin_api.common.redis.service.dto.request.RedisSaveSmsCertServiceRequest;
+import com.personal.skin_api.common.redis.service.dto.request.*;
+import com.personal.skin_api.common.security.JwtTokenConstant;
+import com.personal.skin_api.common.security.JwtTokenProvider;
 import com.personal.skin_api.common.util.CertCodeGenerator;
-import com.personal.skin_api.mail.service.MailPurpose;
+import com.personal.skin_api.common.redis.MailPurpose;
 import com.personal.skin_api.mail.service.MailService;
 import com.personal.skin_api.mail.service.dto.request.MailSendCertServiceRequest;
 import com.personal.skin_api.member.repository.MemberRepository;
@@ -37,6 +37,7 @@ class MemberServiceImpl implements MemberService {
     private final SmsService smsService;
     private final RedisService redisService;
     private final CertCodeGenerator codeGenerator;
+    private final JwtTokenProvider jwtTokenProvider;
 
 
     /**
@@ -162,8 +163,19 @@ class MemberServiceImpl implements MemberService {
         Member loginMember = memberRepository.findMemberByEmailAndPassword(new Email(request.getEmail()), new Password(request.getPassword()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
+        // accessToken 헤더에 담기
+        String accessToken = jwtTokenProvider.generateJwt(request.getEmail(), JwtTokenConstant.accessExpirationTime);
+        String refreshToken = jwtTokenProvider.generateJwt(request.getEmail(), JwtTokenConstant.refreshExpirationTime);
+
+        redisService.saveRefreshToken(RedisSaveRefreshTokenServiceRequest.builder()
+                .purpose(TokenPurpose.REFRESH_TOKEN)
+                .email(loginMember.getEmail())
+                .refreshToken(refreshToken)
+                .build());
+
         return MemberLoginResponse.builder()
                 .member(loginMember)
+                .accessToken(accessToken)
                 .build();
     }
 
