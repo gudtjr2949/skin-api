@@ -32,7 +32,7 @@ public class MemberController {
         return ResponseEntity.ok().body(null);
     }
 
-    @PostMapping("/check-cert-code-signup-email")
+    @PostMapping("/check-cert-code-signup-phone")
     public ResponseEntity<Object> checkCertCodeForSignUpPhone(@RequestBody MemberCheckCertSmsForCheckPhoneRequest request) {
         memberService.checkCertSmsForCheckPhone(request.toService());
         return ResponseEntity.ok().body(null);

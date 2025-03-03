@@ -2,8 +2,10 @@ package com.personal.skin_api.member.controller.request;
 
 import com.personal.skin_api.member.service.dto.request.MemberCheckCertMailForCheckMailServiceRequest;
 import com.personal.skin_api.member.service.dto.request.MemberCheckCertSmsForCheckPhoneServiceRequest;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor
 public class MemberCheckCertSmsForCheckPhoneRequest {
 

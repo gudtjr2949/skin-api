@@ -2,8 +2,10 @@ package com.personal.skin_api.member.controller.request;
 
 import com.personal.skin_api.member.service.dto.request.MemberLoginServiceRequest;
 import com.personal.skin_api.member.service.dto.request.MemberSignUpServiceRequest;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor
 public class MemberLoginRequest {
     private String email;
