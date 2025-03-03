@@ -1,6 +1,6 @@
 package com.personal.skin_api.mail.service.dto.request;
 
-import com.personal.skin_api.mail.service.MailPurpose;
+import com.personal.skin_api.common.redis.MailPurpose;
 import com.personal.skin_api.member.repository.entity.email.Email;
 import lombok.Builder;
 import lombok.Getter;

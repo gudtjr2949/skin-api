@@ -20,6 +20,11 @@ spring:
         format-sql: true
     hibernate:
       ddl-auto: create-drop
+  jwt:
+    secret: ${JWT_SECRET_KEY}
+    token:
+      access-expiration-time: 600000
+      refresh-expiration-time: 3600000
 
 coolsms:
   api:

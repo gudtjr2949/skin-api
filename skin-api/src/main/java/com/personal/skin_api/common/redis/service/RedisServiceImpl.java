@@ -2,10 +2,8 @@ package com.personal.skin_api.common.redis.service;
 
 import com.personal.skin_api.common.exception.CommonErrorCode;
 import com.personal.skin_api.common.exception.RestApiException;
-import com.personal.skin_api.common.redis.service.dto.request.RedisFindMailCertServiceRequest;
-import com.personal.skin_api.common.redis.service.dto.request.RedisFindSmsCertServiceRequest;
-import com.personal.skin_api.common.redis.service.dto.request.RedisSaveMailCertServiceRequest;
-import com.personal.skin_api.common.redis.service.dto.request.RedisSaveSmsCertServiceRequest;
+import com.personal.skin_api.common.redis.service.dto.request.*;
+import com.personal.skin_api.common.security.JwtTokenConstant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -15,8 +13,7 @@ import java.time.Duration;
 @Service
 @RequiredArgsConstructor
 public class RedisServiceImpl implements RedisService {
-    private static final long MAIL_TTL = 3;
-    private static final long SMS_TTL = 3;
+    private static final long MAIL_TTL = 3, SMS_TTL = 3;
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
@@ -60,6 +57,29 @@ public class RedisServiceImpl implements RedisService {
         try {
             String findCode = redisTemplate.opsForValue().get(key).toString();
             return findCode;
+        } catch (Exception e) {
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public void saveRefreshToken(RedisSaveRefreshTokenServiceRequest request) {
+        String key = generateKey(request.getPurpose().toString(), request.getEmail());
+
+        try {
+            redisTemplate.opsForValue().set(key, request.getRefreshToken(), JwtTokenConstant.refreshExpirationTime);
+        } catch (Exception e) {
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public String findRefreshToken(RedisFindRefreshTokenServiceRequest request) {
+        String key = generateKey(request.getPurpose().toString(), request.getEmail());
+
+        try {
+            String findRefreshToken = redisTemplate.opsForValue().get(key).toString();
+            return findRefreshToken;
         } catch (Exception e) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }

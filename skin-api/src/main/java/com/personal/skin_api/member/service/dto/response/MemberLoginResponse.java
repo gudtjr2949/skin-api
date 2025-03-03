@@ -9,11 +9,17 @@ public class MemberLoginResponse {
     private final String email;
     private final String memberName;
     private final String nickname;
+    private String accessToken;
 
     @Builder
-    private MemberLoginResponse(final Member member) {
+    private MemberLoginResponse(final Member member, final String accessToken) {
         this.email = member.getEmail();
         this.memberName = member.getMemberName();
         this.nickname = member.getNickname();
+        this.accessToken = accessToken;
+    }
+
+    public void removeAccessToken() {
+        accessToken = "";
     }
 }

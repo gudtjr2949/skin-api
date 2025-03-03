@@ -4,7 +4,7 @@ import com.personal.skin_api.common.redis.service.dto.request.RedisFindMailCertS
 import com.personal.skin_api.common.redis.service.dto.request.RedisSaveMailCertServiceRequest;
 import com.personal.skin_api.common.util.CertCodeGenerator;
 
-import com.personal.skin_api.mail.service.MailPurpose;
+import com.personal.skin_api.common.redis.MailPurpose;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
