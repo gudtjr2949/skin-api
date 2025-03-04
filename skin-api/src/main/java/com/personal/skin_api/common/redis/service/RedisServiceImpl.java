@@ -5,11 +5,13 @@ import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.common.redis.service.dto.request.*;
 import com.personal.skin_api.common.security.JwtTokenConstant;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RedisServiceImpl implements RedisService {
@@ -65,9 +67,8 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public void saveRefreshToken(RedisSaveRefreshTokenServiceRequest request) {
         String key = generateKey(request.getPurpose().toString(), request.getEmail());
-
         try {
-            redisTemplate.opsForValue().set(key, request.getRefreshToken(), JwtTokenConstant.refreshExpirationTime);
+            redisTemplate.opsForValue().set(key, request.getRefreshToken(), Duration.ofMillis(JwtTokenConstant.refreshExpirationTime));
         } catch (Exception e) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
