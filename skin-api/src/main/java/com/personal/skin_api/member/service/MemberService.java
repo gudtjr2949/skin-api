@@ -12,6 +12,7 @@ public interface MemberService {
     void checkPhoneDuplicated(String phone);
     void signUp(MemberSignUpServiceRequest request);
     MemberLoginResponse login(MemberLoginServiceRequest request);
+    String reissueAccessToken(String email);
     String sendCertSmsForFindEmail(String phone);
     MemberFindEmailResponse findEmail(MemberFindEmailServiceRequest request);
     String sendCertMailForFindPassword(String email);
@@ -20,4 +21,5 @@ public interface MemberService {
     MemberDetailResponse findMemberDetail(MemberFindDetailServiceRequest request);
     void modifyMemberDetail(MemberModifyDetailServiceRequest request);
     void withdraw(MemberWithdrawServiceRequest request);
+
 }

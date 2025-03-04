@@ -1,5 +1,6 @@
 package com.personal.skin_api.member.controller;
 
+import com.personal.skin_api.common.security.JwtFilter;
 import com.personal.skin_api.common.security.JwtTokenConstant;
 import com.personal.skin_api.member.controller.request.*;
 import com.personal.skin_api.member.service.MemberService;
@@ -72,6 +73,25 @@ public class MemberController {
         loginResponse.removeAccessToken();
 
         return ResponseEntity.ok().body(loginResponse);
+    }
+
+    @GetMapping("/reissue-access-token")
+    public ResponseEntity<Object> reissueAccessToken(@CookieValue("accessToken") String accessToken,
+                                                     HttpServletResponse response) {
+        String email = JwtFilter.getEmailFromToken(accessToken);
+        String newAccessToken = memberService.reissueAccessToken(email);
+
+        Cookie accessTokenCookie = new Cookie("accessToken", newAccessToken);
+
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(true);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(1800);
+
+        // 쿠키를 응답에 추가
+        response.addCookie(accessTokenCookie);
+
+        return ResponseEntity.ok().body(null);
     }
 
     @GetMapping("/request-cert-code-find-email")

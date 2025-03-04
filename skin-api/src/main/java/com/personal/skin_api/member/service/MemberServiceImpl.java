@@ -2,6 +2,7 @@ package com.personal.skin_api.member.service;
 
 import com.personal.skin_api.common.exception.RestApiException;
 
+import com.personal.skin_api.common.exception.member.MemberErrorCode;
 import com.personal.skin_api.common.redis.TokenPurpose;
 import com.personal.skin_api.common.redis.service.RedisService;
 import com.personal.skin_api.common.redis.service.dto.request.*;
@@ -177,6 +178,24 @@ class MemberServiceImpl implements MemberService {
                 .member(loginMember)
                 .accessToken(accessToken)
                 .build();
+    }
+
+    @Override
+    public String reissueAccessToken(String email) {
+        Member reissuedMember = memberRepository.findMemberByEmail(new Email(email))
+                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+
+        String refreshToken = redisService.findRefreshToken(RedisFindRefreshTokenServiceRequest.builder()
+                .purpose(TokenPurpose.REFRESH_TOKEN)
+                .email(email).build());
+
+        if (refreshToken == null) {
+            throw new RestApiException(REQUIRED_RE_LOGIN);
+        }
+
+        String newAccessToken = jwtTokenProvider.generateJwt(email, JwtTokenConstant.accessExpirationTime);
+
+        return newAccessToken;
     }
 
     @Override
