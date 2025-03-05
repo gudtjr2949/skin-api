@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/members")
 public class MemberController {
+
     private final MemberService memberService;
 
     @GetMapping("/request-cert-code-signup-email")
