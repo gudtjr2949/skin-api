@@ -1,7 +1,6 @@
 package com.personal.skin_api.member.controller;
 
 import com.personal.skin_api.common.security.JwtFilter;
-import com.personal.skin_api.common.security.JwtTokenConstant;
 import com.personal.skin_api.member.controller.request.*;
 import com.personal.skin_api.member.service.MemberService;
 import com.personal.skin_api.member.service.dto.request.MemberFindDetailServiceRequest;
@@ -80,7 +79,7 @@ public class MemberController {
     public ResponseEntity<Object> reissueAccessToken(@CookieValue("accessToken") String accessToken,
                                                      HttpServletResponse response) {
         String email = JwtFilter.getEmailFromToken(accessToken);
-        String newAccessToken = memberService.reissueAccessToken(email);
+        String newAccessToken = memberService.reissueToken(email);
 
         Cookie accessTokenCookie = new Cookie("accessToken", newAccessToken);
 

@@ -181,7 +181,7 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public String reissueAccessToken(String email) {
+    public String reissueToken(String email) {
         Member reissuedMember = memberRepository.findMemberByEmail(new Email(email))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
@@ -194,6 +194,13 @@ class MemberServiceImpl implements MemberService {
         }
 
         String newAccessToken = jwtTokenProvider.generateJwt(email, JwtTokenConstant.accessExpirationTime);
+        String newRefreshToken = jwtTokenProvider.generateJwt(email, JwtTokenConstant.refreshExpirationTime);
+
+        redisService.saveRefreshToken(RedisSaveRefreshTokenServiceRequest.builder()
+                .purpose(TokenPurpose.REFRESH_TOKEN)
+                .email(email)
+                .refreshToken(newRefreshToken)
+                .build());
 
         return newAccessToken;
     }

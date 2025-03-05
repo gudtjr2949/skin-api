@@ -12,7 +12,7 @@ public interface MemberService {
     void checkPhoneDuplicated(String phone);
     void signUp(MemberSignUpServiceRequest request);
     MemberLoginResponse login(MemberLoginServiceRequest request);
-    String reissueAccessToken(String email);
+    String reissueToken(String email);
     String sendCertSmsForFindEmail(String phone);
     MemberFindEmailResponse findEmail(MemberFindEmailServiceRequest request);
     String sendCertMailForFindPassword(String email);
