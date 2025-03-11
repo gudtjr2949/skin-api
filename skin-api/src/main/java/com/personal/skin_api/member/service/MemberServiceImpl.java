@@ -2,7 +2,6 @@ package com.personal.skin_api.member.service;
 
 import com.personal.skin_api.common.exception.RestApiException;
 
-import com.personal.skin_api.common.exception.member.MemberErrorCode;
 import com.personal.skin_api.common.redis.TokenPurpose;
 import com.personal.skin_api.common.redis.service.RedisService;
 import com.personal.skin_api.common.redis.service.dto.request.*;
