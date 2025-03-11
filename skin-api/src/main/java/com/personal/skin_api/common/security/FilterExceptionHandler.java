@@ -10,7 +10,7 @@ import java.io.IOException;
 public class FilterExceptionHandler {
 
     public static void handleExceptionInternal(HttpServletResponse response, ErrorCode errorCode) throws IOException {
-        ErrorResponse errorResponse = new ErrorResponse(errorCode.toString(), errorCode.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(errorCode.getHttpStatus().value(), errorCode.getMessage());
         response.setStatus(errorCode.getHttpStatus().value());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
