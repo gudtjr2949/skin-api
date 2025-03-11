@@ -43,6 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/members/request-cert-code-signup-phone",
             "/api/v1/members/check-cert-code-signup-phone",
             "/api/v1/members/signup",
+            "/api/v1/members/check-duplicated-nickname",
             "/api/v1/members/login",
             "/api/v1/members/reissue-access-token",
             "/api/v1/members/request-cert-code-find-email",
@@ -110,10 +111,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
     private String resolveToken(HttpServletRequest request) {
-        String accessToken = Arrays.stream(request.getCookies())
-                .filter(cookie -> "accessToken".equals(cookie.getName()))
-                .map(Cookie::getValue)
-                .findFirst().orElseThrow(() -> new RestApiException(JwtErrorCode.INVALID_JWT));
-        return accessToken;
+        try {
+            String accessToken = Arrays.stream(request.getCookies())
+                    .filter(cookie -> "accessToken".equals(cookie.getName()))
+                    .map(Cookie::getValue)
+                    .findFirst().orElseThrow(() -> new RestApiException(JwtErrorCode.INVALID_JWT));
+            return accessToken;
+        } catch (NullPointerException e) {
+            throw new RestApiException(JwtErrorCode.JWT_CANNOT_BE_NULL);
+        }
     }
 }

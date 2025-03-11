@@ -1,5 +1,6 @@
 package com.personal.skin_api.member.controller;
 
+import com.personal.skin_api.common.dto.CommonResponse;
 import com.personal.skin_api.common.security.JwtFilter;
 import com.personal.skin_api.member.controller.request.*;
 import com.personal.skin_api.member.service.MemberService;
@@ -11,6 +12,7 @@ import com.personal.skin_api.member.service.dto.response.MemberLoginResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,9 +32,15 @@ public class MemberController {
     }
 
     @PostMapping("/check-cert-code-signup-email")
-    public ResponseEntity<Object> checkCertCodeForSignUpEmail(@RequestBody MemberCheckCertMailForCheckMailRequest request) {
+    public ResponseEntity<CommonResponse> checkCertCodeForSignUpEmail(@RequestBody MemberCheckCertMailForCheckMailRequest request) {
         memberService.checkCertMailForCheckEmail(request.toService());
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(new CommonResponse(200, "이메일 인증 성공"));
+    }
+
+    @GetMapping("/check-duplicated-nickname")
+    public ResponseEntity<CommonResponse> checkDuplicatedNickname(@RequestParam("nickname") String nickname) {
+        memberService.checkNicknameDuplicated(nickname);
+        return ResponseEntity.ok().body(new CommonResponse(200, "닉네임 중복여부 판별 성공"));
     }
 
     @GetMapping("/request-cert-code-signup-phone")
