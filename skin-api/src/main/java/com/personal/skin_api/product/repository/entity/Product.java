@@ -1,6 +1,7 @@
 package com.personal.skin_api.product.repository.entity;
 
 import com.personal.skin_api.common.entity.BaseEntity;
+import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.product.repository.entity.fileurl.FileUrl;
 import com.personal.skin_api.product.repository.entity.price.Price;
 import com.personal.skin_api.product.repository.entity.product_content.ProductContent;
@@ -15,6 +16,10 @@ public class Product extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
+
+    @ManyToOne
+    @Column(name = "MEMBER_ID")
+    private Member member;
 
     @Embedded
     private ProductContent productContent;
