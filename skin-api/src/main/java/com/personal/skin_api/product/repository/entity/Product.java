@@ -65,6 +65,10 @@ public class Product extends BaseEntity {
         this.productStatus = ProductStatus.REPORTED;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getMember() {
         return member.getEmail();
     }
