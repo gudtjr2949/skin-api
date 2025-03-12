@@ -2,6 +2,7 @@ package com.personal.skin_api.product.repository.entity;
 
 import com.personal.skin_api.common.entity.BaseEntity;
 import com.personal.skin_api.member.repository.entity.Member;
+
 import com.personal.skin_api.product.repository.entity.fileurl.FileUrl;
 import com.personal.skin_api.product.repository.entity.price.Price;
 import com.personal.skin_api.product.repository.entity.product_content.ProductContent;
@@ -35,6 +36,10 @@ public class Product extends BaseEntity {
     @Embedded
     private Price price;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "PRODUCT_STATUS")
+    private ProductStatus productStatus;
+
     @Builder
     private Product(final Member member, final String productName, final String productContent, final String fileUrl, final int price) {
         this.member = member;
@@ -42,6 +47,7 @@ public class Product extends BaseEntity {
         this.productContent = new ProductContent(productContent);
         this.fileUrl = new FileUrl(fileUrl);
         this.price = new Price(price);
+        this.productStatus = ProductStatus.ACTIVE;
     }
 
     public void modifyProduct(final String productName, final String productContent, final String fileUrl, final int price) {
@@ -49,6 +55,14 @@ public class Product extends BaseEntity {
         this.productContent = new ProductContent(productContent);
         this.fileUrl = new FileUrl(fileUrl);
         this.price = new Price(price);
+    }
+
+    public void removeProduct() {
+        this.productStatus = ProductStatus.REMOVED;
+    }
+
+    public void reportProduct() {
+        this.productStatus = ProductStatus.REPORTED;
     }
 
     public String getMember() {
@@ -69,5 +83,9 @@ public class Product extends BaseEntity {
 
     public int getPrice() {
         return price.getPrice();
+    }
+
+    public ProductStatus getProductStatus() {
+        return productStatus;
     }
 }

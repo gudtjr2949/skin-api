@@ -29,27 +29,7 @@ class ProductTest {
         assertThat(product.getFileUrl()).isEqualTo(fileUrl);
         assertThat(product.getPrice()).isEqualTo(price);
     }
-
-    @Test
-    void 제품명을_수정한다() {
-        // given
-        Member member = createMember();
-        Product product = createProductNoParameter(member);
-        String newProductName = "형석이의 새로운 스킨";
-
-        // when
-        product = Product.builder()
-                .member(member)
-                .productName(newProductName)
-                .productContent(product.getProductContent())
-                .price(product.getPrice())
-                .fileUrl(product.getFileUrl())
-                .build();
-
-        // then
-        assertThat(product.getProductName()).isEqualTo(newProductName);
-    }
-
+    
     @Test
     void 제품정보를_수정한다() {
         // given
@@ -68,6 +48,32 @@ class ProductTest {
         assertThat(product.getProductContent()).isEqualTo(newProductContent);
         assertThat(product.getFileUrl()).isEqualTo(newFileUrl);
         assertThat(product.getPrice()).isEqualTo(newPrice);
+    }
+    
+    @Test
+    void 제품이_삭제되면_상태가_REMOVED로_변한다() {
+        // given
+        Member member = createMember();
+        Product product = createProductNoParameter(member);
+        
+        // when
+        product.removeProduct();
+        
+        // then
+        assertThat(product.getProductStatus()).isEqualTo(ProductStatus.REMOVED);
+    }
+
+    @Test
+    void 제품이_신고된다면_상태가_REPORTED로_변한다() {
+        // given
+        Member member = createMember();
+        Product product = createProductNoParameter(member);
+
+        // when
+        product.reportProduct();
+
+        // then
+        assertThat(product.getProductStatus()).isEqualTo(ProductStatus.REPORTED);
     }
 
     private static Product createProduct(Member member, String productName, String productContent, String fileUrl, int price) {
