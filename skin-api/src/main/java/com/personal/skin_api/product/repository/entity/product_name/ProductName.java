@@ -19,4 +19,8 @@ public class ProductName {
     private void validate(final String productName) {
         ProductNameStrategyContext.runStrategy(productName);
     }
+
+    public String getProductName() {
+        return productName;
+    }
 }
