@@ -5,11 +5,12 @@ import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
 import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.product.repository.entity.Product;
+import com.personal.skin_api.product.repository.entity.QProduct;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
-import org.junit.Before;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -34,11 +38,29 @@ class ProductRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private EntityManager em;
+
+    private JPAQueryFactory queryFactory;
+
     private Member member;
+
+    private List<Product> products;
+
+    private static final int PRODUCTS_PAGE_SIZE = 5;
+
+    @BeforeEach
+    void beforeEach() {
+        queryFactory = new JPAQueryFactory(em);
+    }
 
     @BeforeAll
     void setUp() {
         this.member = createMember();
+        products = Stream.generate(this::createProduct)
+                .limit(20)
+                .collect(Collectors.toList());
+        productRepository.saveAll(products);
     }
 
     @Test
@@ -72,6 +94,94 @@ class ProductRepositoryTest {
         // then
         assertThat(byId).isPresent();
         assertThat(byId.get().getId()).isEqualTo(product.getId());
+    }
+
+    @Test
+    void 제품_리스트_첫_장을_조회한다() {
+        // given
+        long productId = 0L; // 첫 장을 조회하기 때문에 기준이 되는 productId가 없음
+
+        BooleanBuilder builder = new BooleanBuilder();
+        if (productId > 0) {
+            builder.and(QProduct.product.id.lt(productId));
+        }
+
+        // when
+        List<Product> findProducts = queryFactory
+                .selectFrom(QProduct.product)
+                .where(builder)
+                .orderBy(QProduct.product.id.desc())
+                .limit(PRODUCTS_PAGE_SIZE)
+                .fetch();
+
+        int firstIdx = products.size()-1; // 내림차순이기 때문에 products의 가장 마지막 객체가 가장 처음으로 조회됨
+        int lastIdx = firstIdx - (PRODUCTS_PAGE_SIZE - 1);
+
+        // then
+        assertThat(findProducts).hasSize(PRODUCTS_PAGE_SIZE);
+        assertThat(products.get(firstIdx).getId()).isEqualTo(findProducts.get(0).getId());
+        assertThat(products.get(lastIdx).getId()).isEqualTo(findProducts.get(PRODUCTS_PAGE_SIZE-1).getId());
+    }
+
+    @Test
+    void 제품_리스트_중간_장을_조회한다() {
+        // given
+        long productId = (long) (products.size() / 2); // 이전까지 조회한 제품 중 가장 마지막 제품 (productId가 가장 작은 제품)
+
+        // when
+        List<Product> findProducts = queryFactory
+                .selectFrom(QProduct.product)
+                .where(QProduct.product.id.lt(productId))
+                .orderBy(QProduct.product.id.desc())
+                .limit(PRODUCTS_PAGE_SIZE)
+                .fetch();
+
+        int firstIdx = (products.size() / 2) - 2;
+        int lastIdx = firstIdx - (PRODUCTS_PAGE_SIZE - 1);
+        
+        // then
+        assertThat(findProducts).hasSize(PRODUCTS_PAGE_SIZE);
+        assertThat(products.get(firstIdx).getId()).isEqualTo(findProducts.get(0).getId());
+        assertThat(products.get(lastIdx).getId()).isEqualTo(findProducts.get(PRODUCTS_PAGE_SIZE-1).getId());
+    }
+
+    @Test
+    void 제품_리스트_마지막_장을_조회한다() {
+        // given
+        long productId = (long) PRODUCTS_PAGE_SIZE + 1; // 마지막 글 조회에 pageSize가 모두 조회되도록 pageSize에 1을 더함
+
+        // when
+        List<Product> findProducts = queryFactory
+                .selectFrom(QProduct.product)
+                .where(QProduct.product.id.lt(productId))
+                .orderBy(QProduct.product.id.desc())
+                .limit(PRODUCTS_PAGE_SIZE)
+                .fetch();
+
+        int firstIdx = (int) productId - 2;
+        int lastIdx = firstIdx - (PRODUCTS_PAGE_SIZE - 1);
+
+        // then
+        assertThat(findProducts).hasSize(PRODUCTS_PAGE_SIZE);
+        assertThat(products.get(firstIdx).getId()).isEqualTo(findProducts.get(0).getId());
+        assertThat(products.get(lastIdx).getId()).isEqualTo(findProducts.get(PRODUCTS_PAGE_SIZE-1).getId());
+    }
+
+    @Test
+    void 제품_리스트_마지막_장을_조회하는데_pageSize보다_적은_수가_조회된다() {
+        // given
+        long productId = PRODUCTS_PAGE_SIZE-1;
+
+        // when
+        List<Product> findProducts = queryFactory
+                .selectFrom(QProduct.product)
+                .where(QProduct.product.id.lt(productId))
+                .orderBy(QProduct.product.id.desc())
+                .limit(PRODUCTS_PAGE_SIZE)
+                .fetch();
+
+        // then
+        assertThat(findProducts.size()).isLessThan(PRODUCTS_PAGE_SIZE);
     }
 
     private Product createProduct() {
