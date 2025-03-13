@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.*;
 @Slf4j
 @DataJpaTest
 @ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS) // 인스턴스 단위로 실행 (static 필요 없음)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProductRepositoryTest {
 
     @Autowired
