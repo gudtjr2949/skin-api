@@ -46,3 +46,16 @@ sample:
   email: ${SAMPLE_EMAIL}
   member-name: ${SAMPLE_MEMBER_NAME}
   phone: ${SAMPLE_PHONE}
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY_ID}       # AWS IAM AccessKey 적기
+      secretKey: ${AWS_SECRET_ACCESS_KEY}   # AWS IAM SecretKey 적기
+    s3:
+      bucket: skin-uploads
+      dir: skin
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
