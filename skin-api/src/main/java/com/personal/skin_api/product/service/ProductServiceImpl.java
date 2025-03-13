@@ -19,11 +19,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
-    private final ProductRepository productRepository;
-
-    private final MemberRepository memberRepository;
-
     private final S3Service s3Service;
+    private final MemberRepository memberRepository;
+    private final ProductRepository productRepository;
 
     @Override
     public void registerProduct(ProductRegisterServiceRequest request) {
