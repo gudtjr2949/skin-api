@@ -32,7 +32,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     private HttpServletResponse setResponse(HttpServletResponse response) throws IOException {
         HttpServletResponse newResponse = new HttpServletResponseWrapper(response);
 
-        ErrorResponse errorResultDto = new ErrorResponse(HttpStatus.FORBIDDEN.toString(),"적절하지 않은 접근입니다.");
+        ErrorResponse errorResultDto = new ErrorResponse(HttpStatus.FORBIDDEN.value(),"적절하지 않은 접근입니다.");
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
