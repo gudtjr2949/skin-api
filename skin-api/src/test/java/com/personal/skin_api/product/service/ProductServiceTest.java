@@ -12,10 +12,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProductServiceTest {
 
@@ -33,18 +40,24 @@ class ProductServiceTest {
     }
 
     @Test
-    void 제품을_등록한다() {
+    void 제품을_등록한다() throws IOException {
         // given
         String productName = "형석이의 스킨";
         String productContent = "아주 예쁜 스킨입니다!";
-        String fileUrl = "s3://hyeongseok-skin/fileUrl";
+        ClassPathResource resource = new ClassPathResource("test.zip");
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test.zip",
+                MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                resource.getInputStream()
+        );
         int price = 10_000;
 
         ProductRegisterServiceRequest registerRequest = ProductRegisterServiceRequest.builder()
                 .email(member.getEmail())
                 .productName(productName)
                 .productContent(productContent)
-//                .file()
+                .file(file)
                 .price(price)
                 .build();
 
