@@ -3,6 +3,7 @@ package com.personal.skin_api.product.service;
 import com.personal.skin_api.common.exception.CommonErrorCode;
 import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.common.exception.member.MemberErrorCode;
+import com.personal.skin_api.common.file.service.S3Service;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.email.Email;
@@ -22,14 +23,16 @@ public class ProductServiceImpl implements ProductService {
 
     private final MemberRepository memberRepository;
 
-    // TODO : S3 관련 클래스 의존 필요
+    private final S3Service s3Service;
 
     @Override
     public void registerProduct(ProductRegisterServiceRequest request) {
         Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        Product product = request.toEntity(member, "S3fileUrl");
+        String fileUrl = s3Service.uploadFile(request.getFile());
+
+        Product product = request.toEntity(member, fileUrl);
 
         try {
             productRepository.save(product);
