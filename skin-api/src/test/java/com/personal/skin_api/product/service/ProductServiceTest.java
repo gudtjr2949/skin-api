@@ -1,5 +1,6 @@
 package com.personal.skin_api.product.service;
 
+import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
@@ -9,6 +10,7 @@ import com.personal.skin_api.product.repository.entity.Product;
 import com.personal.skin_api.product.service.dto.request.ProductFindListServiceRequest;
 import com.personal.skin_api.product.service.dto.request.ProductFindMyListServiceRequest;
 import com.personal.skin_api.product.service.dto.request.ProductRegisterServiceRequest;
+import com.personal.skin_api.product.service.dto.response.ProductDetailResponse;
 import com.personal.skin_api.product.service.dto.response.ProductListResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -151,6 +153,48 @@ class ProductServiceTest {
         // then
         assertThat(member1Products.getProductResponses()).hasSize(PRODUCTS_PAGE_SIZE);
         assertThat(member2Products.getProductResponses()).hasSize(0);
+    }
+
+    @Test
+    void 제품_상세_정보를_조회한다() {
+        // given
+        Product product = createProduct();
+        productRepository.save(product);
+
+        // when
+        ProductDetailResponse findDetailProduct = productService.findProductDetail(product.getId());
+
+        // then
+        assertThat(findDetailProduct.getProductId()).isEqualTo(product.getId());
+        assertThat(findDetailProduct.getProductName()).isEqualTo(product.getProductName());
+        assertThat(findDetailProduct.getProductContent()).isEqualTo(product.getProductContent());
+    }
+
+    @Test
+    void 제품_상세_정보를_조회할_때_없는_제품ID가_입력되면_예외가_발생한다() {
+        // given
+        Long smallProductId = 0L;
+        Long largeProductId = 1_000_000_000L;
+        List<Long> noProductIds = List.of(smallProductId, largeProductId);
+
+        // when & then
+        noProductIds.stream().forEach(productId -> assertThatThrownBy(() -> productService.findProductDetail(productId))
+                .isInstanceOf(RestApiException.class));
+    }
+
+    @Test
+    void 제품_상세_정보_조회를_성공하면_조회수가_1_증가한다() {
+        // given
+        Product product = createProduct();
+        productRepository.save(product);
+
+        int beforeProductViews = product.getProductViews();
+
+        // when
+        ProductDetailResponse findDetailProduct = productService.findProductDetail(product.getId());
+
+        // then
+        assertThat(findDetailProduct.getProductViews()).isEqualTo(beforeProductViews+1);
     }
 
     private Product createProduct() {

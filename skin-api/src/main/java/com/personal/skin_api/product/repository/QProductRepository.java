@@ -26,10 +26,16 @@ public class QProductRepository {
 
     public static final int PRODUCTS_PAGE_SIZE = 5;
 
-    public List<Product> findProducts(Long productId, String keyword) {
+    public List<Product> findProducts(Long productId, String sorter, String keyword) {
         BooleanBuilder builder = new BooleanBuilder();
+
         if (productId > 0) {
             builder.and(QProduct.product.id.lt(productId));
+        }
+
+        // TODO : 기준 별 정렬 필요
+        if (sorter != null) {
+
         }
 
         if (keyword != null) {
