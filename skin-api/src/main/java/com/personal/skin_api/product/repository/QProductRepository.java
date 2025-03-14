@@ -13,19 +13,29 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-@RequiredArgsConstructor
 public class QProductRepository {
 
     private final EntityManager em;
 
     private final JPAQueryFactory queryFactory;
 
-    private static final int PRODUCTS_PAGE_SIZE = 5;
+    public QProductRepository(EntityManager em) {
+        this.em = em;
+        this.queryFactory = new JPAQueryFactory(em);
+    }
 
-    public List<Product> findProducts(Long productId, String keyword) {
+    public static final int PRODUCTS_PAGE_SIZE = 5;
+
+    public List<Product> findProducts(Long productId, String sorter, String keyword) {
         BooleanBuilder builder = new BooleanBuilder();
+
         if (productId > 0) {
             builder.and(QProduct.product.id.lt(productId));
+        }
+
+        // TODO : 기준 별 정렬 필요
+        if (sorter != null) {
+
         }
 
         if (keyword != null) {

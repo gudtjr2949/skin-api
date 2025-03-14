@@ -7,6 +7,7 @@ import com.personal.skin_api.product.repository.entity.fileurl.FileUrl;
 import com.personal.skin_api.product.repository.entity.price.Price;
 import com.personal.skin_api.product.repository.entity.product_content.ProductContent;
 import com.personal.skin_api.product.repository.entity.product_name.ProductName;
+import com.personal.skin_api.product.repository.entity.views.ProductViews;
 import jakarta.persistence.*;
 
 import lombok.Builder;
@@ -36,6 +37,9 @@ public class Product extends BaseEntity {
     @Embedded
     private Price price;
 
+    @Embedded
+    private ProductViews productViews;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "PRODUCT_STATUS")
     private ProductStatus productStatus;
@@ -47,6 +51,7 @@ public class Product extends BaseEntity {
         this.productContent = new ProductContent(productContent);
         this.fileUrl = new FileUrl(fileUrl);
         this.price = new Price(price);
+        this.productViews = new ProductViews(0);
         this.productStatus = ProductStatus.ACTIVE;
     }
 
@@ -57,6 +62,10 @@ public class Product extends BaseEntity {
         this.price = new Price(price);
     }
 
+    public void increaseViews() {
+        productViews.increaseViews();
+    }
+
     public void removeProduct() {
         this.productStatus = ProductStatus.REMOVED;
     }
@@ -64,6 +73,8 @@ public class Product extends BaseEntity {
     public void reportProduct() {
         this.productStatus = ProductStatus.REPORTED;
     }
+
+
 
     public Long getId() {
         return id;
@@ -87,6 +98,10 @@ public class Product extends BaseEntity {
 
     public int getPrice() {
         return price.getPrice();
+    }
+
+    public int getProductViews() {
+        return productViews.getProductViews();
     }
 
     public ProductStatus getProductStatus() {
