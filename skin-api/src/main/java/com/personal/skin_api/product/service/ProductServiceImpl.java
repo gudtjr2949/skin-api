@@ -13,6 +13,7 @@ import com.personal.skin_api.product.repository.QProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
 import com.personal.skin_api.product.service.dto.request.ProductFindListServiceRequest;
 import com.personal.skin_api.product.service.dto.request.ProductFindMyListServiceRequest;
+import com.personal.skin_api.product.service.dto.request.ProductModifyServiceRequest;
 import com.personal.skin_api.product.service.dto.request.ProductRegisterServiceRequest;
 import com.personal.skin_api.product.service.dto.response.ProductDetailResponse;
 import com.personal.skin_api.product.service.dto.response.ProductListResponse;
@@ -117,5 +118,31 @@ public class ProductServiceImpl implements ProductService {
                 .price(product.getPrice())
                 .productViews(product.getProductViews())
                 .build();
+    }
+
+    /**
+     * 제품 정보를 수정한다.
+     * @param request 수정할 제품 정보
+     */
+    @Override
+    @Transactional
+    public void modifyProduct(ProductModifyServiceRequest request) {
+        Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Product product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new RestApiException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        if (!product.getMember().equals(member.getEmail())) {
+            throw new RestApiException(ProductErrorCode.CAN_NOT_MODIFY_PRODUCT);
+        }
+
+        String newFileUrl = product.getFileUrl();
+
+        if (request.getNewFile() != null) {
+            newFileUrl = s3Service.uploadFile(request.getNewFile());
+        }
+
+        product.modifyProduct(request.getNewProductName(), request.getNewProductContent(), newFileUrl, request.getNewPrice());
     }
 }

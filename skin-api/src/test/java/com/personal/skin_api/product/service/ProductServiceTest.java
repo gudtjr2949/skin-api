@@ -9,6 +9,7 @@ import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
 import com.personal.skin_api.product.service.dto.request.ProductFindListServiceRequest;
 import com.personal.skin_api.product.service.dto.request.ProductFindMyListServiceRequest;
+import com.personal.skin_api.product.service.dto.request.ProductModifyServiceRequest;
 import com.personal.skin_api.product.service.dto.request.ProductRegisterServiceRequest;
 import com.personal.skin_api.product.service.dto.response.ProductDetailResponse;
 import com.personal.skin_api.product.service.dto.response.ProductListResponse;
@@ -24,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -158,8 +160,7 @@ class ProductServiceTest {
     @Test
     void 제품_상세_정보를_조회한다() {
         // given
-        Product product = createProduct();
-        productRepository.save(product);
+        Product product = products.get(0);
 
         // when
         ProductDetailResponse findDetailProduct = productService.findProductDetail(product.getId());
@@ -185,8 +186,7 @@ class ProductServiceTest {
     @Test
     void 제품_상세_정보_조회를_성공하면_조회수가_1_증가한다() {
         // given
-        Product product = createProduct();
-        productRepository.save(product);
+        Product product = products.get(0);
 
         int beforeProductViews = product.getProductViews();
 
@@ -195,6 +195,95 @@ class ProductServiceTest {
 
         // then
         assertThat(findDetailProduct.getProductViews()).isEqualTo(beforeProductViews+1);
+    }
+
+    @Test
+    void 제품_정보를_수정한다() throws IOException {
+        // given
+        Product product = products.get(0);
+        String originFileUrl = product.getFileUrl();
+
+        String newProductName = "제품명 수정";
+        String newProductContent = "제품 내용 수정";
+        ClassPathResource resource = new ClassPathResource("new_test.zip");
+        MockMultipartFile newFile = new MockMultipartFile(
+                "file",
+                "new_test.zip",
+                MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                resource.getInputStream()
+        );
+        int newPrice = product.getPrice() + 10_000;
+
+        ProductModifyServiceRequest request = ProductModifyServiceRequest.builder()
+                .productId(product.getId())
+                .email(product.getMember())
+                .newProductName(newProductName)
+                .newProductContent(newProductContent)
+                .newFile(newFile)
+                .newPrice(newPrice)
+                .build();
+
+        // when
+        productService.modifyProduct(request);
+        Optional<Product> modifiedProduct = productRepository.findById(product.getId());
+
+        // then
+        assertThat(modifiedProduct).isPresent();
+        assertThat(modifiedProduct.get().getProductName()).isEqualTo(newProductName);
+        assertThat(modifiedProduct.get().getProductContent()).isEqualTo(newProductContent);
+        assertThat(modifiedProduct.get().getPrice()).isEqualTo(newPrice);
+        assertThat(modifiedProduct.get().getFileUrl()).isNotEqualTo(originFileUrl);
+    }
+    
+    @Test
+    void 새로운_제품_파일이_null인_경우_파일_경로는_변경하지_않는다() {
+        // given
+        Product product = products.get(0);
+        String originFileUrl = product.getFileUrl();
+
+        String newProductName = "제품명 수정";
+        String newProductContent = "제품 내용 수정";
+        int newPrice = product.getPrice() + 10_000;
+
+        ProductModifyServiceRequest request = ProductModifyServiceRequest.builder()
+                .productId(product.getId())
+                .email(product.getMember())
+                .newProductName(newProductName)
+                .newProductContent(newProductContent)
+                .newFile(null)
+                .newPrice(newPrice)
+                .build();
+
+        // when
+        productService.modifyProduct(request);
+        Optional<Product> modifiedProduct = productRepository.findById(product.getId());
+
+        // then
+        assertThat(modifiedProduct).isPresent();
+        assertThat(modifiedProduct.get().getFileUrl()).isEqualTo(originFileUrl);
+    }
+
+    @Test
+    void 제품_수정_시_해당_제품_등록자가_아닌_경우_예외가_발생한다() {
+        // given
+        Product product = products.get(0);
+
+        String newProductName = "제품명 수정";
+        String newProductContent = "제품 내용 수정";
+        int newPrice = product.getPrice() + 10_000;
+
+        ProductModifyServiceRequest request = ProductModifyServiceRequest.builder()
+                .productId(product.getId())
+                .email("wrong123@naver.com")
+                .newProductName(newProductName)
+                .newProductContent(newProductContent)
+                .newFile(null)
+                .newPrice(newPrice)
+                .build();
+
+        // when & then
+        assertThatThrownBy(() -> productService.modifyProduct(request))
+                .isInstanceOf(RestApiException.class);
     }
 
     private Product createProduct() {
