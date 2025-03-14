@@ -1,7 +1,9 @@
 package com.personal.skin_api.product.service.dto.response;
 
 import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 public class ProductResponse {
     private final Long productId;
     private final String productName;

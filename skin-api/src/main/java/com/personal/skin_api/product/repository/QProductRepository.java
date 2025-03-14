@@ -13,14 +13,18 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-@RequiredArgsConstructor
 public class QProductRepository {
 
     private final EntityManager em;
 
     private final JPAQueryFactory queryFactory;
 
-    private static final int PRODUCTS_PAGE_SIZE = 5;
+    public QProductRepository(EntityManager em) {
+        this.em = em;
+        this.queryFactory = new JPAQueryFactory(em);
+    }
+
+    public static final int PRODUCTS_PAGE_SIZE = 5;
 
     public List<Product> findProducts(Long productId, String keyword) {
         BooleanBuilder builder = new BooleanBuilder();
