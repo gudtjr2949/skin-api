@@ -66,8 +66,8 @@ public class Product extends BaseEntity {
         productViews.increaseViews();
     }
 
-    public void removeProduct() {
-        this.productStatus = ProductStatus.REMOVED;
+    public void deleteProduct() {
+        this.productStatus = ProductStatus.DELETED;
     }
 
     public void reportProduct() {

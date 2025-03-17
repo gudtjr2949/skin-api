@@ -70,6 +70,7 @@ public class RedisServiceImpl implements RedisService {
         try {
             redisTemplate.opsForValue().set(key, request.getRefreshToken(), Duration.ofMillis(JwtTokenConstant.refreshExpirationTime));
         } catch (Exception e) {
+            log.error("Refresh Token 저장 에러 발생");
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
