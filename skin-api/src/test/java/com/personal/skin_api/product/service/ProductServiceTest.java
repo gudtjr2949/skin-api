@@ -14,6 +14,7 @@ import com.personal.skin_api.product.service.dto.request.ProductRegisterServiceR
 import com.personal.skin_api.product.service.dto.response.ProductDetailResponse;
 import com.personal.skin_api.product.service.dto.response.ProductListResponse;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -160,7 +161,7 @@ class ProductServiceTest {
     @Test
     void 제품_상세_정보를_조회한다() {
         // given
-        Product product = products.get(0);
+        Product product = products.get(10);
 
         // when
         ProductDetailResponse findDetailProduct = productService.findProductDetail(product.getId());

@@ -4,6 +4,7 @@ import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.product.repository.entity.Product;
 import com.personal.skin_api.product.repository.entity.QProduct;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +29,21 @@ public class QProductRepository {
 
     public List<Product> findProducts(Long productId, String sorter, String keyword) {
         BooleanBuilder builder = new BooleanBuilder();
+        OrderSpecifier<?> orderSpecifier = QProduct.product.id.desc();
 
         if (productId > 0) {
             builder.and(QProduct.product.id.lt(productId));
         }
 
-        // TODO : 기준 별 정렬 필요
         if (sorter != null) {
-
+            switch (sorter) {
+                case "views":
+                    orderSpecifier = QProduct.product.productViews.productViews.desc(); // 조회수 내림차순 정렬
+                    break;
+                case "price":
+                    orderSpecifier = QProduct.product.price.price.asc();
+                    break;
+            }
         }
 
         if (keyword != null) {
@@ -46,7 +54,7 @@ public class QProductRepository {
         List<Product> findProducts = queryFactory
                 .selectFrom(QProduct.product)
                 .where(builder)
-                .orderBy(QProduct.product.id.desc())
+                .orderBy(orderSpecifier)
                 .limit(PRODUCTS_PAGE_SIZE)
                 .fetch();
 
