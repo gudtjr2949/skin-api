@@ -6,6 +6,7 @@ import com.personal.skin_api.product.controller.dto.request.ProductModifyRequest
 import com.personal.skin_api.product.controller.dto.request.ProductRegisterRequest;
 import com.personal.skin_api.product.service.ProductService;
 
+import com.personal.skin_api.product.service.dto.request.ProductDeleteServiceRequest;
 import com.personal.skin_api.product.service.dto.request.ProductFindMyListServiceRequest;
 import com.personal.skin_api.product.service.dto.response.ProductListResponse;
 import com.personal.skin_api.product.service.dto.response.ProductDetailResponse;
@@ -58,5 +59,16 @@ public class ProductController {
         productService.modifyProduct(request.toService(userDetails.getUsername()));
 
         return ResponseEntity.ok().body(new CommonResponse(HttpStatus.OK.value(), "제품 수정 완료"));
+    }
+    
+    @DeleteMapping("/delete")
+    public ResponseEntity<Object> deleteProduct(@RequestParam("productId") Long productId,
+                                                @AuthenticationPrincipal UserDetails userDetails) {
+        productService.deleteProduct(ProductDeleteServiceRequest.builder()
+                .email(userDetails.getUsername())
+                .productId(productId)
+                .build());
+
+        return ResponseEntity.ok().body(new CommonResponse(HttpStatus.OK.value(), "제품 삭제 완료"));
     }
 }

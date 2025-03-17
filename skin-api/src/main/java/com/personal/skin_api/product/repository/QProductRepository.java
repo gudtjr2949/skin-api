@@ -2,6 +2,7 @@ package com.personal.skin_api.product.repository;
 
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.product.repository.entity.Product;
+import com.personal.skin_api.product.repository.entity.ProductStatus;
 import com.personal.skin_api.product.repository.entity.QProduct;
 import com.personal.skin_api.product.service.dto.ProductSorter;
 import com.querydsl.core.BooleanBuilder;
@@ -29,10 +30,10 @@ public class QProductRepository {
         BooleanBuilder builder = new BooleanBuilder();
         OrderSpecifier<?> orderSpecifier = ProductSorter.getOrderSpecifier(sorter);
 
+        builder.and(QProduct.product.productStatus.eq(ProductStatus.ACTIVE));
         if (productId > 0) {
             builder.and(QProduct.product.id.lt(productId));
         }
-
         if (keyword != null) {
             builder.and(QProduct.product.productName.productName.contains(keyword));
             builder.and(QProduct.product.productContent.productContent.contains(keyword));
@@ -50,10 +51,11 @@ public class QProductRepository {
 
     public List<Product> findMyProducts(Long productId, Member member) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(QProduct.product.productStatus.eq(ProductStatus.ACTIVE));
         if (productId > 0) {
             builder.and(QProduct.product.id.lt(productId));
         }
-
         builder.and(QProduct.product.member.eq(member));
 
         List<Product> findProducts = queryFactory
