@@ -57,10 +57,10 @@ class ProductTest {
         Product product = createProductNoParameter(member);
         
         // when
-        product.removeProduct();
+        product.deleteProduct();
         
         // then
-        assertThat(product.getProductStatus()).isEqualTo(ProductStatus.REMOVED);
+        assertThat(product.getProductStatus()).isEqualTo(ProductStatus.DELETED);
     }
 
     @Test
