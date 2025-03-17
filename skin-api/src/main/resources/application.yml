@@ -12,9 +12,9 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
-      sentinel:
-        master: mymaster
-        nodes: 127.0.0.1:26379
+#      sentinel:
+#        master: mymaster
+#        nodes: 127.0.0.1:26379
 
 
   jpa:
@@ -46,3 +46,16 @@ sample:
   email: ${SAMPLE_EMAIL}
   member-name: ${SAMPLE_MEMBER_NAME}
   phone: ${SAMPLE_PHONE}
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY_ID}
+      secretKey: ${AWS_SECRET_ACCESS_KEY}
+    s3:
+      bucket: skin-uploads
+      dir: skin
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false

@@ -8,6 +8,6 @@ import lombok.RequiredArgsConstructor;
 @Builder
 @RequiredArgsConstructor
 public class ErrorResponse {
-    private final String code;
+    private final int code;
     private final String message;
 }
