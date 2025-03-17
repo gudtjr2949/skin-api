@@ -10,17 +10,17 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Set;
 
-@Getter
-@Setter
-@Configuration
-@NoArgsConstructor
-@AllArgsConstructor
+//@Getter
+//@Setter
+//@Configuration
+//@NoArgsConstructor
+//@AllArgsConstructor
 public class RedisSentinelInfo {
-    @Value("${spring.data.redis.sentinel.nodes}")
-    private Set<String> nodes;
-
-    @Value("${spring.data.redis.sentinel.master}")
-    private String master;
+//    @Value("${spring.data.redis.sentinel.nodes}")
+//    private Set<String> nodes;
+//
+//    @Value("${spring.data.redis.sentinel.master}")
+//    private String master;
 
     private String password;
 
