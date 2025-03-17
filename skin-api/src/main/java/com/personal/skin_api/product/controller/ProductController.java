@@ -7,6 +7,7 @@ import com.personal.skin_api.product.service.ProductService;
 
 import com.personal.skin_api.product.service.dto.request.ProductFindMyListServiceRequest;
 import com.personal.skin_api.product.service.dto.response.ProductListResponse;
+import com.personal.skin_api.product.service.dto.response.ProductDetailResponse;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -43,5 +44,10 @@ public class ProductController {
                 .email(userDetails.getUsername())
                 .productId(productId)
                 .build()));
+    }
+
+    @GetMapping("/detail")
+    public ResponseEntity<ProductDetailResponse> findProductDetail(@RequestParam("productId") Long productId) {
+        return ResponseEntity.ok().body(productService.findProductDetail(productId));
     }
 }
