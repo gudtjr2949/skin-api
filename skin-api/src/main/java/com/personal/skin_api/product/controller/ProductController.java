@@ -4,6 +4,10 @@ import com.personal.skin_api.common.dto.CommonResponse;
 import com.personal.skin_api.product.controller.dto.request.ProductFindListRequest;
 import com.personal.skin_api.product.controller.dto.request.ProductRegisterRequest;
 import com.personal.skin_api.product.service.ProductService;
+<<<<<<< HEAD
+=======
+import com.personal.skin_api.product.service.dto.request.ProductFindMyListServiceRequest;
+>>>>>>> feat-product-controller-myproduct
 import com.personal.skin_api.product.service.dto.response.ProductListResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -31,5 +35,15 @@ public class ProductController {
     @PostMapping("/list")
     public ResponseEntity<ProductListResponse> findProductList(@RequestBody ProductFindListRequest request) {
         return ResponseEntity.ok().body(productService.findProducts(request.toService()));
+    }
+
+    @GetMapping("/my-product")
+    public ResponseEntity<ProductListResponse> findMyProductList(@RequestParam(value = "productId", defaultValue = "0") Long productId,
+                                                                 @AuthenticationPrincipal UserDetails userDetails) {
+
+        return ResponseEntity.ok().body(productService.findMyProducts(ProductFindMyListServiceRequest.builder()
+                .email(userDetails.getUsername())
+                .productId(productId)
+                .build()));
     }
 }
