@@ -39,4 +39,8 @@ public class Payment {
         this.price = price;
         this.paidAt = paidAt;
     }
+
+    public Long getId() {
+        return id;
+    }
 }
