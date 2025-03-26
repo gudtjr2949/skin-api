@@ -77,7 +77,7 @@ class QOrderRepositoryTest {
                 .toList();
 
         this.orders = IntStream.range(0, ORDER_PAGE_SIZE)
-                .mapToObj(i -> Order.completedPayOrder(member, product, payments.get(i)))
+                .mapToObj(i -> Order.createBeforePayOrder(member, product))
                 .toList();
 
         orderRepository.saveAll(orders);
@@ -103,7 +103,6 @@ class QOrderRepositoryTest {
                 .impUid("imp_370615...")
                 .price(100L)
                 .payMethod("card")
-                .payInfo("현대카드 942012*********1")
                 .paidAt(paidAt)
                 .build());
     }

@@ -15,14 +15,15 @@ public class Payment {
     @Column(name = "ID")
     private Long id;
 
+    @OneToOne
+    @JoinColumn(name = "ORDER_ID")
+    private Order order;
+
     @Column(name = "IMP_UID")
     private String impUid;
 
     @Column(name = "PAY_METHOD")
     private String payMethod;
-
-    @Column(name = "PAY_INFO")
-    private String payInfo;
 
     @Column(name = "PRICE")
     private Long price;
@@ -31,11 +32,10 @@ public class Payment {
     private LocalDateTime paidAt;
 
     @Builder
-    private Payment(final String impUid, final String payMethod, final String payInfo,
+    private Payment(final String impUid, final String payMethod,
                     final Long price, final LocalDateTime paidAt) {
         this.impUid = impUid;
         this.payMethod = payMethod;
-        this.payInfo = payInfo;
         this.price = price;
         this.paidAt = paidAt;
     }

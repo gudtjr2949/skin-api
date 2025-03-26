@@ -59,7 +59,7 @@ class OrderRepositoryTest {
     @Test
     void 결제가_완료된_주문을_생성하고_조회한다() {
         // given
-        Order order = Order.completedPayOrder(member, product, payment);
+        Order order = Order.createBeforePayOrder(member, product);
 
         // when
         orderRepository.save(order);
@@ -74,7 +74,7 @@ class OrderRepositoryTest {
     @Test
     void 주문을_생성하고_주문_관련_정보를_조회한다() {
         // given
-        Order order = Order.completedPayOrder(member, product, payment);
+        Order order = Order.createBeforePayOrder(member, product);
         orderRepository.save(order);
 
         // when
@@ -84,13 +84,12 @@ class OrderRepositoryTest {
         assertThat(findOrder).isPresent();
         assertThat(findOrder.get().getProduct()).isEqualTo(product.getId());
         assertThat(findOrder.get().getMember()).isEqualTo(member.getEmail());
-        assertThat(findOrder.get().getPayment()).isEqualTo(payment.getId());
     }
 
     @Test
     void 주문을_취소한다() {
         // given
-        Order order = Order.completedPayOrder(member, product, payment);
+        Order order = Order.createBeforePayOrder(member, product);
         orderRepository.save(order);
 
         // when
@@ -107,7 +106,6 @@ class OrderRepositoryTest {
                 .impUid("imp_370615...")
                 .price(100L)
                 .payMethod("card")
-                .payInfo("현대카드 942012*********1")
                 .paidAt(paidAt)
                 .build();
     }

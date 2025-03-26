@@ -9,18 +9,18 @@ import lombok.NoArgsConstructor;
 public class Price {
 
     @Column(name = "PRICE")
-    private int price;
+    private Long price;
 
-    public Price(final int price) {
+    public Price(final Long price) {
         validate(price);
         this.price = price;
     }
 
-    private void validate(final int price) {
+    private void validate(final Long price) {
         PriceStrategyContext.runStrategy(price);
     }
 
-    public int getPrice() {
+    public Long getPrice() {
         return price;
     }
 }
