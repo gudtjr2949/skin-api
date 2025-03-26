@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.personal.skin_api.product.repository.QProductRepository.PRODUCTS_PAGE_SIZE;
 import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
@@ -46,8 +47,6 @@ class ProductRepositoryTest {
     private Member member;
 
     private List<Product> products;
-
-    private static final int PRODUCTS_PAGE_SIZE = 5;
 
     @BeforeEach
     void beforeEach() {
