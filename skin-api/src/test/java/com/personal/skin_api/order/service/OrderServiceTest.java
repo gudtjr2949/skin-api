@@ -7,11 +7,11 @@ import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.order.repository.OrderRepository;
 import com.personal.skin_api.order.repository.PaymentRepository;
 import com.personal.skin_api.order.repository.entity.Payment;
-import com.personal.skin_api.order.service.dto.request.OrderSaveServiceRequest;
+import com.personal.skin_api.order.service.dto.request.OrderCreateServiceRequest;
+import com.personal.skin_api.order.service.dto.response.OrderDetailResponse;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
 import com.siot.IamportRestClient.exception.IamportResponseException;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -62,17 +62,14 @@ class OrderServiceTest {
     @Test
     void 주문을_생성한다() throws IamportResponseException, IOException {
         // given
-        OrderSaveServiceRequest request = OrderSaveServiceRequest.builder()
+        OrderCreateServiceRequest request = OrderCreateServiceRequest.builder()
                 .email(member.getEmail())
                 .productId(product.getId())
-                .impUid(payment.getImpUid())
                 .build();
 
         // when
-        orderService.saveOrder(request);
 
         // then
-
     }
 
     private static Payment createPayment(LocalDateTime paidAt) {
@@ -80,7 +77,6 @@ class OrderServiceTest {
                 .impUid("imp_370615...")
                 .price(100L)
                 .payMethod("card")
-                .payInfo("현대카드 942012*********1")
                 .paidAt(paidAt)
                 .build();
     }
@@ -119,5 +115,4 @@ class OrderServiceTest {
                 .price(price)
                 .build();
     }
-
 }

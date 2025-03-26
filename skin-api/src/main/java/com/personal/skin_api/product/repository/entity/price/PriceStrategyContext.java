@@ -8,7 +8,7 @@ public class PriceStrategyContext {
             new PriceRangeStrategy()
     );
 
-    static void runStrategy(final int price) {
+    static void runStrategy(final Long price) {
         priceValidationStrategies.stream().forEach(strategy -> strategy.validate(price));
     }
 }
