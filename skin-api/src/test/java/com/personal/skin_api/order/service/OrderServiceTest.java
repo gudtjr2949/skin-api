@@ -7,8 +7,7 @@ import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.order.repository.OrderRepository;
 import com.personal.skin_api.order.repository.PaymentRepository;
 import com.personal.skin_api.order.repository.entity.Payment;
-import com.personal.skin_api.order.service.dto.request.OrderCreateServiceRequest;
-import com.personal.skin_api.order.service.dto.response.OrderDetailResponse;
+import com.personal.skin_api.order.service.dto.request.OrderCreateTableServiceRequest;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -21,8 +20,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -62,7 +59,7 @@ class OrderServiceTest {
     @Test
     void 주문을_생성한다() throws IamportResponseException, IOException {
         // given
-        OrderCreateServiceRequest request = OrderCreateServiceRequest.builder()
+        OrderCreateTableServiceRequest request = OrderCreateTableServiceRequest.builder()
                 .email(member.getEmail())
                 .productId(product.getId())
                 .build();

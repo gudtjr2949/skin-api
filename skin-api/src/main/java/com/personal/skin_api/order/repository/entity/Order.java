@@ -16,6 +16,9 @@ public class Order extends BaseEntity {
     @Column(name = "ID")
     private Long id;
 
+    @Column(name = "ORDER_UID")
+    private String orderUid;
+
     @ManyToOne
     @JoinColumn(name = "ORDERER_ID")
     private Member member;
@@ -38,13 +41,14 @@ public class Order extends BaseEntity {
 
 
 
-    public static Order createBeforePayOrder(final Member member, final Product product) {
-        return new Order(member, product, OrderStatus.WAITING);
+    public static Order createBeforePayOrder(final Member member, final Product product, final String orderUid) {
+        return new Order(member, product, orderUid, OrderStatus.WAITING);
     }
 
-    private Order(final Member member, final Product product, final OrderStatus orderStatus) {
+    private Order(final Member member, final Product product, final String orderUid, final OrderStatus orderStatus) {
         this.member = member;
         this.product = product;
+        this.orderUid = orderUid;
         this.orderStatus = orderStatus;
     }
 
