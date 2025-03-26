@@ -43,4 +43,16 @@ public class Payment {
     public Long getId() {
         return id;
     }
+
+    public String getImpUid() {
+        return impUid;
+    }
+
+    public String getPayMethod() {
+        return payMethod;
+    }
+
+    public Long getPrice() {
+        return price;
+    }
 }
