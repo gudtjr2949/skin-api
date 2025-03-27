@@ -13,4 +13,5 @@ public interface OrderService {
     String createBeforePaidOrder(OrderCreateBeforePaidServiceRequest request);
     OrderDetailResponse findOrder(OrderDetailServiceRequest request);
     OrderListResponse findMyOrderList(OrderListServiceRequest request);
+    void changeOrderStatusToPaid(String orderUid);
 }

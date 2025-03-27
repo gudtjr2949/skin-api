@@ -29,6 +29,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.personal.skin_api.common.util.MerchantUidGenerator.generateMerchantUid;
 
@@ -86,13 +87,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findByOrderUidAndMember(request.getOrderUid(), member)
                 .orElseThrow(() -> new RestApiException(OrderErrorCode.CAN_NOT_FOUND_ORDER));
 
-        OrderDetailResponse response = OrderDetailResponse.builder()
-                .orderUid(order.getOrderUid())
-                .createdAt(order.getCreatedAt())
-                .productName(order.getProductName())
-                .payMethod(order.getPayMethod())
-                .price(order.getPrice())
-                .build();
+        OrderDetailResponse response = createOrderDetailResponse(order);
 
         return response;
     }
@@ -105,15 +100,28 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orderList = qOrderRepository.findMyOrderList(request.getOrderId(), member, request.getKeyword(), request.getYear());
 
         List<OrderDetailResponse> orderResponses = orderList.stream()
-                .map(order -> OrderDetailResponse.builder()
-                        .orderUid(order.getOrderUid())
-                        .createdAt(order.getCreatedAt())
-                        .productName(order.getProductName())
-                        .payMethod(order.getPayMethod())
-                        .price(order.getPrice())
-                        .build())
+                .map(order -> createOrderDetailResponse(order))
                 .toList();
 
         return new OrderListResponse(orderResponses);
+    }
+
+    private OrderDetailResponse createOrderDetailResponse(Order order) {
+        return OrderDetailResponse.builder()
+                .orderUid(order.getOrderUid())
+                .createdAt(order.getCreatedAt())
+                .productName(order.getProductName())
+                .payMethod(order.getPayMethod())
+                .price(order.getPrice())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void changeOrderStatusToPaid(String orderUid) {
+        Order order = orderRepository.findByOrderUid(orderUid)
+                .orElseThrow(() -> new RestApiException(OrderErrorCode.CAN_NOT_FOUND_ORDER));
+
+        order.paidOrder();
     }
 }

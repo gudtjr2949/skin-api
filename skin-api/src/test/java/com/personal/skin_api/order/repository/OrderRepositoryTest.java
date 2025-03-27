@@ -70,7 +70,7 @@ class OrderRepositoryTest {
         // then
         assertThat(findOrder).isPresent();
         assertThat(findOrder.get().getId()).isEqualTo(order.getId());
-        assertThat(findOrder.get().getOrderStatus()).isEqualTo(OrderStatus.PAID);
+        assertThat(findOrder.get().getOrderStatus()).isEqualTo(OrderStatus.WAITING);
     }
 
     @Test
