@@ -27,6 +27,9 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "PRODUCT_ID")
     private Product product;
 
+    @OneToOne(mappedBy = "order")
+    private Payment payment;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "ORDER_STATUS")
     private OrderStatus orderStatus;
@@ -38,8 +41,6 @@ public class Order extends BaseEntity {
     public void cancelOrder() {
         orderStatus = OrderStatus.CANCELED;
     }
-
-
 
     public static Order createBeforePayOrder(final Member member, final Product product, final String orderUid) {
         return new Order(member, product, orderUid, OrderStatus.WAITING);
@@ -57,12 +58,24 @@ public class Order extends BaseEntity {
         return id;
     }
 
+    public String getOrderUid() {
+        return orderUid;
+    }
+
     public String getMember() {
         return member.getEmail();
     }
 
-    public Long getProduct() {
-        return product.getId();
+    public String getProductName() {
+        return product.getProductName();
+    }
+
+    public String getPayMethod() {
+        return payment.getPayMethod();
+    }
+
+    public Long getPrice() {
+        return payment.getPrice();
     }
 
     public OrderStatus getOrderStatus() {

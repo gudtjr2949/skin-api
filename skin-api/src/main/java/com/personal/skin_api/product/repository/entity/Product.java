@@ -55,7 +55,8 @@ public class Product extends BaseEntity {
         this.productStatus = ProductStatus.ACTIVE;
     }
 
-    public void modifyProduct(final String productName, final String productContent, final String fileUrl, final Long price) {
+    public void modifyProduct(final String productName, final String productContent,
+                              final String fileUrl, final Long price) {
         this.productName = new ProductName(productName);
         this.productContent = new ProductContent(productContent);
         this.fileUrl = new FileUrl(fileUrl);

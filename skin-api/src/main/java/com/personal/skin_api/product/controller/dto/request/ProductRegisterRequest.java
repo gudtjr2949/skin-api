@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProductRegisterRequest {
     private String productName;
     private String productContent;
-    private int price;
+    private Long price;
     private MultipartFile file;
 
     public ProductRegisterServiceRequest toService(String email) {

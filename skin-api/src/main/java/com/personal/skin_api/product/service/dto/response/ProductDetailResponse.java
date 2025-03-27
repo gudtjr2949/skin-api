@@ -9,7 +9,7 @@ public class ProductDetailResponse {
     private final Long productId;
     private final String productName;
     private final String productContent;
-    private final int price;
+    private final Long price;
     private final String registrantNickname;
     private final int productViews;
 
@@ -17,7 +17,7 @@ public class ProductDetailResponse {
     private ProductDetailResponse(final Long productId,
                                   final String productName,
                                   final String productContent,
-                                  final int price,
+                                  final Long price,
                                   final String registrantNickname,
                                   final int productViews) {
         this.productId = productId;

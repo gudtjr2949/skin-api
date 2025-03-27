@@ -32,10 +32,11 @@ public class Payment {
     private LocalDateTime paidAt;
 
     @Builder
-    private Payment(final String impUid, final String payMethod,
+    private Payment(final String impUid, final String payMethod, final Order order,
                     final Long price, final LocalDateTime paidAt) {
         this.impUid = impUid;
         this.payMethod = payMethod;
+        this.order = order;
         this.price = price;
         this.paidAt = paidAt;
     }

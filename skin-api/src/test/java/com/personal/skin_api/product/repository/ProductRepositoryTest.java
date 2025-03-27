@@ -187,7 +187,7 @@ class ProductRepositoryTest {
         String productName = "형석이의 스킨";
         String productContent = "아주 예쁜 스킨입니다!";
         String fileUrl = "s3://hyeongseok-skin/fileUrl";
-        int price = 10_000;
+        Long price = 10_000L;
 
         return Product.builder()
                 .member(member)

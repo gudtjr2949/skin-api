@@ -1,5 +1,6 @@
 package com.personal.skin_api.order.repository;
 
+import com.personal.skin_api.common.util.MerchantUidGenerator;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
@@ -57,9 +58,10 @@ class OrderRepositoryTest {
     }
 
     @Test
-    void 결제가_완료된_주문을_생성하고_조회한다() {
+    void 주문을_생성하고_조회한다() {
         // given
-        Order order = Order.createBeforePayOrder(member, product);
+        String orderUid = MerchantUidGenerator.generateMerchantUid();
+        Order order = Order.createBeforePayOrder(member, product, orderUid);
 
         // when
         orderRepository.save(order);
@@ -74,7 +76,8 @@ class OrderRepositoryTest {
     @Test
     void 주문을_생성하고_주문_관련_정보를_조회한다() {
         // given
-        Order order = Order.createBeforePayOrder(member, product);
+        String orderUid = MerchantUidGenerator.generateMerchantUid();
+        Order order = Order.createBeforePayOrder(member, product, orderUid);
         orderRepository.save(order);
 
         // when
@@ -82,14 +85,15 @@ class OrderRepositoryTest {
 
         // then
         assertThat(findOrder).isPresent();
-        assertThat(findOrder.get().getProduct()).isEqualTo(product.getId());
+        assertThat(findOrder.get().getProductName()).isEqualTo(product.getProductName());
         assertThat(findOrder.get().getMember()).isEqualTo(member.getEmail());
     }
 
     @Test
     void 주문을_취소한다() {
         // given
-        Order order = Order.createBeforePayOrder(member, product);
+        String orderUid = MerchantUidGenerator.generateMerchantUid();
+        Order order = Order.createBeforePayOrder(member, product, orderUid);
         orderRepository.save(order);
 
         // when
@@ -134,7 +138,7 @@ class OrderRepositoryTest {
         String productName = "형석이의 스킨";
         String productContent = "아주 예쁜 스킨입니다!";
         String fileUrl = "s3://hyeongseok-skin/fileUrl";
-        int price = 10_000;
+        Long price = 10_000L;
 
         return Product.builder()
                 .member(member)

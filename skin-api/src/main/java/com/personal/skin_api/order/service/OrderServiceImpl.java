@@ -11,24 +11,24 @@ import com.personal.skin_api.order.repository.OrderRepository;
 import com.personal.skin_api.order.repository.PaymentRepository;
 import com.personal.skin_api.order.repository.QOrderRepository;
 import com.personal.skin_api.order.repository.entity.Order;
-import com.personal.skin_api.order.service.dto.request.OrderCompleteServiceRequest;
+
 import com.personal.skin_api.order.service.dto.request.OrderCreateBeforePaidServiceRequest;
 import com.personal.skin_api.order.service.dto.request.OrderCreateTableServiceRequest;
+import com.personal.skin_api.order.service.dto.request.OrderDetailRequest;
 import com.personal.skin_api.order.service.dto.response.OrderCreateTableResponse;
 import com.personal.skin_api.order.service.dto.response.OrderDetailResponse;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
-import com.siot.IamportRestClient.IamportClient;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
-import org.springframework.core.io.Resource;
+import org.aspectj.lang.annotation.Aspect;
+
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
+import static com.personal.skin_api.common.util.MerchantUidGenerator.generateMerchantUid;
 
+@Aspect
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -38,7 +38,6 @@ public class OrderServiceImpl implements OrderService {
     private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
-    private final IamportClient iamportClient;
 
     @Override
     @Transactional
@@ -74,17 +73,22 @@ public class OrderServiceImpl implements OrderService {
         return orderUid;
     }
 
-    private String generateMerchantUid() {
-        String uniqueString = UUID.randomUUID().toString().replace("-", "");
-        LocalDateTime today = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDay = today.format(formatter).replace("-", "");
-        return formattedDay +'-'+ uniqueString;
-    }
-
     @Override
-    public OrderDetailResponse findOrder(Long orderId) {
+    public OrderDetailResponse findOrder(OrderDetailRequest request) {
+        Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        return null;
+        Order order = orderRepository.findByOrderUidAndMember(request.getOrderUid(), member)
+                .orElseThrow(() -> new RestApiException(OrderErrorCode.CAN_NOT_FOUND_ORDER));
+
+        OrderDetailResponse response = OrderDetailResponse.builder()
+                .orderUid(order.getOrderUid())
+                .createdAt(order.getCreatedAt())
+                .productName(order.getProductName())
+                .payMethod(order.getPayMethod())
+                .price(order.getPrice())
+                .build();
+
+        return response;
     }
 }
