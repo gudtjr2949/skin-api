@@ -91,7 +91,7 @@ class QOrderRepositoryTest {
         Order lastOrder = orders.get(0);
 
         // when
-        List<Order> myOrders = qOrderRepository.findMyOrders(0L, member);
+        List<Order> myOrders = qOrderRepository.findMyOrderList(0L, member, "", LocalDateTime.now().getYear());
 
         // then
         assertThat(myOrders).hasSize(ORDER_PAGE_SIZE);

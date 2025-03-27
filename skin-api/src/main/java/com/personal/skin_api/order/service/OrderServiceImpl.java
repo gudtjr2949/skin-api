@@ -14,9 +14,11 @@ import com.personal.skin_api.order.repository.entity.Order;
 
 import com.personal.skin_api.order.service.dto.request.OrderCreateBeforePaidServiceRequest;
 import com.personal.skin_api.order.service.dto.request.OrderCreateTableServiceRequest;
-import com.personal.skin_api.order.service.dto.request.OrderDetailRequest;
+import com.personal.skin_api.order.service.dto.request.OrderDetailServiceRequest;
+import com.personal.skin_api.order.service.dto.request.OrderListServiceRequest;
 import com.personal.skin_api.order.service.dto.response.OrderCreateTableResponse;
 import com.personal.skin_api.order.service.dto.response.OrderDetailResponse;
+import com.personal.skin_api.order.service.dto.response.OrderListResponse;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
 
@@ -25,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static com.personal.skin_api.common.util.MerchantUidGenerator.generateMerchantUid;
 
@@ -57,6 +61,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public String createBeforePaidOrder(OrderCreateBeforePaidServiceRequest request) {
         Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
@@ -74,7 +79,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDetailResponse findOrder(OrderDetailRequest request) {
+    public OrderDetailResponse findOrder(OrderDetailServiceRequest request) {
         Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
@@ -90,5 +95,25 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         return response;
+    }
+
+    @Override
+    public OrderListResponse findMyOrderList(OrderListServiceRequest request) {
+        Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        List<Order> orderList = qOrderRepository.findMyOrderList(request.getOrderId(), member, request.getKeyword(), request.getYear());
+
+        List<OrderDetailResponse> orderResponses = orderList.stream()
+                .map(order -> OrderDetailResponse.builder()
+                        .orderUid(order.getOrderUid())
+                        .createdAt(order.getCreatedAt())
+                        .productName(order.getProductName())
+                        .payMethod(order.getPayMethod())
+                        .price(order.getPrice())
+                        .build())
+                .toList();
+
+        return new OrderListResponse(orderResponses);
     }
 }
