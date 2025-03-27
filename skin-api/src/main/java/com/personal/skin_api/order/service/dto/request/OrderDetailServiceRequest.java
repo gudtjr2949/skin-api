@@ -4,12 +4,12 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class OrderDetailRequest {
+public class OrderDetailServiceRequest {
     private String orderUid;
     private String email;
 
     @Builder
-    private OrderDetailRequest(final String orderUid, final String email) {
+    private OrderDetailServiceRequest(final String orderUid, final String email) {
         this.orderUid = orderUid;
         this.email = email;
     }
