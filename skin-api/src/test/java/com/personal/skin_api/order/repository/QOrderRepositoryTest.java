@@ -1,5 +1,6 @@
 package com.personal.skin_api.order.repository;
 
+import com.personal.skin_api.common.util.MerchantUidGenerator;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
@@ -77,7 +78,7 @@ class QOrderRepositoryTest {
                 .toList();
 
         this.orders = IntStream.range(0, ORDER_PAGE_SIZE)
-                .mapToObj(i -> Order.createBeforePayOrder(member, product))
+                .mapToObj(i -> Order.createBeforePayOrder(member, product, MerchantUidGenerator.generateMerchantUid()))
                 .toList();
 
         orderRepository.saveAll(orders);
@@ -131,7 +132,7 @@ class QOrderRepositoryTest {
         String productName = "형석이의 스킨";
         String productContent = "아주 예쁜 스킨입니다!";
         String fileUrl = "s3://hyeongseok-skin/fileUrl";
-        int price = 10_000;
+        Long price = 10_000L;
 
         return productRepository.save(Product.builder()
                 .member(member)

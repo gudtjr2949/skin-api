@@ -10,7 +10,7 @@ public class ProductModifyServiceRequest {
     private final String email;
     private final String newProductName;
     private final String newProductContent;
-    private final int newPrice;
+    private final Long newPrice;
     private final MultipartFile newFile;
 
     @Builder
@@ -18,7 +18,7 @@ public class ProductModifyServiceRequest {
                                         final String email,
                                         final String newProductName,
                                         final String newProductContent,
-                                        final int newPrice,
+                                        final Long newPrice,
                                         final MultipartFile newFile) {
         this.productId = productId;
         this.email = email;
