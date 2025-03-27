@@ -14,10 +14,7 @@ import com.personal.skin_api.product.repository.entity.Product;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -82,6 +79,14 @@ class QOrderRepositoryTest {
                 .toList();
 
         orderRepository.saveAll(orders);
+    }
+
+    @AfterAll
+    void tearDown() {
+        paymentRepository.deleteAllInBatch();
+        orderRepository.deleteAllInBatch();
+        productRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
     }
 
     @Test

@@ -8,8 +8,8 @@ import com.personal.skin_api.member.repository.entity.MemberRole;
 import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.order.repository.OrderRepository;
 import com.personal.skin_api.order.repository.PaymentRepository;
-import com.personal.skin_api.order.repository.QOrderRepository;
 import com.personal.skin_api.order.repository.entity.Order;
+import com.personal.skin_api.order.repository.entity.OrderStatus;
 import com.personal.skin_api.order.repository.entity.Payment;
 import com.personal.skin_api.order.service.dto.request.OrderCreateBeforePaidServiceRequest;
 import com.personal.skin_api.order.service.dto.request.OrderCreateTableServiceRequest;
@@ -20,6 +20,8 @@ import com.personal.skin_api.order.service.dto.response.OrderDetailResponse;
 import com.personal.skin_api.order.service.dto.response.OrderListResponse;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -67,6 +69,15 @@ class OrderServiceTest {
         product = createProduct();
         productRepository.save(product);
     }
+
+    @AfterAll
+    void tearDown() {
+        paymentRepository.deleteAllInBatch();
+        orderRepository.deleteAllInBatch();
+        productRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
+    }
+
 
     @Test
     void 주문테이블을_생성한다() {
@@ -194,6 +205,33 @@ class OrderServiceTest {
         assertThat(myOrderList.getOrderResponses()).hasSize(ORDER_PAGE_SIZE);
         assertThat(myOrderList.getOrderResponses().get(0).getOrderUid()).isEqualTo(orderUidList.get(ORDER_PAGE_SIZE-1));
         assertThat(myOrderList.getOrderResponses().get(ORDER_PAGE_SIZE-1).getOrderUid()).isEqualTo(orderUidList.get(0));
+    }
+
+    @Test
+    @Transactional
+    void 결제가_완료된_주문은_상태가_결제되었다고_변한다() {
+        // given
+        OrderCreateBeforePaidServiceRequest orderCreateBeforePaidServiceRequest = OrderCreateBeforePaidServiceRequest.builder()
+                .email(member.getEmail())
+                .productId(product.getId())
+                .build();
+        String orderUid = orderService.createBeforePaidOrder(orderCreateBeforePaidServiceRequest);
+
+        Optional<Order> findOrder = orderRepository.findByOrderUid(orderUid);
+        OrderStatus beforeOrderStatus = findOrder.get().getOrderStatus();
+
+        String impUid = "imp_370615..";
+        Payment payment = createPayment(impUid, LocalDateTime.now(), findOrder.get());
+        paymentRepository.save(payment);
+
+        // when
+        orderService.changeOrderStatusToPaid(orderUid);
+        Order updatedOrder = orderRepository.findByOrderUid(orderUid)
+                .orElseThrow(() -> new RestApiException(OrderErrorCode.CAN_NOT_FOUND_ORDER));
+
+        // then
+        assertThat(beforeOrderStatus).isEqualTo(OrderStatus.WAITING);
+        assertThat(updatedOrder.getOrderStatus()).isEqualTo(OrderStatus.PAID);
     }
 
     private Member createMember() {
