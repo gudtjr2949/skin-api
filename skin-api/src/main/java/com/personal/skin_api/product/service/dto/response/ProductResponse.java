@@ -7,10 +7,10 @@ import lombok.Getter;
 public class ProductResponse {
     private final Long productId;
     private final String productName;
-    private final int price;
+    private final Long price;
 
     @Builder
-    private ProductResponse(final Long productId, final String productName, final int price) {
+    private ProductResponse(final Long productId, final String productName, final Long price) {
         this.productId = productId;
         this.productName = productName;
         this.price = price;
