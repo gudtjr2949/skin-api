@@ -1,19 +1,20 @@
 package com.personal.skin_api.order.controller;
 
-import com.personal.skin_api.common.dto.CommonResponse;
+import com.personal.skin_api.order.controller.dto.request.OrderListRequest;
 import com.personal.skin_api.order.service.OrderService;
 import com.personal.skin_api.order.service.dto.request.OrderCreateBeforePaidServiceRequest;
 import com.personal.skin_api.order.service.dto.request.OrderCreateTableServiceRequest;
 import com.personal.skin_api.order.service.dto.request.OrderDetailServiceRequest;
+
 import com.personal.skin_api.order.service.dto.response.OrderCreateTableResponse;
 import com.personal.skin_api.order.service.dto.response.OrderDetailResponse;
+import com.personal.skin_api.order.service.dto.response.OrderListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -25,11 +26,12 @@ public class OrderController {
 
     @PostMapping("/create-table")
     public ResponseEntity<OrderCreateTableResponse> createOrderTable(@RequestParam Long productId,
-                                                  @AuthenticationPrincipal UserDetails userDetails) {
+                                                                     @AuthenticationPrincipal UserDetails userDetails) {
         OrderCreateTableResponse response = orderService.createOrderTable(OrderCreateTableServiceRequest.builder()
                 .email(userDetails.getUsername())
                 .productId(productId)
                 .build());
+
         return ResponseEntity.ok().body(response);
     }
 
@@ -46,11 +48,19 @@ public class OrderController {
 
     @GetMapping("/detail")
     public ResponseEntity<OrderDetailResponse> detailOrder(@RequestParam String orderUid,
-                                              @AuthenticationPrincipal UserDetails userDetails) {
+                                                           @AuthenticationPrincipal UserDetails userDetails) {
         OrderDetailResponse response = orderService.findOrder(OrderDetailServiceRequest.builder()
                 .email(userDetails.getUsername())
                 .orderUid(orderUid)
                 .build());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/list")
+    public ResponseEntity<OrderListResponse> findOrderList(@RequestBody OrderListRequest request,
+                                                           @AuthenticationPrincipal UserDetails userDetails) {
+        OrderListResponse response = orderService.findMyOrderList(request.toService(userDetails.getUsername()));
 
         return ResponseEntity.ok().body(response);
     }
