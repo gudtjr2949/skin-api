@@ -1,11 +1,13 @@
 package com.personal.skin_api.order.repository;
 
+import com.personal.skin_api.common.util.MerchantUidGenerator;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
 import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.order.repository.entity.Order;
-import com.personal.skin_api.order.repository.entity.Payment;
+import com.personal.skin_api.payment.repository.PaymentRepository;
+import com.personal.skin_api.payment.repository.entity.Payment;
 
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
@@ -13,10 +15,7 @@ import com.personal.skin_api.product.repository.entity.Product;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -77,10 +76,18 @@ class QOrderRepositoryTest {
                 .toList();
 
         this.orders = IntStream.range(0, ORDER_PAGE_SIZE)
-                .mapToObj(i -> Order.completedPayOrder(member, product, payments.get(i)))
+                .mapToObj(i -> Order.createBeforePayOrder(member, product, MerchantUidGenerator.generateMerchantUid()))
                 .toList();
 
         orderRepository.saveAll(orders);
+    }
+
+    @AfterAll
+    void tearDown() {
+        paymentRepository.deleteAllInBatch();
+        orderRepository.deleteAllInBatch();
+        productRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
     }
 
     @Test
@@ -90,7 +97,7 @@ class QOrderRepositoryTest {
         Order lastOrder = orders.get(0);
 
         // when
-        List<Order> myOrders = qOrderRepository.findMyOrders(0L, member);
+        List<Order> myOrders = qOrderRepository.findMyOrderList(0L, member, "", LocalDateTime.now().getYear());
 
         // then
         assertThat(myOrders).hasSize(ORDER_PAGE_SIZE);
@@ -103,7 +110,6 @@ class QOrderRepositoryTest {
                 .impUid("imp_370615...")
                 .price(100L)
                 .payMethod("card")
-                .payInfo("현대카드 942012*********1")
                 .paidAt(paidAt)
                 .build());
     }
@@ -132,7 +138,7 @@ class QOrderRepositoryTest {
         String productName = "형석이의 스킨";
         String productContent = "아주 예쁜 스킨입니다!";
         String fileUrl = "s3://hyeongseok-skin/fileUrl";
-        int price = 10_000;
+        Long price = 10_000L;
 
         return productRepository.save(Product.builder()
                 .member(member)

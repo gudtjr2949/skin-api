@@ -9,7 +9,7 @@ public class ProductModifyRequest {
     private Long productId;
     private String productName;
     private String productContent;
-    private int price;
+    private Long price;
     private MultipartFile file;
 
     public ProductModifyServiceRequest toService(String email) {

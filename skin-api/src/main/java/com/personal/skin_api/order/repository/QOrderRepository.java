@@ -7,7 +7,6 @@ import com.personal.skin_api.order.repository.entity.QOrder;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,14 +24,19 @@ public class QOrderRepository {
     }
 
 
-    public List<Order> findMyOrders(Long orderId, Member member) {
+    public List<Order> findMyOrderList(Long orderId, Member member, String keyword, int year) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (orderId > 0) {
             builder.and(QOrder.order.id.lt(orderId));
         }
 
+        if (!("".equals(keyword) || keyword == null)) {
+            builder.and(QOrder.order.product.productName.productName.contains(keyword));
+        }
+
         builder.and(QOrder.order.member.eq(member));
+        builder.and(QOrder.order.createdAt.year().eq(year));
 
         List<Order> findOrders = queryFactory
                 .selectFrom(QOrder.order)

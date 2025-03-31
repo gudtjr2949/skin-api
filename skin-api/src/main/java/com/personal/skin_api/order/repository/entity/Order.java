@@ -2,10 +2,10 @@ package com.personal.skin_api.order.repository.entity;
 
 import com.personal.skin_api.common.entity.BaseEntity;
 import com.personal.skin_api.member.repository.entity.Member;
+import com.personal.skin_api.payment.repository.entity.Payment;
 import com.personal.skin_api.product.repository.entity.Product;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -17,6 +17,9 @@ public class Order extends BaseEntity {
     @Column(name = "ID")
     private Long id;
 
+    @Column(name = "ORDER_UID")
+    private String orderUid;
+
     @ManyToOne
     @JoinColumn(name = "ORDERER_ID")
     private Member member;
@@ -25,32 +28,29 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "PRODUCT_ID")
     private Product product;
 
-    @OneToOne
-    @JoinColumn(name = "PAYMENT_ID")
+    @OneToOne(mappedBy = "order")
     private Payment payment;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "ORDER_STATUS")
     private OrderStatus orderStatus;
 
+    public void paidOrder() {
+        orderStatus = OrderStatus.PAID;
+    }
+
     public void cancelOrder() {
         orderStatus = OrderStatus.CANCELED;
     }
 
-    public static Order completedPayOrder(final Member member, final Product product, final Payment payment) {
-        return Order.builder()
-                .member(member)
-                .product(product)
-                .payment(payment)
-                .orderStatus(OrderStatus.PAID)
-                .build();
+    public static Order createBeforePayOrder(final Member member, final Product product, final String orderUid) {
+        return new Order(member, product, orderUid, OrderStatus.WAITING);
     }
 
-    @Builder
-    private Order(final Member member, final Product product, final Payment payment, final OrderStatus orderStatus) {
+    private Order(final Member member, final Product product, final String orderUid, final OrderStatus orderStatus) {
         this.member = member;
         this.product = product;
-        this.payment = payment;
+        this.orderUid = orderUid;
         this.orderStatus = orderStatus;
     }
 
@@ -59,16 +59,24 @@ public class Order extends BaseEntity {
         return id;
     }
 
+    public String getOrderUid() {
+        return orderUid;
+    }
+
     public String getMember() {
         return member.getEmail();
     }
 
-    public Long getProduct() {
-        return product.getId();
+    public String getProductName() {
+        return product.getProductName();
     }
 
-    public Long getPayment() {
-        return payment.getId();
+    public String getPayMethod() {
+        return payment.getPayMethod();
+    }
+
+    public Long getPrice() {
+        return payment.getPrice();
     }
 
     public OrderStatus getOrderStatus() {

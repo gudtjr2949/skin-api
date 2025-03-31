@@ -75,7 +75,7 @@ class ProductServiceTest {
                 MediaType.APPLICATION_OCTET_STREAM_VALUE,
                 resource.getInputStream()
         );
-        int price = 10_000;
+        Long price = 10_000L;
 
         ProductRegisterServiceRequest registerRequest = ProductRegisterServiceRequest.builder()
                 .email(member1.getEmail())
@@ -213,7 +213,7 @@ class ProductServiceTest {
                 MediaType.APPLICATION_OCTET_STREAM_VALUE,
                 resource.getInputStream()
         );
-        int newPrice = product.getPrice() + 10_000;
+        Long newPrice = product.getPrice() + 10_000L;
 
         ProductModifyServiceRequest request = ProductModifyServiceRequest.builder()
                 .productId(product.getId())
@@ -244,7 +244,7 @@ class ProductServiceTest {
 
         String newProductName = "제품명 수정";
         String newProductContent = "제품 내용 수정";
-        int newPrice = product.getPrice() + 10_000;
+        Long newPrice = product.getPrice() + 10_000L;
 
         ProductModifyServiceRequest request = ProductModifyServiceRequest.builder()
                 .productId(product.getId())
@@ -271,7 +271,7 @@ class ProductServiceTest {
 
         String newProductName = "제품명 수정";
         String newProductContent = "제품 내용 수정";
-        int newPrice = product.getPrice() + 10_000;
+        Long newPrice = product.getPrice() + 10_000L;
 
         ProductModifyServiceRequest request = ProductModifyServiceRequest.builder()
                 .productId(product.getId())
@@ -291,7 +291,7 @@ class ProductServiceTest {
         String productName = "형석이의 스킨";
         String productContent = "아주 예쁜 스킨입니다!";
         String fileUrl = "s3://hyeongseok-skin/fileUrl";
-        int price = 10_000;
+        Long price = 10_000L;
 
         return Product.builder()
                 .member(member1)
