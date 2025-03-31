@@ -4,7 +4,9 @@ import com.personal.skin_api.common.dto.CommonResponse;
 import com.personal.skin_api.order.service.OrderService;
 import com.personal.skin_api.order.service.dto.request.OrderCreateBeforePaidServiceRequest;
 import com.personal.skin_api.order.service.dto.request.OrderCreateTableServiceRequest;
+import com.personal.skin_api.order.service.dto.request.OrderDetailServiceRequest;
 import com.personal.skin_api.order.service.dto.response.OrderCreateTableResponse;
+import com.personal.skin_api.order.service.dto.response.OrderDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -40,5 +42,16 @@ public class OrderController {
                 .build());
 
         return ResponseEntity.ok().body(Map.of("orderUid", orderUid));
+    }
+
+    @GetMapping("/detail")
+    public ResponseEntity<OrderDetailResponse> detailOrder(@RequestParam String orderUid,
+                                              @AuthenticationPrincipal UserDetails userDetails) {
+        OrderDetailResponse response = orderService.findOrder(OrderDetailServiceRequest.builder()
+                .email(userDetails.getUsername())
+                .orderUid(orderUid)
+                .build());
+
+        return ResponseEntity.ok().body(response);
     }
 }
