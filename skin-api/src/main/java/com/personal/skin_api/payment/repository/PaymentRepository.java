@@ -1,6 +1,6 @@
-package com.personal.skin_api.order.repository;
+package com.personal.skin_api.payment.repository;
 
-import com.personal.skin_api.order.repository.entity.Payment;
+import com.personal.skin_api.payment.repository.entity.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

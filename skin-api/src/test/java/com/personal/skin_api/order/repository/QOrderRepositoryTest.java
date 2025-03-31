@@ -6,7 +6,8 @@ import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
 import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.order.repository.entity.Order;
-import com.personal.skin_api.order.repository.entity.Payment;
+import com.personal.skin_api.payment.repository.PaymentRepository;
+import com.personal.skin_api.payment.repository.entity.Payment;
 
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;

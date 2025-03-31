@@ -1,5 +1,6 @@
-package com.personal.skin_api.order.repository.entity;
+package com.personal.skin_api.payment.repository.entity;
 
+import com.personal.skin_api.order.repository.entity.Order;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;

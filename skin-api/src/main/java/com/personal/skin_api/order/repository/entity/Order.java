@@ -2,6 +2,7 @@ package com.personal.skin_api.order.repository.entity;
 
 import com.personal.skin_api.common.entity.BaseEntity;
 import com.personal.skin_api.member.repository.entity.Member;
+import com.personal.skin_api.payment.repository.entity.Payment;
 import com.personal.skin_api.product.repository.entity.Product;
 
 import jakarta.persistence.*;

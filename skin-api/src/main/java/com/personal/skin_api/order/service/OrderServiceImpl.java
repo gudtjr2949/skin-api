@@ -8,7 +8,7 @@ import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.email.Email;
 import com.personal.skin_api.order.repository.OrderRepository;
-import com.personal.skin_api.order.repository.PaymentRepository;
+import com.personal.skin_api.payment.repository.PaymentRepository;
 import com.personal.skin_api.order.repository.QOrderRepository;
 import com.personal.skin_api.order.repository.entity.Order;
 
@@ -29,7 +29,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.personal.skin_api.common.util.MerchantUidGenerator.generateMerchantUid;
 
