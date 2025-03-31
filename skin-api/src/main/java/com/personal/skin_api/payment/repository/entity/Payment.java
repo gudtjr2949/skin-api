@@ -1,6 +1,7 @@
 package com.personal.skin_api.payment.repository.entity;
 
 import com.personal.skin_api.order.repository.entity.Order;
+import com.personal.skin_api.payment.repository.entity.impuid.ImpUid;
 import com.personal.skin_api.payment.repository.entity.price.PaymentPrice;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -20,8 +21,8 @@ public class Payment {
     @JoinColumn(name = "ORDER_ID")
     private Order order;
 
-    @Column(name = "IMP_UID")
-    private String impUid;
+    @Embedded
+    private ImpUid impUid;
 
     @Column(name = "PAY_METHOD")
     private String payMethod;
@@ -35,7 +36,7 @@ public class Payment {
     @Builder
     private Payment(final String impUid, final String payMethod, final Order order,
                     final Long price, final LocalDateTime paidAt) {
-        this.impUid = impUid;
+        this.impUid = new ImpUid(impUid);
         this.payMethod = payMethod;
         this.order = order;
         this.price = new PaymentPrice(price);
@@ -47,7 +48,7 @@ public class Payment {
     }
 
     public String getImpUid() {
-        return impUid;
+        return impUid.getImpUid();
     }
 
     public String getPayMethod() {
