@@ -22,11 +22,11 @@ import com.personal.skin_api.order.service.dto.response.OrderListResponse;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,6 +35,7 @@ import static com.personal.skin_api.common.util.MerchantUidGenerator.generateMer
 @Aspect
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
