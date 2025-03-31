@@ -1,16 +1,18 @@
 package com.personal.skin_api.order.controller;
 
+import com.personal.skin_api.common.dto.CommonResponse;
 import com.personal.skin_api.order.service.OrderService;
+import com.personal.skin_api.order.service.dto.request.OrderCreateBeforePaidServiceRequest;
 import com.personal.skin_api.order.service.dto.request.OrderCreateTableServiceRequest;
 import com.personal.skin_api.order.service.dto.response.OrderCreateTableResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,5 +29,16 @@ public class OrderController {
                 .productId(productId)
                 .build());
         return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<Object> createOrder(@RequestParam Long productId,
+                                              @AuthenticationPrincipal UserDetails userDetails) {
+        String orderUid = orderService.createBeforePaidOrder(OrderCreateBeforePaidServiceRequest.builder()
+                .productId(productId)
+                .email(userDetails.getUsername())
+                .build());
+
+        return ResponseEntity.ok().body(Map.of("orderUid", orderUid));
     }
 }
