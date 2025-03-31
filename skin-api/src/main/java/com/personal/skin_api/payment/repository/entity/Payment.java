@@ -1,6 +1,7 @@
 package com.personal.skin_api.payment.repository.entity;
 
 import com.personal.skin_api.order.repository.entity.Order;
+import com.personal.skin_api.payment.repository.entity.price.PaymentPrice;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -11,8 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Payment {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
 
@@ -26,8 +26,8 @@ public class Payment {
     @Column(name = "PAY_METHOD")
     private String payMethod;
 
-    @Column(name = "PRICE")
-    private Long price;
+    @Embedded
+    private PaymentPrice price;
 
     @Column(name = "PAID_AT")
     private LocalDateTime paidAt;
@@ -38,7 +38,7 @@ public class Payment {
         this.impUid = impUid;
         this.payMethod = payMethod;
         this.order = order;
-        this.price = price;
+        this.price = new PaymentPrice(price);
         this.paidAt = paidAt;
     }
 
@@ -55,6 +55,6 @@ public class Payment {
     }
 
     public Long getPrice() {
-        return price;
+        return price.getPrice();
     }
 }
