@@ -1,5 +1,6 @@
 package com.personal.skin_api.product.repository;
 
+import com.personal.skin_api.JpaAbstractIntegrationTest;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
@@ -31,7 +32,7 @@ import static org.assertj.core.api.Assertions.*;
 @DataJpaTest
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ProductRepositoryTest {
+class ProductRepositoryTest extends JpaAbstractIntegrationTest {
 
     @Autowired
     private ProductRepository productRepository;
