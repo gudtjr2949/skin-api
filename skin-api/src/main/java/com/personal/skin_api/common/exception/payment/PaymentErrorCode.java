@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum PaymentErrorCode implements ErrorCode {
     DUPLICATE_PAYMENT(HttpStatus.BAD_REQUEST, "이미 저장된 결제 정보입니다."),
     CAN_NOT_FOUND_PAYMENT(HttpStatus.NOT_FOUND, "결제정보를 찾을 수 없습니다."),
+    REQUESTER_ORDERER_MISMATCH(HttpStatus.UNAUTHORIZED, "요청자와 주문자의 정보가 다릅니다."),
     ;
 
     private final HttpStatus httpStatus;

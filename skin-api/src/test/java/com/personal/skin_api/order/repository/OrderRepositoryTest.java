@@ -87,7 +87,7 @@ class OrderRepositoryTest {
         // then
         assertThat(findOrder).isPresent();
         assertThat(findOrder.get().getProductName()).isEqualTo(product.getProductName());
-        assertThat(findOrder.get().getMember()).isEqualTo(member.getEmail());
+        assertThat(findOrder.get().getOrdererEmail()).isEqualTo(member.getEmail());
     }
 
     @Test

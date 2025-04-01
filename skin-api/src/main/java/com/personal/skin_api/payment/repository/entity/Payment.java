@@ -58,4 +58,8 @@ public class Payment {
     public Long getPrice() {
         return price.getPrice();
     }
+
+    public LocalDateTime getPaidAt() {
+        return paidAt;
+    }
 }
