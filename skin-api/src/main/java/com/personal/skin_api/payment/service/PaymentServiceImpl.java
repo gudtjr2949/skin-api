@@ -26,7 +26,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final OrderRepository orderRepository;
     private final MemberRepository memberRepository;
-    private final ProductRepository productRepository;
     private final PaymentRepository paymentRepository;
 
     @Override
