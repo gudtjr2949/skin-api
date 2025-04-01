@@ -8,14 +8,14 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-class PriceTest {
+class PaymentPriceTest {
 
     @Test
     void 가능한_금액_범위를_벗어난_경우_예외가_발생한다() {
         // given
-        int tooLittlePrice = PriceRangeStrategy.MIN_PRICE - 1;
-        int tooMuchPrice = PriceRangeStrategy.MAX_PRICE + 1;
-        List<Integer> prices = List.of(tooLittlePrice, tooMuchPrice);
+        Long tooLittlePrice = PriceRangeStrategy.MIN_PRICE - 1;
+        Long tooMuchPrice = PriceRangeStrategy.MAX_PRICE + 1;
+        List<Long> prices = List.of(tooLittlePrice, tooMuchPrice);
 
         // when & then
         prices.stream().forEach(price -> assertThatThrownBy(() -> new Price(price))
@@ -25,7 +25,7 @@ class PriceTest {
     @Test
     void 금액이_정상적으로_생성된다() {
         // given
-        int normalPrice = 10_000;
+        Long normalPrice = 10_000L;
 
         // when
         Price price = new Price(normalPrice);
