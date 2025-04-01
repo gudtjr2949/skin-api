@@ -1,6 +1,8 @@
 package com.personal.skin_api.order.repository.entity;
 
 import com.personal.skin_api.common.entity.BaseEntity;
+import com.personal.skin_api.common.exception.RestApiException;
+import com.personal.skin_api.common.exception.payment.PaymentErrorCode;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.payment.repository.entity.Payment;
 import com.personal.skin_api.product.repository.entity.Product;
@@ -81,5 +83,13 @@ public class Order extends BaseEntity {
 
     public OrderStatus getOrderStatus() {
         return orderStatus;
+    }
+
+    /**
+     * TODO : 리팩토링 고려하기. 값을 반환하는 메서드에서 null 여부를 검증..?
+     */
+    public Long getPaymentId() {
+        if (payment == null) throw new RestApiException(PaymentErrorCode.CAN_NOT_FOUND_PAYMENT);
+        return payment.getId();
     }
 }

@@ -6,6 +6,8 @@ import com.personal.skin_api.member.repository.entity.MemberRole;
 import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.order.repository.OrderRepository;
 import com.personal.skin_api.order.repository.entity.Order;
+import com.personal.skin_api.payment.repository.PaymentRepository;
+import com.personal.skin_api.payment.repository.entity.Payment;
 import com.personal.skin_api.payment.service.PaymentService;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
@@ -13,6 +15,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.time.LocalDateTime;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -27,8 +31,12 @@ public abstract class AbstractIntegrationTest {
     @Autowired
     protected OrderRepository orderRepository;
 
+    @Autowired
+    protected PaymentRepository paymentRepository;
+
     @AfterEach
     void tearDown() {
+        paymentRepository.deleteAllInBatch();
         orderRepository.deleteAllInBatch();
         productRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
@@ -50,6 +58,13 @@ public abstract class AbstractIntegrationTest {
     private static String productContent = "아주 예쁜 스킨입니다!";
     private static String fileUrl = "s3://hyeongseok-skin/fileUrl";
     private static Long price = 10_000L;
+
+
+    /**
+     * 결제 정보
+     */
+    private static String impUid = "imp_123456789876";
+    private static String payMethod = "card";
 
     protected Member createGeneralMember() {
         return memberRepository.save(Member.builder()
@@ -87,5 +102,15 @@ public abstract class AbstractIntegrationTest {
 
     protected Order createOrder(final Member member, final Product product, final String orderUid) {
         return orderRepository.save(Order.createBeforePayOrder(member, product, orderUid));
+    }
+
+    protected Payment createPayment(final Order order) {
+        return paymentRepository.save(Payment.builder()
+                .price(price)
+                .paidAt(LocalDateTime.now())
+                .payMethod(payMethod)
+                .impUid(impUid)
+                .order(order)
+                .build());
     }
 }
