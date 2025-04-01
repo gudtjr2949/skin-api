@@ -6,6 +6,7 @@ import com.personal.skin_api.order.repository.entity.Order;
 import com.personal.skin_api.product.repository.entity.Product;
 import com.personal.skin_api.review.repository.entity.review_content.ReviewContent;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -30,4 +31,16 @@ public class Review extends BaseEntity {
 
     @Embedded
     private ReviewContent reviewContent;
+
+    @Builder
+    private Review(final Product product, final Order order, final Member member, final String reviewContent) {
+        this.product = product;
+        this.order = order;
+        this.member = member;
+        this.reviewContent = new ReviewContent(reviewContent);
+    }
+
+    public String getReviewContent() {
+        return reviewContent.getReviewContent();
+    }
 }

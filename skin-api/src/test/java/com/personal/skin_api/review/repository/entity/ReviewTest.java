@@ -1,64 +1,40 @@
 package com.personal.skin_api.review.repository.entity;
 
-import com.personal.skin_api.common.exception.RestApiException;
-import com.personal.skin_api.review.repository.entity.review_content.ReviewContent;
-
+import com.personal.skin_api.EntityAbstractIntegrationTest;
+import com.personal.skin_api.common.util.MerchantUidGenerator;
+import com.personal.skin_api.member.repository.entity.Member;
+import com.personal.skin_api.member.repository.entity.MemberRole;
+import com.personal.skin_api.member.repository.entity.MemberStatus;
+import com.personal.skin_api.order.repository.entity.Order;
+import com.personal.skin_api.payment.repository.entity.Payment;
+import com.personal.skin_api.product.repository.entity.Product;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static com.personal.skin_api.review.repository.entity.review_content.ReviewContentLengthStrategy.*;
 import static org.assertj.core.api.Assertions.*;
 
-class ReviewTest {
+class ReviewTest extends EntityAbstractIntegrationTest {
 
     @Test
-    void 후기_내용이_NULL_이라면_예외가_발생한다() {
+    void 후기를_정상적으로_생성한다() {
         // given
-        String nullContent = null;
-
-        // when & then
-        assertThatThrownBy(() -> new ReviewContent(nullContent))
-                .isInstanceOf(RestApiException.class);
-    }
-
-    @Test
-    void 후기_내용이_비어있는_경우_예외가_발생한다() {
-        // given
-        String emptyContent = "";
-
-        // when & then
-        assertThatThrownBy(() -> new ReviewContent(emptyContent))
-                .isInstanceOf(RestApiException.class);
-    }
-
-    @Test
-    void 공백을_제외한_후기_내용의_길이가_최소길이_이하인_경우_예외가_발생한다() {
-        // given
-        String shortContent = "1 ".repeat(REVIEW_CONTENT_MIN_LENGTH-1);
-
-        // when & then
-        assertThatThrownBy(() -> new ReviewContent(shortContent))
-                .isInstanceOf(RestApiException.class);
-    }
-
-    @Test
-    void 공백을_제외한_후기_내용의_길이가_최대길이_이상인_경우_예외가_발생한다() {
-        // given
-        String longContent = "1 ".repeat(REVIEW_CONTENT_MAX_LENGTH+1);
-
-        // when & then
-        assertThatThrownBy(() -> new ReviewContent(longContent))
-                .isInstanceOf(RestApiException.class);
-    }
-
-    @Test
-    void 후기가_정상적으로_생성된다() {
-        // given
-        String normalContent = "너무 좋은 스킨이네요! 잘 쓸께요!";
+        Member member = createGeneralMember();
+        Product product = createProduct(member);
+        String orderUid = MerchantUidGenerator.generateMerchantUid();
+        Order order = createOrder(member, product, orderUid);
+        Payment payment = createPayment(order);
+        String reviewContent = "너무 좋은 스킨입니다! 잘 쓸께요!";
 
         // when
-        ReviewContent reviewContent = new ReviewContent(normalContent);
+        Review review = Review.builder()
+                .member(member)
+                .product(product)
+                .order(order)
+                .reviewContent(reviewContent)
+                .build();
 
         // then
-        assertThat(reviewContent.getReviewContent()).isEqualTo(normalContent);
+        assertThat(review.getReviewContent()).isEqualTo(reviewContent);
     }
+
 }
