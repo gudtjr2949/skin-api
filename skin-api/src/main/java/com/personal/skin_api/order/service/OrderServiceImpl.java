@@ -115,7 +115,12 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orderList = qOrderRepository.findMyOrderList(request.getOrderId(), member, request.getKeyword(), request.getYear());
 
         List<OrderDetailResponse> orderResponses = orderList.stream()
-                .map(order -> createOrderDetailResponse(order, member.getMemberName()))
+                .map(order -> {
+                    if (order.getPayment() == null) {
+                        return createOrderDetailResponseWhenNoPayment(order, member.getMemberName());
+                    }
+                    return createOrderDetailResponse(order, member.getMemberName());
+                })
                 .toList();
 
         return new OrderListResponse(orderResponses);

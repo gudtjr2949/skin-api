@@ -5,23 +5,22 @@ import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
 import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.order.repository.OrderRepository;
+import com.personal.skin_api.order.repository.QOrderRepository;
 import com.personal.skin_api.order.repository.entity.Order;
 import com.personal.skin_api.payment.repository.PaymentRepository;
 import com.personal.skin_api.payment.repository.entity.Payment;
-import com.personal.skin_api.payment.service.PaymentService;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-@SpringBootTest
+@DataJpaTest
 @ActiveProfiles("test")
-public abstract class AbstractIntegrationTest {
+public abstract class JpaAbstractIntegrationTest {
 
     @Autowired
     protected MemberRepository memberRepository;
@@ -42,6 +41,7 @@ public abstract class AbstractIntegrationTest {
         productRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
     }
+
 
     /**
      * 회원 정보
