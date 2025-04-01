@@ -22,11 +22,11 @@ import com.personal.skin_api.order.service.dto.response.OrderListResponse;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,6 +35,7 @@ import static com.personal.skin_api.common.util.MerchantUidGenerator.generateMer
 @Aspect
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
@@ -86,9 +87,24 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findByOrderUidAndMember(request.getOrderUid(), member)
                 .orElseThrow(() -> new RestApiException(OrderErrorCode.CAN_NOT_FOUND_ORDER));
 
-        OrderDetailResponse response = createOrderDetailResponse(order);
+        OrderDetailResponse response = new OrderDetailResponse();
+
+        if (order.getPayment() == null) {
+            response = createOrderDetailResponseWhenNoPayment(order, member.getMemberName());
+        } else {
+            response = createOrderDetailResponse(order, member.getMemberName());
+        }
 
         return response;
+    }
+
+    private OrderDetailResponse createOrderDetailResponseWhenNoPayment(Order order, String memberName) {
+        return OrderDetailResponse.builder()
+                .orderUid(order.getOrderUid())
+                .memberName(memberName)
+                .productName(order.getProductName())
+                .createdAt(order.getCreatedAt())
+                .build();
     }
 
     @Override
@@ -99,19 +115,21 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orderList = qOrderRepository.findMyOrderList(request.getOrderId(), member, request.getKeyword(), request.getYear());
 
         List<OrderDetailResponse> orderResponses = orderList.stream()
-                .map(order -> createOrderDetailResponse(order))
+                .map(order -> createOrderDetailResponse(order, member.getMemberName()))
                 .toList();
 
         return new OrderListResponse(orderResponses);
     }
 
-    private OrderDetailResponse createOrderDetailResponse(Order order) {
+    private OrderDetailResponse createOrderDetailResponse(Order order, String memberName) {
         return OrderDetailResponse.builder()
                 .orderUid(order.getOrderUid())
-                .createdAt(order.getCreatedAt())
+                .memberName(memberName)
                 .productName(order.getProductName())
+                .price(order.getPaymentPrice())
                 .payMethod(order.getPayMethod())
-                .price(order.getPrice())
+                .paidAt(order.getPaidAt())
+                .createdAt(order.getCreatedAt())
                 .build();
     }
 

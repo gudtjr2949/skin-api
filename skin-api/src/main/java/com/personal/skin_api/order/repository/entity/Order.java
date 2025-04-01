@@ -1,12 +1,16 @@
 package com.personal.skin_api.order.repository.entity;
 
 import com.personal.skin_api.common.entity.BaseEntity;
+import com.personal.skin_api.common.exception.RestApiException;
+import com.personal.skin_api.common.exception.payment.PaymentErrorCode;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.payment.repository.entity.Payment;
 import com.personal.skin_api.product.repository.entity.Product;
 
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "ORDERS")
@@ -63,7 +67,7 @@ public class Order extends BaseEntity {
         return orderUid;
     }
 
-    public String getMember() {
+    public String getOrdererEmail() {
         return member.getEmail();
     }
 
@@ -71,15 +75,31 @@ public class Order extends BaseEntity {
         return product.getProductName();
     }
 
+    public Payment getPayment() {
+        return payment;
+    }
+
     public String getPayMethod() {
         return payment.getPayMethod();
     }
 
-    public Long getPrice() {
+    public Long getPaymentPrice() {
         return payment.getPrice();
     }
 
     public OrderStatus getOrderStatus() {
         return orderStatus;
+    }
+
+    /**
+     * TODO : 리팩토링 고려하기. 값을 반환하는 메서드에서 null 여부를 검증..?
+     */
+    public Long getPaymentId() {
+        if (payment == null) throw new RestApiException(PaymentErrorCode.CAN_NOT_FOUND_PAYMENT);
+        return payment.getId();
+    }
+
+    public LocalDateTime getPaidAt() {
+        return payment.getPaidAt();
     }
 }
