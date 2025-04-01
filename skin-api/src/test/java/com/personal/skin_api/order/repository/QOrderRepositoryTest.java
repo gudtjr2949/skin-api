@@ -1,5 +1,7 @@
 package com.personal.skin_api.order.repository;
 
+import com.personal.skin_api.AbstractIntegrationTest;
+import com.personal.skin_api.JpaAbstractIntegrationTest;
 import com.personal.skin_api.common.util.MerchantUidGenerator;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
@@ -31,23 +33,7 @@ import java.util.stream.Stream;
 import static com.personal.skin_api.order.repository.QOrderRepository.ORDER_PAGE_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Slf4j
-@SpringBootTest
-@ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class QOrderRepositoryTest {
-
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private PaymentRepository paymentRepository;
+class QOrderRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
     private QOrderRepository qOrderRepository;
@@ -57,95 +43,29 @@ class QOrderRepositoryTest {
 
     private JPAQueryFactory queryFactory;
 
-    private Member member;
-    private Product product;
-    private List<Payment> payments;
-    private List<Order> orders;
-
     @BeforeEach
     void beforeEach() {
         queryFactory = new JPAQueryFactory(em);
     }
 
-    @BeforeAll
-    void setUp() {
-        this.member = createMember();
-        this.product = createProduct();
-        this.payments = Stream.generate(() -> createPayment(LocalDateTime.now()))
-                .limit(ORDER_PAGE_SIZE)
-                .toList();
-
-        this.orders = IntStream.range(0, ORDER_PAGE_SIZE)
-                .mapToObj(i -> Order.createBeforePayOrder(member, product, MerchantUidGenerator.generateMerchantUid()))
-                .toList();
-
-        orderRepository.saveAll(orders);
-    }
-
-    @AfterAll
-    void tearDown() {
-        paymentRepository.deleteAllInBatch();
-        orderRepository.deleteAllInBatch();
-        productRepository.deleteAllInBatch();
-        memberRepository.deleteAllInBatch();
-    }
-
     @Test
     void 회원_정보가_일치하는_주문목록_첫_장을_조회한다() {
         // given
-        Order firstOrder = orders.get(orders.size()-1);
-        Order lastOrder = orders.get(0);
+        Member member = createGeneralMember();
+        Product product = createProduct(member);
+
+        Order firstOrder = createOrder(member, product, MerchantUidGenerator.generateMerchantUid());
+        for (int i = 1 ; i < ORDER_PAGE_SIZE-1 ; i++) {
+            createOrder(member, product, MerchantUidGenerator.generateMerchantUid());
+        }
+        Order lastOrder = createOrder(member, product, MerchantUidGenerator.generateMerchantUid());
 
         // when
         List<Order> myOrders = qOrderRepository.findMyOrderList(0L, member, "", LocalDateTime.now().getYear());
 
         // then
         assertThat(myOrders).hasSize(ORDER_PAGE_SIZE);
-        assertThat(myOrders.get(0).getId()).isEqualTo(firstOrder.getId());
-        assertThat(myOrders.get(ORDER_PAGE_SIZE-1).getId()).isEqualTo(lastOrder.getId());
-    }
-
-    private Payment createPayment(LocalDateTime paidAt) {
-        return paymentRepository.save(Payment.builder()
-                .impUid("imp_370615...")
-                .price(100L)
-                .payMethod("card")
-                .paidAt(paidAt)
-                .build());
-    }
-
-    private Member createMember() {
-        String email = "asd123@naver.com";
-        String password = "asd1234!";
-        String memberName = "홍길동";
-        String nickname = "길동짱짱";
-        String phone = "01012345678";
-        MemberStatus status = MemberStatus.ACTIVE;
-        MemberRole role = MemberRole.GENERAL;
-
-        return memberRepository.save(Member.builder()
-                .email(email)
-                .password(password)
-                .memberName(memberName)
-                .nickname(nickname)
-                .phone(phone)
-                .status(status)
-                .role(role)
-                .build());
-    }
-
-    private Product createProduct() {
-        String productName = "형석이의 스킨";
-        String productContent = "아주 예쁜 스킨입니다!";
-        String fileUrl = "s3://hyeongseok-skin/fileUrl";
-        Long price = 10_000L;
-
-        return productRepository.save(Product.builder()
-                .member(member)
-                .productName(productName)
-                .productContent(productContent)
-                .fileUrl(fileUrl)
-                .price(price)
-                .build());
+        assertThat(myOrders.get(0).getId()).isEqualTo(lastOrder.getId());
+        assertThat(myOrders.get(ORDER_PAGE_SIZE-1).getId()).isEqualTo(firstOrder.getId());
     }
 }

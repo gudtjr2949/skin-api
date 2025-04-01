@@ -10,6 +10,8 @@ import com.personal.skin_api.product.repository.entity.Product;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "ORDERS")
 @NoArgsConstructor
@@ -73,11 +75,15 @@ public class Order extends BaseEntity {
         return product.getProductName();
     }
 
+    public Payment getPayment() {
+        return payment;
+    }
+
     public String getPayMethod() {
         return payment.getPayMethod();
     }
 
-    public Long getPrice() {
+    public Long getPaymentPrice() {
         return payment.getPrice();
     }
 
@@ -91,5 +97,9 @@ public class Order extends BaseEntity {
     public Long getPaymentId() {
         if (payment == null) throw new RestApiException(PaymentErrorCode.CAN_NOT_FOUND_PAYMENT);
         return payment.getId();
+    }
+
+    public LocalDateTime getPaidAt() {
+        return payment.getPaidAt();
     }
 }
