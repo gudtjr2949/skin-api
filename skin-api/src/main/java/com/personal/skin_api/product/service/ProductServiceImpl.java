@@ -15,14 +15,16 @@ import com.personal.skin_api.product.service.dto.request.*;
 import com.personal.skin_api.product.service.dto.response.ProductDetailResponse;
 import com.personal.skin_api.product.service.dto.response.ProductListResponse;
 import com.personal.skin_api.product.service.dto.response.ProductResponse;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
 
     private final S3Service s3Service;
@@ -35,6 +37,7 @@ public class ProductServiceImpl implements ProductService {
      * @param request 등록 제품 정보
      */
     @Override
+    @Transactional
     public void registerProduct(ProductRegisterServiceRequest request) {
         Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
