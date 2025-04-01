@@ -1,5 +1,6 @@
 package com.personal.skin_api.product.repository;
 
+import com.personal.skin_api.JpaAbstractIntegrationTest;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
@@ -24,13 +25,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.personal.skin_api.product.repository.QProductRepository.PRODUCTS_PAGE_SIZE;
 import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
 @DataJpaTest
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ProductRepositoryTest {
+class ProductRepositoryTest extends JpaAbstractIntegrationTest {
 
     @Autowired
     private ProductRepository productRepository;
@@ -46,8 +48,6 @@ class ProductRepositoryTest {
     private Member member;
 
     private List<Product> products;
-
-    private static final int PRODUCTS_PAGE_SIZE = 5;
 
     @BeforeEach
     void beforeEach() {
@@ -188,7 +188,7 @@ class ProductRepositoryTest {
         String productName = "형석이의 스킨";
         String productContent = "아주 예쁜 스킨입니다!";
         String fileUrl = "s3://hyeongseok-skin/fileUrl";
-        int price = 10_000;
+        Long price = 10_000L;
 
         return Product.builder()
                 .member(member)

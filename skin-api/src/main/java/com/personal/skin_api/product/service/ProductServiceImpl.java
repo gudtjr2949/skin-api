@@ -11,22 +11,20 @@ import com.personal.skin_api.member.repository.entity.email.Email;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.QProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
-import com.personal.skin_api.product.service.dto.request.ProductFindListServiceRequest;
-import com.personal.skin_api.product.service.dto.request.ProductFindMyListServiceRequest;
-import com.personal.skin_api.product.service.dto.request.ProductModifyServiceRequest;
-import com.personal.skin_api.product.service.dto.request.ProductRegisterServiceRequest;
+import com.personal.skin_api.product.service.dto.request.*;
 import com.personal.skin_api.product.service.dto.response.ProductDetailResponse;
 import com.personal.skin_api.product.service.dto.response.ProductListResponse;
 import com.personal.skin_api.product.service.dto.response.ProductResponse;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
 
     private final S3Service s3Service;
@@ -39,6 +37,7 @@ public class ProductServiceImpl implements ProductService {
      * @param request 등록 제품 정보
      */
     @Override
+    @Transactional
     public void registerProduct(ProductRegisterServiceRequest request) {
         Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
@@ -144,5 +143,21 @@ public class ProductServiceImpl implements ProductService {
         }
 
         product.modifyProduct(request.getNewProductName(), request.getNewProductContent(), newFileUrl, request.getNewPrice());
+    }
+
+    @Override
+    @Transactional
+    public void deleteProduct(ProductDeleteServiceRequest request) {
+        Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Product product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new RestApiException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        if (!product.getMember().equals(member.getEmail())) {
+            throw new RestApiException(ProductErrorCode.CAN_NOT_MODIFY_PRODUCT);
+        }
+
+        product.deleteProduct();
     }
 }

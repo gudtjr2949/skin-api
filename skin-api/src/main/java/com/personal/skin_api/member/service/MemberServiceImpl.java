@@ -163,15 +163,16 @@ class MemberServiceImpl implements MemberService {
         Member loginMember = memberRepository.findMemberByEmailAndPassword(new Email(request.getEmail()), new Password(request.getPassword()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
-        // accessToken 헤더에 담기
         String accessToken = jwtTokenProvider.generateJwt(request.getEmail(), JwtTokenConstant.accessExpirationTime);
         String refreshToken = jwtTokenProvider.generateJwt(request.getEmail(), JwtTokenConstant.refreshExpirationTime);
+
 
         redisService.saveRefreshToken(RedisSaveRefreshTokenServiceRequest.builder()
                 .purpose(TokenPurpose.REFRESH_TOKEN)
                 .email(loginMember.getEmail())
                 .refreshToken(refreshToken)
                 .build());
+
 
         return MemberLoginResponse.builder()
                 .member(loginMember)

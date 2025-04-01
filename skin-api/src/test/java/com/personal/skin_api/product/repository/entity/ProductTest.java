@@ -17,7 +17,7 @@ class ProductTest {
         String productName = "형석이의 스킨";
         String productContent = "아주 예쁜 스킨입니다!";
         String fileUrl = "s3://hyeongseok-skin/fileUrl";
-        int price = 10_000;
+        Long price = 10_000L;
 
         // when
         Product product = createProduct(member, productName, productContent, fileUrl, price);
@@ -38,7 +38,7 @@ class ProductTest {
         String newProductName = product.getProductName() + "2";
         String newProductContent = product.getProductContent() + "2";
         String newFileUrl = product.getFileUrl() + "2";
-        int newPrice = product.getPrice() + 10_000;
+        Long newPrice = product.getPrice() + 10_000L;
 
         // when
         product.modifyProduct(newProductName, newProductContent, newFileUrl, newPrice);
@@ -57,10 +57,10 @@ class ProductTest {
         Product product = createProductNoParameter(member);
         
         // when
-        product.removeProduct();
+        product.deleteProduct();
         
         // then
-        assertThat(product.getProductStatus()).isEqualTo(ProductStatus.REMOVED);
+        assertThat(product.getProductStatus()).isEqualTo(ProductStatus.DELETED);
     }
 
     @Test
@@ -76,7 +76,8 @@ class ProductTest {
         assertThat(product.getProductStatus()).isEqualTo(ProductStatus.REPORTED);
     }
 
-    private static Product createProduct(Member member, String productName, String productContent, String fileUrl, int price) {
+    private static Product createProduct(Member member, String productName,
+                                         String productContent, String fileUrl, Long price) {
         return Product.builder()
                 .member(member)
                 .productName(productName)
@@ -90,7 +91,7 @@ class ProductTest {
         String productName = "형석이의 스킨";
         String productContent = "아주 예쁜 스킨입니다!";
         String fileUrl = "s3://hyeongseok-skin/fileUrl";
-        int price = 10_000;
+        Long price = 10_000L;
 
         return Product.builder()
                 .member(member)
