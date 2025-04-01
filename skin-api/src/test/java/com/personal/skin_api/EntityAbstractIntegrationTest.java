@@ -1,53 +1,21 @@
 package com.personal.skin_api;
 
-import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
 import com.personal.skin_api.member.repository.entity.MemberStatus;
-import com.personal.skin_api.order.repository.OrderRepository;
-import com.personal.skin_api.order.repository.QOrderRepository;
+
 import com.personal.skin_api.order.repository.entity.Order;
-import com.personal.skin_api.payment.repository.PaymentRepository;
+
 import com.personal.skin_api.payment.repository.entity.Payment;
-import com.personal.skin_api.product.repository.ProductRepository;
+
 import com.personal.skin_api.product.repository.entity.Product;
-import com.personal.skin_api.review.repository.ReviewRepository;
-import com.personal.skin_api.review.repository.entity.Review;
-import org.junit.jupiter.api.AfterEach;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 
-@DataJpaTest
 @ActiveProfiles("test")
-public abstract class JpaAbstractIntegrationTest {
-
-    @Autowired
-    protected MemberRepository memberRepository;
-
-    @Autowired
-    protected ProductRepository productRepository;
-
-    @Autowired
-    protected OrderRepository orderRepository;
-
-    @Autowired
-    protected PaymentRepository paymentRepository;
-
-    @Autowired
-    protected ReviewRepository reviewRepository;
-
-    @AfterEach
-    void tearDown() {
-        reviewRepository.deleteAllInBatch();
-        paymentRepository.deleteAllInBatch();
-        orderRepository.deleteAllInBatch();
-        productRepository.deleteAllInBatch();
-        memberRepository.deleteAllInBatch();
-    }
-
+public abstract class EntityAbstractIntegrationTest {
 
     /**
      * 회원 정보
@@ -73,14 +41,8 @@ public abstract class JpaAbstractIntegrationTest {
     private static String impUid = "imp_123456789876";
     private static String payMethod = "card";
 
-    /**
-     * 후기 정보
-     *
-     */
-    private static String reviewContent = "너무 좋은 스킨입니다! 감사합니다!";
-
     protected Member createGeneralMember() {
-        return memberRepository.save(Member.builder()
+        return Member.builder()
                 .email(email)
                 .password(password)
                 .memberName(memberName)
@@ -88,11 +50,11 @@ public abstract class JpaAbstractIntegrationTest {
                 .phone(phone)
                 .status(MemberStatus.ACTIVE)
                 .role(MemberRole.GENERAL)
-                .build());
+                .build();
     }
 
     protected Member createGeneralMemberWithEmail(final String email) {
-        return memberRepository.save(Member.builder()
+        return Member.builder()
                 .email(email)
                 .password(password)
                 .memberName(memberName)
@@ -100,39 +62,30 @@ public abstract class JpaAbstractIntegrationTest {
                 .phone(phone)
                 .status(MemberStatus.ACTIVE)
                 .role(MemberRole.GENERAL)
-                .build());
+                .build();
     }
 
     protected Product createProduct(Member member) {
-        return productRepository.save(Product.builder()
+        return Product.builder()
                 .member(member)
                 .productName(productName)
                 .productContent(productContent)
                 .fileUrl(fileUrl)
                 .price(price)
-                .build());
+                .build();
     }
 
     protected Order createOrder(final Member member, final Product product, final String orderUid) {
-        return orderRepository.save(Order.createBeforePayOrder(member, product, orderUid));
+        return Order.createBeforePayOrder(member, product, orderUid);
     }
 
     protected Payment createPayment(final Order order) {
-        return paymentRepository.save(Payment.builder()
+        return Payment.builder()
                 .price(price)
                 .paidAt(LocalDateTime.now())
                 .payMethod(payMethod)
                 .impUid(impUid)
                 .order(order)
-                .build());
-    }
-
-    protected Review createReview(final Member member, final Product product, final Order order) {
-        return reviewRepository.save(Review.builder()
-                .member(member)
-                .product(product)
-                .order(order)
-                .reviewContent(reviewContent)
-                .build());
+                .build();
     }
 }
