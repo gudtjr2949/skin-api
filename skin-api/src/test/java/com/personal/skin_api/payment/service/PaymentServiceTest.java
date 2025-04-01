@@ -13,6 +13,8 @@ import com.personal.skin_api.payment.repository.entity.Payment;
 import com.personal.skin_api.payment.repository.entity.impuid.ImpUid;
 import com.personal.skin_api.payment.service.dto.request.PaymentCreateServiceRequest;
 
+import com.personal.skin_api.payment.service.dto.request.PaymentFindServiceRequest;
+import com.personal.skin_api.payment.service.dto.response.PaymentDetailResponse;
 import com.personal.skin_api.product.repository.entity.Product;
 
 import org.junit.jupiter.api.AfterEach;
@@ -153,6 +155,45 @@ class PaymentServiceTest extends AbstractIntegrationTest {
         // then
         assertThat(byOrderUid).isPresent();
         assertThat(byOrderUid.get().getOrderStatus()).isEqualTo(OrderStatus.PAID);
+    }
+    
+    @Test
+    void 결제정보를_상세조회한다() {
+        // given
+        Member member = createGeneralMember();
+        Product product = createProduct(member);
+        String orderUid = generateMerchantUid();
+        Order order = createOrder(member, product, orderUid);
+        Payment payment = createPayment(order);
+        PaymentFindServiceRequest request = PaymentFindServiceRequest.builder()
+                .email(member.getEmail())
+                .orderUid(order.getOrderUid())
+                .build();
+
+        // when
+        PaymentDetailResponse findPayment = paymentService.findPayment(request);
+
+        // then
+        assertThat(findPayment).isNotNull();
+        assertThat(findPayment.getImpUid()).isEqualTo(payment.getImpUid());
+    }
+
+    @Test
+    void 없는_결제정보를_조회하면_예외가_발생한다() {
+        // given (결제 안 함)
+        Member member = createGeneralMember();
+        Product product = createProduct(member);
+        String orderUid = generateMerchantUid();
+        Order order = createOrder(member, product, orderUid);
+
+        PaymentFindServiceRequest request = PaymentFindServiceRequest.builder()
+                .email(member.getEmail())
+                .orderUid(order.getOrderUid())
+                .build();
+
+        // when & then
+        assertThatThrownBy(() -> paymentService.findPayment(request))
+                .isInstanceOf(RestApiException.class);
     }
 
 }
