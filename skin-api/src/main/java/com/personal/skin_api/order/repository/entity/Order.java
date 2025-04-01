@@ -63,7 +63,7 @@ public class Order extends BaseEntity {
         return orderUid;
     }
 
-    public String getMember() {
+    public String getOrdererEmail() {
         return member.getEmail();
     }
 
