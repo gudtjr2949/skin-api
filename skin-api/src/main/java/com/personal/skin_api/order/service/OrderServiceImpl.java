@@ -87,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findByOrderUidAndMember(request.getOrderUid(), member)
                 .orElseThrow(() -> new RestApiException(OrderErrorCode.CAN_NOT_FOUND_ORDER));
 
-        OrderDetailResponse response = createOrderDetailResponse(order);
+        OrderDetailResponse response = createOrderDetailResponse(order, member.getMemberName());
 
         return response;
     }
@@ -100,15 +100,16 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orderList = qOrderRepository.findMyOrderList(request.getOrderId(), member, request.getKeyword(), request.getYear());
 
         List<OrderDetailResponse> orderResponses = orderList.stream()
-                .map(order -> createOrderDetailResponse(order))
+                .map(order -> createOrderDetailResponse(order, member.getMemberName()))
                 .toList();
 
         return new OrderListResponse(orderResponses);
     }
 
-    private OrderDetailResponse createOrderDetailResponse(Order order) {
+    private OrderDetailResponse createOrderDetailResponse(Order order, String memberName) {
         return OrderDetailResponse.builder()
                 .orderUid(order.getOrderUid())
+                .memberName(memberName)
                 .createdAt(order.getCreatedAt())
                 .productName(order.getProductName())
                 .payMethod(order.getPayMethod())

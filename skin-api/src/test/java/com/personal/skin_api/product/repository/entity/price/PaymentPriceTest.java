@@ -8,7 +8,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-class PriceTest {
+class PaymentPriceTest {
 
     @Test
     void 가능한_금액_범위를_벗어난_경우_예외가_발생한다() {
