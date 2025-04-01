@@ -87,9 +87,24 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findByOrderUidAndMember(request.getOrderUid(), member)
                 .orElseThrow(() -> new RestApiException(OrderErrorCode.CAN_NOT_FOUND_ORDER));
 
-        OrderDetailResponse response = createOrderDetailResponse(order, member.getMemberName());
+        OrderDetailResponse response = new OrderDetailResponse();
+
+        if (order.getPayment() == null) {
+            response = createOrderDetailResponseWhenNoPayment(order, member.getMemberName());
+        } else {
+            response = createOrderDetailResponse(order, member.getMemberName());
+        }
 
         return response;
+    }
+
+    private OrderDetailResponse createOrderDetailResponseWhenNoPayment(Order order, String memberName) {
+        return OrderDetailResponse.builder()
+                .orderUid(order.getOrderUid())
+                .memberName(memberName)
+                .productName(order.getProductName())
+                .createdAt(order.getCreatedAt())
+                .build();
     }
 
     @Override
@@ -110,10 +125,11 @@ public class OrderServiceImpl implements OrderService {
         return OrderDetailResponse.builder()
                 .orderUid(order.getOrderUid())
                 .memberName(memberName)
-                .createdAt(order.getCreatedAt())
                 .productName(order.getProductName())
+                .price(order.getPaymentPrice())
                 .payMethod(order.getPayMethod())
-                .price(order.getPrice())
+                .paidAt(order.getPaidAt())
+                .createdAt(order.getCreatedAt())
                 .build();
     }
 
