@@ -98,7 +98,7 @@ public class ReviewServiceImpl implements ReviewService {
         Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        Review review = reviewRepository.findById(request.getReviewId())
+        Review review = reviewRepository.findByIdAndReviewStatus(request.getReviewId(), ACTIVE)
                 .orElseThrow(() -> new RestApiException(ReviewErrorCode.CAN_NOT_FOUND_REVIEW));
 
         checkReviewerPermission(member, review);
