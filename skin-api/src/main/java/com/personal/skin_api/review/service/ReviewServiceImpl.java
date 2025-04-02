@@ -12,11 +12,18 @@ import com.personal.skin_api.order.repository.OrderRepository;
 import com.personal.skin_api.order.repository.entity.Order;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
+import com.personal.skin_api.review.repository.QReviewRepository;
 import com.personal.skin_api.review.repository.ReviewRepository;
+import com.personal.skin_api.review.repository.entity.Review;
 import com.personal.skin_api.review.service.dto.request.ReviewCreateServiceRequest;
+import com.personal.skin_api.review.service.dto.request.ReviewFindListServiceRequest;
+import com.personal.skin_api.review.service.dto.response.ReviewDetailResponse;
+import com.personal.skin_api.review.service.dto.response.ReviewListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +34,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final ReviewRepository reviewRepository;
+    private final QReviewRepository qReviewRepository;
 
 
     @Override
@@ -51,5 +59,24 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         reviewRepository.save(request.toEntity(member, product, order));
+    }
+
+    @Override
+    public ReviewListResponse findReviewList(ReviewFindListServiceRequest request) {
+        Product product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new RestApiException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        List<Review> productReviews = qReviewRepository.findProductReviews(product.getId(), request.getReviewId());
+
+        List<ReviewDetailResponse> reviewDetailResponses = productReviews.stream()
+                .map(review -> ReviewDetailResponse.builder()
+                        .reviewId(review.getId())
+                        .reviewContent(review.getReviewContent())
+                        .nickname(review.getReviewerNickname())
+                        .createdAt(review.getCreatedAt())
+                        .build())
+                .toList();
+
+        return new ReviewListResponse(reviewDetailResponses);
     }
 }

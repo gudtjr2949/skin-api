@@ -11,6 +11,8 @@ import com.personal.skin_api.product.repository.entity.Product;
 import com.personal.skin_api.review.repository.entity.Review;
 import com.personal.skin_api.review.service.dto.request.ReviewCreateServiceRequest;
 
+import com.personal.skin_api.review.service.dto.request.ReviewFindListServiceRequest;
+import com.personal.skin_api.review.service.dto.response.ReviewListResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -93,5 +95,33 @@ class ReviewServiceTest extends AbstractIntegrationTest {
         // when & then
         assertThatThrownBy(() -> reviewService.createReview(request))
                 .isInstanceOf(RestApiException.class);
+    }
+
+    @Test
+    void 제품에_작성된_리뷰를_조회한다() {
+        // given
+        int reviewCnt = 5;
+        Member seller = createGeneralMember();
+        Product product = createProduct(seller);
+
+        for (int i = 0 ; i < reviewCnt ; i++) {
+            Member member = createGeneralMemberWithEmail("test" + i + "@naver.com");
+            String orderUid = MerchantUidGenerator.generateMerchantUid();
+            Order order = createOrder(member, product, orderUid);
+            Payment payment = createPayment(order);
+            createReview(member, product, order);
+        }
+
+
+        // when
+        ReviewFindListServiceRequest request = ReviewFindListServiceRequest.builder()
+                .productId(product.getId())
+                .reviewId(0L)
+                .build();
+
+        ReviewListResponse reviewList = reviewService.findReviewList(request);
+
+        // then
+        assertThat(reviewList.getReviewDetailResponses()).hasSize(reviewCnt);
     }
 }
