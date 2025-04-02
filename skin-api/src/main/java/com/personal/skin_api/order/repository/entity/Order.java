@@ -71,6 +71,10 @@ public class Order extends BaseEntity {
         return member.getEmail();
     }
 
+    public Long getProductId() {
+        return product.getId();
+    }
+
     public String getProductName() {
         return product.getProductName();
     }
