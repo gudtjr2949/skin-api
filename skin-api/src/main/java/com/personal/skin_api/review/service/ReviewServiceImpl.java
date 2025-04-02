@@ -12,6 +12,7 @@ import com.personal.skin_api.order.repository.OrderRepository;
 import com.personal.skin_api.order.repository.entity.Order;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
+import com.personal.skin_api.product.repository.entity.ProductStatus;
 import com.personal.skin_api.review.repository.QReviewRepository;
 import com.personal.skin_api.review.repository.ReviewRepository;
 import com.personal.skin_api.review.repository.entity.Review;
@@ -53,7 +54,7 @@ public class ReviewServiceImpl implements ReviewService {
         Order order = orderRepository.findByOrderUid(request.getOrderUid())
                 .orElseThrow(() -> new RestApiException(OrderErrorCode.CAN_NOT_FOUND_ORDER));
 
-        Product product = productRepository.findById(order.getProductId())
+        Product product = productRepository.findByIdAndProductStatus(order.getProductId(), ProductStatus.ACTIVE)
                 .orElseThrow(() -> new RestApiException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
 
@@ -73,9 +74,11 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.save(request.toEntity(member, product, order));
     }
 
+
+
     @Override
     public ReviewListResponse findReviewList(ReviewFindListServiceRequest request) {
-        Product product = productRepository.findById(request.getProductId())
+        Product product = productRepository.findByIdAndProductStatus(request.getProductId(), ProductStatus.ACTIVE)
                 .orElseThrow(() -> new RestApiException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
         List<Review> productReviews = qReviewRepository.findProductReviews(product.getId(), request.getReviewId());
@@ -90,6 +93,16 @@ public class ReviewServiceImpl implements ReviewService {
                 .toList();
 
         return new ReviewListResponse(reviewDetailResponses);
+    }
+
+    @Override
+    public int findProductReviewCount(Long productId) {
+        Product product = productRepository.findByIdAndProductStatus(productId, ProductStatus.ACTIVE)
+                .orElseThrow(() -> new RestApiException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        List<Review> byProduct = reviewRepository.findByProduct(product);
+
+        return byProduct.size();
     }
 
     @Override

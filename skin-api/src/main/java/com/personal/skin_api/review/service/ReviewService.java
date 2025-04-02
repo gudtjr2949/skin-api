@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 public interface ReviewService {
     void createReview(ReviewCreateServiceRequest request);
     ReviewListResponse findReviewList(ReviewFindListServiceRequest request);
+    int findProductReviewCount(Long productId);
     void modifyReview(ReviewModifyServiceRequest request);
     void deleteReview(ReviewDeleteServiceRequest request);
 }
