@@ -30,6 +30,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 
     @Override
+    @Transactional
     public void createReview(ReviewCreateServiceRequest request) {
         // Member 정보, Order 정보
         Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
