@@ -11,6 +11,7 @@ import com.personal.skin_api.payment.repository.entity.Payment;
 import com.personal.skin_api.payment.service.PaymentService;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
+import com.personal.skin_api.review.repository.ReviewRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,8 +36,12 @@ public abstract class AbstractIntegrationTest {
     @Autowired
     protected PaymentRepository paymentRepository;
 
+    @Autowired
+    protected ReviewRepository reviewRepository;
+
     @AfterEach
     void tearDown() {
+        reviewRepository.deleteAllInBatch();
         paymentRepository.deleteAllInBatch();
         orderRepository.deleteAllInBatch();
         productRepository.deleteAllInBatch();
