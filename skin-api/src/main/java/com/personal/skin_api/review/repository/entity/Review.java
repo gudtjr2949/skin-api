@@ -69,4 +69,8 @@ public class Review extends BaseEntity {
     public String getReviewerNickname() {
         return member.getNickname();
     }
+
+    public String getReviewerEmail() {
+        return member.getEmail();
+    }
 }

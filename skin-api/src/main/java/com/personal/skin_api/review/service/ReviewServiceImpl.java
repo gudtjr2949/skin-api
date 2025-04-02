@@ -15,8 +15,11 @@ import com.personal.skin_api.product.repository.entity.Product;
 import com.personal.skin_api.review.repository.QReviewRepository;
 import com.personal.skin_api.review.repository.ReviewRepository;
 import com.personal.skin_api.review.repository.entity.Review;
+import com.personal.skin_api.review.repository.entity.ReviewStatus;
 import com.personal.skin_api.review.service.dto.request.ReviewCreateServiceRequest;
+import com.personal.skin_api.review.service.dto.request.ReviewDeleteServiceRequest;
 import com.personal.skin_api.review.service.dto.request.ReviewFindListServiceRequest;
+import com.personal.skin_api.review.service.dto.request.ReviewModifyServiceRequest;
 import com.personal.skin_api.review.service.dto.response.ReviewDetailResponse;
 import com.personal.skin_api.review.service.dto.response.ReviewListResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+
+import static com.personal.skin_api.review.repository.entity.ReviewStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +56,7 @@ public class ReviewServiceImpl implements ReviewService {
         Product product = productRepository.findById(order.getProductId())
                 .orElseThrow(() -> new RestApiException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
+
         if (!member.getEmail().equals(order.getOrdererEmail())) {
             throw new RestApiException(OrderErrorCode.INVALID_ORDER_MEMBER);
         }
@@ -57,6 +64,11 @@ public class ReviewServiceImpl implements ReviewService {
         if (order.getPayment() == null) {
             throw new RestApiException(ReviewErrorCode.NOT_PAYMENT_ORDER);
         }
+
+        Optional<Review> findReview = reviewRepository.findByMemberAndProductAndOrder(member, product, order);
+
+        if (findReview.isPresent())
+            throw new RestApiException(ReviewErrorCode.DUPLICATE_REVIEW);
 
         reviewRepository.save(request.toEntity(member, product, order));
     }
@@ -78,5 +90,38 @@ public class ReviewServiceImpl implements ReviewService {
                 .toList();
 
         return new ReviewListResponse(reviewDetailResponses);
+    }
+
+    @Override
+    @Transactional
+    public void modifyReview(ReviewModifyServiceRequest request) {
+        Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Review review = reviewRepository.findById(request.getReviewId())
+                .orElseThrow(() -> new RestApiException(ReviewErrorCode.CAN_NOT_FOUND_REVIEW));
+
+        checkReviewerPermission(member, review);
+
+        review.modifyReviewStatus(request.getNewReviewContent());
+    }
+
+    @Override
+    @Transactional
+    public void deleteReview(ReviewDeleteServiceRequest request) {
+        Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Review review = reviewRepository.findByIdAndReviewStatus(request.getReviewId(), ACTIVE)
+                .orElseThrow(() -> new RestApiException(ReviewErrorCode.CAN_NOT_FOUND_REVIEW));
+
+        checkReviewerPermission(member, review);
+
+        review.deleteReview();
+    }
+
+    private void checkReviewerPermission(Member member, Review review) {
+        if (!member.getEmail().equals(review.getReviewerEmail()))
+            throw new RestApiException(ReviewErrorCode.CAN_NOT_MODIFY_REVIEW);
     }
 }
