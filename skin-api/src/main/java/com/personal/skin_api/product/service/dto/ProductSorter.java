@@ -1,5 +1,6 @@
 package com.personal.skin_api.product.service.dto;
 
+import com.personal.skin_api.order.repository.entity.QOrder;
 import com.personal.skin_api.product.repository.entity.QProduct;
 import com.querydsl.core.types.OrderSpecifier;
 import lombok.Getter;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ProductSorter {
     RECENT("recent", QProduct.product.id.desc()),
+    ORDERS("orders", QProduct.product.orderCnt.desc()),
+    REVIEWS("reviews", QProduct.product.reviewCnt.desc()),
     VIEWS("views", QProduct.product.productViews.productViews.desc()),
     PRICE_ASC("price_asc", QProduct.product.price.price.asc()),
     PRICE_DESC("price_desc", QProduct.product.price.price.desc());

@@ -16,7 +16,6 @@ import com.personal.skin_api.product.repository.entity.ProductStatus;
 import com.personal.skin_api.review.repository.QReviewRepository;
 import com.personal.skin_api.review.repository.ReviewRepository;
 import com.personal.skin_api.review.repository.entity.Review;
-import com.personal.skin_api.review.repository.entity.ReviewStatus;
 import com.personal.skin_api.review.service.dto.request.ReviewCreateServiceRequest;
 import com.personal.skin_api.review.service.dto.request.ReviewDeleteServiceRequest;
 import com.personal.skin_api.review.service.dto.request.ReviewFindListServiceRequest;
@@ -70,6 +69,8 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (findReview.isPresent())
             throw new RestApiException(ReviewErrorCode.DUPLICATE_REVIEW);
+
+        product.increaseReview();
 
         reviewRepository.save(request.toEntity(member, product, order));
     }
@@ -130,7 +131,12 @@ public class ReviewServiceImpl implements ReviewService {
 
         checkReviewerPermission(member, review);
 
+        Product product = productRepository.findByIdAndProductStatus(review.getProductId(), ProductStatus.ACTIVE)
+                .orElseThrow(() -> new RestApiException(ProductErrorCode.PRODUCT_NOT_FOUND));
+        product.decreaseReview();
+
         review.deleteReview();
+
     }
 
     private void checkReviewerPermission(Member member, Review review) {

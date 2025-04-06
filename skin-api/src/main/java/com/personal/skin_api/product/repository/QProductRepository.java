@@ -19,6 +19,7 @@ public class QProductRepository {
 
     private final EntityManager em;
     private final JPAQueryFactory queryFactory;
+    private static final String ORDERS = "orders", REVIEWS = "reviews";
     public static final int PRODUCTS_PAGE_SIZE = 5;
 
     public QProductRepository(EntityManager em) {
@@ -26,14 +27,18 @@ public class QProductRepository {
         this.queryFactory = new JPAQueryFactory(em);
     }
 
+    // TODO : RECENT를 제외한 No Offset 기준 찾기
     public List<Product> findProducts(Long productId, String sorter, String keyword) {
-        BooleanBuilder builder = new BooleanBuilder();
         OrderSpecifier<?> orderSpecifier = ProductSorter.getOrderSpecifier(sorter);
+        BooleanBuilder builder = new BooleanBuilder();
 
         builder.and(QProduct.product.productStatus.eq(ProductStatus.ACTIVE));
-        if (productId > 0) {
+
+        // TODO : 리팩토링 필요
+        if (productId > 0 && ProductSorter.RECENT.getSorter().equals(sorter)) {
             builder.and(QProduct.product.id.lt(productId));
         }
+
         if (keyword != null) {
             builder.and(QProduct.product.productName.productName.contains(keyword));
             builder.and(QProduct.product.productContent.productContent.contains(keyword));

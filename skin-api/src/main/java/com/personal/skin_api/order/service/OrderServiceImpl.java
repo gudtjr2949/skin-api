@@ -143,7 +143,10 @@ public class OrderServiceImpl implements OrderService {
     public void changeOrderStatusToPaid(String orderUid) {
         Order order = orderRepository.findByOrderUid(orderUid)
                 .orElseThrow(() -> new RestApiException(OrderErrorCode.CAN_NOT_FOUND_ORDER));
-
         order.paidOrder();
+
+        Product product = productRepository.findById(order.getProductId())
+                .orElseThrow(() -> new RestApiException(ProductErrorCode.PRODUCT_NOT_FOUND));
+        product.increaseOrder();
     }
 }

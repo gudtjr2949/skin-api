@@ -104,4 +104,66 @@ class QProductRepositoryTest extends AbstractIntegrationTest {
         // then
         assertThat(products.size()).isLessThan(PRODUCTS_PAGE_SIZE);
     }
+
+    @Test
+    void 제품을_높은_가격_순으로_조회한다() {
+        // given
+        Member member = createGeneralMember();
+        String sorter = "price_desc";
+
+        Long firstPrice = 30_000L;
+        Long secondPrice = 20_000L;
+        Long thirdPrice = 10_000L;
+        Product firstProduct = createProductWithPrice(member, firstPrice);
+        Product secondProduct = createProductWithPrice(member, secondPrice);
+        Product thirdProduct = createProductWithPrice(member, thirdPrice);
+
+        // when
+        List<Product> products = qProductRepository.findProducts(0L, sorter, null);
+
+        // then
+        assertThat(products).hasSize(3);
+        assertThat(products.get(0).getId()).isEqualTo(firstProduct.getId());
+        assertThat(products.get(products.size()-1).getId()).isEqualTo(thirdProduct.getId());
+    }
+
+    @Test
+    void 제품을_낮은_가격_순으로_조회한다() {
+        // given
+        Member member = createGeneralMember();
+        String sorter = "price_asc";
+
+        Long firstPrice = 10_000L;
+        Long secondPrice = 20_000L;
+        Long thirdPrice = 30_000L;
+        Product firstProduct = createProductWithPrice(member, firstPrice);
+        Product secondProduct = createProductWithPrice(member, secondPrice);
+        Product thirdProduct = createProductWithPrice(member, thirdPrice);
+
+        // when
+        List<Product> products = qProductRepository.findProducts(0L, sorter, null);
+
+        // then
+        assertThat(products).hasSize(3);
+        assertThat(products.get(0).getId()).isEqualTo(firstProduct.getId());
+        assertThat(products.get(products.size()-1).getId()).isEqualTo(thirdProduct.getId());
+    }
+
+    @Test
+    void 제품을_주문이_많은_순으로_조회한다() {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @Test
+    void 제품을_후기가_많은_순으로_조회한다() {
+        // given
+
+        // when
+
+        // then
+    }
 }
