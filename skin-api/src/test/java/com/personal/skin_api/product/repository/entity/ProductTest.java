@@ -37,11 +37,12 @@ class ProductTest {
         Product product = createProductNoParameter(member);
         String newProductName = product.getProductName() + "2";
         String newProductContent = product.getProductContent() + "2";
+        String newBlogUrl = product.getBlogUrl() + "2";
         String newFileUrl = product.getFileUrl() + "2";
         Long newPrice = product.getPrice() + 10_000L;
 
         // when
-        product.modifyProduct(newProductName, newProductContent, newFileUrl, newPrice);
+        product.modifyProduct(newProductName, newProductContent, newBlogUrl, newFileUrl, newPrice);
 
         // then
         assertThat(product.getProductName()).isEqualTo(newProductName);

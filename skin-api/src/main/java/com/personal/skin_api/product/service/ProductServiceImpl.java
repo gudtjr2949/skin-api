@@ -38,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     @Transactional
-    public void registerProduct(ProductRegisterServiceRequest request) {
+    public Long registerProduct(ProductRegisterServiceRequest request) {
         Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
@@ -51,6 +51,8 @@ public class ProductServiceImpl implements ProductService {
         } catch (Exception e) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
+
+        return product.getId();
     }
 
     /**
@@ -113,6 +115,7 @@ public class ProductServiceImpl implements ProductService {
                 .productId(product.getId())
                 .productName(product.getProductName())
                 .productContent(product.getProductContent())
+                .blogUrl(product.getBlogUrl())
                 .registrantNickname(product.getMember())
                 .price(product.getPrice())
                 .productViews(product.getProductViews())
@@ -142,7 +145,7 @@ public class ProductServiceImpl implements ProductService {
             newFileUrl = s3Service.uploadFile(request.getNewFile());
         }
 
-        product.modifyProduct(request.getNewProductName(), request.getNewProductContent(), newFileUrl, request.getNewPrice());
+        product.modifyProduct(request.getNewProductName(), request.getNewProductContent(), request.getNewBlogUrl(), newFileUrl, request.getNewPrice());
     }
 
     @Override

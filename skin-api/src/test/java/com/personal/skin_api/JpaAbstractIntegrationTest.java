@@ -63,6 +63,7 @@ public abstract class JpaAbstractIntegrationTest {
      */
     private static String productName = "형석이의 스킨";
     private static String productContent = "아주 예쁜 스킨입니다!";
+    private static String blogUrl = "www.test-blog.com";
     private static String fileUrl = "s3://hyeongseok-skin/fileUrl";
     private static Long price = 10_000L;
 
@@ -108,6 +109,7 @@ public abstract class JpaAbstractIntegrationTest {
                 .member(member)
                 .productName(productName)
                 .productContent(productContent)
+                .blogUrl(blogUrl)
                 .fileUrl(fileUrl)
                 .price(price)
                 .build());

@@ -10,15 +10,18 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProductRegisterServiceRequest {
     private final String productName;
     private final String productContent;
+    private final String blogUrl;
     private final Long price;
     private final MultipartFile file;
     private final String email;
 
     @Builder
     private ProductRegisterServiceRequest(final String productName, final String productContent,
-                                          final Long price, final MultipartFile file, final String email) {
+                                          final String blogUrl, final Long price,
+                                          final MultipartFile file, final String email) {
         this.productName = productName;
         this.productContent = productContent;
+        this.blogUrl = blogUrl;
         this.price = price;
         this.file = file;
         this.email = email;
@@ -29,6 +32,7 @@ public class ProductRegisterServiceRequest {
                 .member(member)
                 .productName(productName)
                 .productContent(productContent)
+                .blogUrl(blogUrl)
                 .price(price)
                 .fileUrl(fileUrl)
                 .build();

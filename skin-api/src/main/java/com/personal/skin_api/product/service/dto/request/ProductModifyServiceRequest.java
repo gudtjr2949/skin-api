@@ -10,6 +10,7 @@ public class ProductModifyServiceRequest {
     private final String email;
     private final String newProductName;
     private final String newProductContent;
+    private final String newBlogUrl;
     private final Long newPrice;
     private final MultipartFile newFile;
 
@@ -18,12 +19,14 @@ public class ProductModifyServiceRequest {
                                         final String email,
                                         final String newProductName,
                                         final String newProductContent,
+                                        final String newBlogUrl,
                                         final Long newPrice,
                                         final MultipartFile newFile) {
         this.productId = productId;
         this.email = email;
         this.newProductName = newProductName;
         this.newProductContent = newProductContent;
+        this.newBlogUrl = newBlogUrl;
         this.newPrice = newPrice;
         this.newFile = newFile;
     }
