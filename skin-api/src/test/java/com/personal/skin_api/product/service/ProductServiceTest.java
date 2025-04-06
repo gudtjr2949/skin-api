@@ -40,6 +40,7 @@ class ProductServiceTest extends AbstractIntegrationTest {
 
         String productName = "형석이의 스킨";
         String productContent = "아주 예쁜 스킨입니다!";
+        String blogUrl = "www.test-blog.com";
         ClassPathResource resource = new ClassPathResource("test.zip");
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -53,6 +54,7 @@ class ProductServiceTest extends AbstractIntegrationTest {
                 .email(member.getEmail())
                 .productName(productName)
                 .productContent(productContent)
+                .blogUrl(blogUrl)
                 .file(file)
                 .price(price)
                 .build();
@@ -190,6 +192,7 @@ class ProductServiceTest extends AbstractIntegrationTest {
 
         String newProductName = "제품명 수정";
         String newProductContent = "제품 내용 수정";
+        String newBlogUrl = "www.new-test-blog.com";
         ClassPathResource resource = new ClassPathResource("new_test.zip");
         MockMultipartFile newFile = new MockMultipartFile(
                 "file",
@@ -204,6 +207,7 @@ class ProductServiceTest extends AbstractIntegrationTest {
                 .email(product.getMember())
                 .newProductName(newProductName)
                 .newProductContent(newProductContent)
+                .newBlogUrl(newBlogUrl)
                 .newFile(newFile)
                 .newPrice(newPrice)
                 .build();
@@ -216,6 +220,7 @@ class ProductServiceTest extends AbstractIntegrationTest {
         assertThat(modifiedProduct).isPresent();
         assertThat(modifiedProduct.get().getProductName()).isEqualTo(newProductName);
         assertThat(modifiedProduct.get().getProductContent()).isEqualTo(newProductContent);
+        assertThat(modifiedProduct.get().getBlogUrl()).isEqualTo(newBlogUrl);
         assertThat(modifiedProduct.get().getPrice()).isEqualTo(newPrice);
         assertThat(modifiedProduct.get().getFileUrl()).isNotEqualTo(originFileUrl);
     }

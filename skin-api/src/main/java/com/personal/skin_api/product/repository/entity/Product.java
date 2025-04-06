@@ -3,6 +3,8 @@ package com.personal.skin_api.product.repository.entity;
 import com.personal.skin_api.common.entity.BaseEntity;
 import com.personal.skin_api.member.repository.entity.Member;
 
+import com.personal.skin_api.order.repository.entity.Order;
+import com.personal.skin_api.product.repository.entity.blogurl.BlogUrl;
 import com.personal.skin_api.product.repository.entity.fileurl.FileUrl;
 import com.personal.skin_api.product.repository.entity.price.Price;
 import com.personal.skin_api.product.repository.entity.product_content.ProductContent;
@@ -12,6 +14,9 @@ import jakarta.persistence.*;
 
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -31,6 +36,12 @@ public class Product extends BaseEntity {
     @Embedded
     private ProductContent productContent;
 
+    @OneToMany(mappedBy = "product")
+    private List<Order> orders = new ArrayList<>();
+
+    @Embedded
+    private BlogUrl blogUrl;
+
     @Embedded
     private FileUrl fileUrl;
 
@@ -45,20 +56,30 @@ public class Product extends BaseEntity {
     private ProductStatus productStatus;
 
     @Builder
-    private Product(final Member member, final String productName, final String productContent, final String fileUrl, final Long price) {
+    private Product(final Member member,
+                    final String productName,
+                    final String productContent,
+                    final String blogUrl,
+                    final String fileUrl,
+                    final Long price) {
         this.member = member;
         this.productName = new ProductName(productName);
         this.productContent = new ProductContent(productContent);
+        this.blogUrl = new BlogUrl(blogUrl);
         this.fileUrl = new FileUrl(fileUrl);
         this.price = new Price(price);
         this.productViews = new ProductViews(0);
         this.productStatus = ProductStatus.ACTIVE;
     }
 
-    public void modifyProduct(final String productName, final String productContent,
-                              final String fileUrl, final Long price) {
+    public void modifyProduct(final String productName,
+                              final String productContent,
+                              final String blogUrl,
+                              final String fileUrl,
+                              final Long price) {
         this.productName = new ProductName(productName);
         this.productContent = new ProductContent(productContent);
+        this.blogUrl = new BlogUrl(blogUrl);
         this.fileUrl = new FileUrl(fileUrl);
         this.price = new Price(price);
     }
@@ -91,6 +112,10 @@ public class Product extends BaseEntity {
 
     public String getProductContent() {
         return productContent.getProductContent();
+    }
+
+    public String getBlogUrl() {
+        return blogUrl.getBlogUrl();
     }
 
     public String getFileUrl() {

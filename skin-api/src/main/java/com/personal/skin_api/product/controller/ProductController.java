@@ -8,6 +8,7 @@ import com.personal.skin_api.product.service.ProductService;
 
 import com.personal.skin_api.product.service.dto.request.ProductDeleteServiceRequest;
 import com.personal.skin_api.product.service.dto.request.ProductFindMyListServiceRequest;
+import com.personal.skin_api.product.service.dto.request.ProductRegisterServiceRequest;
 import com.personal.skin_api.product.service.dto.response.ProductListResponse;
 import com.personal.skin_api.product.service.dto.response.ProductDetailResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,11 +31,25 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("/register")
-    public ResponseEntity<CommonResponse> registerProduct(@ModelAttribute ProductRegisterRequest request,
+    public ResponseEntity<Object> registerProduct(@RequestParam("productName") String productName,
+                                                          @RequestParam("productContent") String productContent,
+                                                          @RequestParam("price") String price,
+                                                          @RequestParam("blogUrl") String blogUrl,
+                                                          @RequestParam("file") MultipartFile file,
                                                           @AuthenticationPrincipal UserDetails userDetails) {
-        productService.registerProduct(request.toService(userDetails.getUsername()));
+        Long productId = productService.registerProduct(ProductRegisterServiceRequest.builder()
+                .productName(productName)
+                .productContent(productContent)
+                .blogUrl(blogUrl)
+                .price(Long.parseLong(price))
+                .file(file)
+                .email(userDetails.getUsername())
+                .build());
 
-        return ResponseEntity.ok().body(new CommonResponse(HttpStatus.OK.value(), "제품 등록 완료"));
+        Map<String, Object> map = new HashMap<>();
+        map.put("productId", productId);
+
+        return ResponseEntity.ok().body(map);
     }
 
     @PostMapping("/list")

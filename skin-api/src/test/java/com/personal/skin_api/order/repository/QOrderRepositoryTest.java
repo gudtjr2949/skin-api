@@ -38,16 +38,6 @@ class QOrderRepositoryTest extends AbstractIntegrationTest {
     @Autowired
     private QOrderRepository qOrderRepository;
 
-    @Autowired
-    private EntityManager em;
-
-    private JPAQueryFactory queryFactory;
-
-    @BeforeEach
-    void beforeEach() {
-        queryFactory = new JPAQueryFactory(em);
-    }
-
     @Test
     void 회원_정보가_일치하는_주문목록_첫_장을_조회한다() {
         // given

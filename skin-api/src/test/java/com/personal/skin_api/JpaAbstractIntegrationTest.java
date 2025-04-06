@@ -11,6 +11,8 @@ import com.personal.skin_api.payment.repository.PaymentRepository;
 import com.personal.skin_api.payment.repository.entity.Payment;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
+import com.personal.skin_api.review.repository.ReviewRepository;
+import com.personal.skin_api.review.repository.entity.Review;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -34,8 +36,12 @@ public abstract class JpaAbstractIntegrationTest {
     @Autowired
     protected PaymentRepository paymentRepository;
 
+    @Autowired
+    protected ReviewRepository reviewRepository;
+
     @AfterEach
     void tearDown() {
+        reviewRepository.deleteAllInBatch();
         paymentRepository.deleteAllInBatch();
         orderRepository.deleteAllInBatch();
         productRepository.deleteAllInBatch();
@@ -57,6 +63,7 @@ public abstract class JpaAbstractIntegrationTest {
      */
     private static String productName = "형석이의 스킨";
     private static String productContent = "아주 예쁜 스킨입니다!";
+    private static String blogUrl = "www.test-blog.com";
     private static String fileUrl = "s3://hyeongseok-skin/fileUrl";
     private static Long price = 10_000L;
 
@@ -66,6 +73,12 @@ public abstract class JpaAbstractIntegrationTest {
      */
     private static String impUid = "imp_123456789876";
     private static String payMethod = "card";
+
+    /**
+     * 후기 정보
+     *
+     */
+    private static String reviewContent = "너무 좋은 스킨입니다! 감사합니다!";
 
     protected Member createGeneralMember() {
         return memberRepository.save(Member.builder()
@@ -96,6 +109,7 @@ public abstract class JpaAbstractIntegrationTest {
                 .member(member)
                 .productName(productName)
                 .productContent(productContent)
+                .blogUrl(blogUrl)
                 .fileUrl(fileUrl)
                 .price(price)
                 .build());
@@ -112,6 +126,15 @@ public abstract class JpaAbstractIntegrationTest {
                 .payMethod(payMethod)
                 .impUid(impUid)
                 .order(order)
+                .build());
+    }
+
+    protected Review createReview(final Member member, final Product product, final Order order) {
+        return reviewRepository.save(Review.builder()
+                .member(member)
+                .product(product)
+                .order(order)
+                .reviewContent(reviewContent)
                 .build());
     }
 }

@@ -8,9 +8,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ProductSorter {
+    RECENT("recent", QProduct.product.id.desc()),
     VIEWS("views", QProduct.product.productViews.productViews.desc()),
     PRICE_ASC("price_asc", QProduct.product.price.price.asc()),
     PRICE_DESC("price_desc", QProduct.product.price.price.desc());
+
 
     private final String sorter;
     private final OrderSpecifier<?> orderSpecifier;
