@@ -6,26 +6,27 @@ import com.querydsl.core.types.OrderSpecifier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @RequiredArgsConstructor
 public enum ProductSorter {
-    RECENT("recent", QProduct.product.id.desc()),
-    ORDERS("orders", QProduct.product.orderCnt.desc()),
-    REVIEWS("reviews", QProduct.product.reviewCnt.desc()),
-    VIEWS("views", QProduct.product.productViews.productViews.desc()),
-    PRICE_ASC("price_asc", QProduct.product.price.price.asc()),
-    PRICE_DESC("price_desc", QProduct.product.price.price.desc());
-
+    RECENT("recent", List.of(QProduct.product.id.desc())),
+    ORDERS("orders", List.of(QProduct.product.orderCnt.desc(), QProduct.product.id.asc())),
+    REVIEWS("reviews", List.of(QProduct.product.reviewCnt.desc(), QProduct.product.id.asc())),
+    VIEWS("views", List.of(QProduct.product.productViews.productViews.desc(), QProduct.product.id.asc())),
+    PRICE_ASC("price_asc", List.of(QProduct.product.price.price.asc(), QProduct.product.id.asc())),
+    PRICE_DESC("price_desc", List.of(QProduct.product.price.price.desc(), QProduct.product.id.asc()));
 
     private final String sorter;
-    private final OrderSpecifier<?> orderSpecifier;
+    private final List<OrderSpecifier<?>> orderSpecifiers;
 
-    public static OrderSpecifier<?> getOrderSpecifier(String sorter) {
+    public static List<OrderSpecifier<?>> getOrderSpecifiers(String sorter) {
         for (ProductSorter ps : values()) {
             if (ps.getSorter().equals(sorter)) {
-                return ps.getOrderSpecifier();
+                return ps.getOrderSpecifiers();
             }
         }
-        return QProduct.product.id.desc(); // 기본 정렬 기준
+        return List.of(QProduct.product.id.desc()); // 기본 정렬 기준
     }
 }

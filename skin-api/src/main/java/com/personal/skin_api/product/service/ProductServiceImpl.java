@@ -62,7 +62,7 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public ProductListResponse findProducts(ProductFindListServiceRequest request) {
-        List<Product> products = qProductRepository.findProducts(request.getProductId(), request.getSorter(), request.getKeyword());
+        List<Product> products = qProductRepository.findProducts(request.getProductId(), request.getSorter(), request.getKeyword(), request.getLastSortValue());
 
         List<ProductResponse> productResponses = products.stream()
                 .map(product -> ProductResponse.builder()

@@ -1,13 +1,17 @@
 package com.personal.skin_api.product.repository;
 
 import com.personal.skin_api.AbstractIntegrationTest;
+import com.personal.skin_api.common.util.MerchantUidGenerator;
 import com.personal.skin_api.member.repository.entity.Member;
 
+import com.personal.skin_api.order.repository.entity.Order;
+import com.personal.skin_api.order.service.OrderService;
 import com.personal.skin_api.product.repository.entity.Product;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -33,7 +37,7 @@ class QProductRepositoryTest extends AbstractIntegrationTest {
         }
         Product firstProduct = createProduct(member);
 
-        List<Product> products = qProductRepository.findProducts(0L, "", "");
+        List<Product> products = qProductRepository.findProducts(0L, "", "", 0L);
 
         // then
         assertThat(products).hasSize(PRODUCTS_PAGE_SIZE);
@@ -59,7 +63,7 @@ class QProductRepositoryTest extends AbstractIntegrationTest {
         }
 
         // when
-        List<Product> products = qProductRepository.findProducts(lastViewProduct.getId(), "", "");
+        List<Product> products = qProductRepository.findProducts(lastViewProduct.getId(), "", "", 0L);
 
         // then
         assertThat(products).hasSize(PRODUCTS_PAGE_SIZE);
@@ -82,7 +86,7 @@ class QProductRepositoryTest extends AbstractIntegrationTest {
         }
 
         // when
-        List<Product> products = qProductRepository.findProducts(lastViewProduct.getId(), "", "");
+        List<Product> products = qProductRepository.findProducts(lastViewProduct.getId(), "", "", 0L);
 
         // then
         assertThat(products).hasSize(PRODUCTS_PAGE_SIZE);
@@ -99,7 +103,7 @@ class QProductRepositoryTest extends AbstractIntegrationTest {
         }
 
         // when
-        List<Product> products = qProductRepository.findProducts(PRODUCTS_PAGE_SIZE - 1L, "", "");
+        List<Product> products = qProductRepository.findProducts(PRODUCTS_PAGE_SIZE - 1L, "", "", 0L);
 
         // then
         assertThat(products.size()).isLessThan(PRODUCTS_PAGE_SIZE);
@@ -119,7 +123,7 @@ class QProductRepositoryTest extends AbstractIntegrationTest {
         Product thirdProduct = createProductWithPrice(member, thirdPrice);
 
         // when
-        List<Product> products = qProductRepository.findProducts(0L, sorter, null);
+        List<Product> products = qProductRepository.findProducts(0L, sorter, null, 0L);
 
         // then
         assertThat(products).hasSize(3);
@@ -141,7 +145,7 @@ class QProductRepositoryTest extends AbstractIntegrationTest {
         Product thirdProduct = createProductWithPrice(member, thirdPrice);
 
         // when
-        List<Product> products = qProductRepository.findProducts(0L, sorter, null);
+        List<Product> products = qProductRepository.findProducts(0L, sorter, null, 0L);
 
         // then
         assertThat(products).hasSize(3);
@@ -150,20 +154,62 @@ class QProductRepositoryTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @Transactional
     void 제품을_주문이_많은_순으로_조회한다() {
         // given
+        Member member = createGeneralMember();
+        String sorter = "orders";
+        Product firstProduct = createProduct(member);
+        Product secondProduct = createProduct(member);
+        Product thirdProduct = createProduct(member);
+
+        for (int i = 0 ; i < 3 ; i++) {
+            createOrder(member, secondProduct, MerchantUidGenerator.generateMerchantUid());
+            secondProduct.increaseOrder();
+        }
+
+        for (int i = 0 ; i < 1 ; i++) {
+            createOrder(member, firstProduct, MerchantUidGenerator.generateMerchantUid());
+            firstProduct.increaseOrder();
+        }
 
         // when
+        List<Product> products = qProductRepository.findProducts(0L, sorter, null, 0L);
 
         // then
+        assertThat(products).hasSize(3);
+        assertThat(products.get(0).getId()).isEqualTo(secondProduct.getId());
+        assertThat(products.get(products.size()-1).getId()).isEqualTo(thirdProduct.getId());
     }
 
     @Test
+    @Transactional
     void 제품을_후기가_많은_순으로_조회한다() {
         // given
+        Member member = createGeneralMember();
+        String sorter = "reviews";
+        Product firstProduct = createProduct(member);
+        Product secondProduct = createProduct(member);
+        Product thirdProduct = createProduct(member);
+
+        for (int i = 0 ; i < 3 ; i++) {
+            Order order = createOrder(member, secondProduct, MerchantUidGenerator.generateMerchantUid());
+            createReview(member, secondProduct, order);
+            secondProduct.increaseReview();
+        }
+
+        for (int i = 0 ; i < 1 ; i++) {
+            Order order = createOrder(member, firstProduct, MerchantUidGenerator.generateMerchantUid());
+            createReview(member, firstProduct, order);
+            firstProduct.increaseReview();
+        }
 
         // when
+        List<Product> products = qProductRepository.findProducts(0L, sorter, null, 0L);
 
         // then
+        assertThat(products).hasSize(3);
+        assertThat(products.get(0).getId()).isEqualTo(secondProduct.getId());
+        assertThat(products.get(products.size()-1).getId()).isEqualTo(thirdProduct.getId());
     }
 }
