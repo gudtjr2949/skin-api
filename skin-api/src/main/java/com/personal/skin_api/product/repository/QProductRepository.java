@@ -7,6 +7,8 @@ import com.personal.skin_api.product.repository.entity.QProduct;
 import com.personal.skin_api.product.service.dto.ProductSorter;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpression;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 

@@ -3,6 +3,7 @@ package com.personal.skin_api.product.service.dto;
 import com.personal.skin_api.order.repository.entity.QOrder;
 import com.personal.skin_api.product.repository.entity.QProduct;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
