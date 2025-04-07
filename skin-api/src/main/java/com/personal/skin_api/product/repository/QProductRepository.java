@@ -7,6 +7,8 @@ import com.personal.skin_api.product.repository.entity.QProduct;
 import com.personal.skin_api.product.service.dto.ProductSorter;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpression;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 
@@ -28,25 +30,34 @@ public class QProductRepository {
     }
 
     // TODO : RECENT를 제외한 No Offset 기준 찾기
-    public List<Product> findProducts(Long productId, String sorter, String keyword) {
-        OrderSpecifier<?> orderSpecifier = ProductSorter.getOrderSpecifier(sorter);
-        BooleanBuilder builder = new BooleanBuilder();
+    public List<Product> findProducts(Long productId, String sorter, String keyword, int lastSortValue) {
+        ProductSorter productSorter = ProductSorter.from(sorter);
+        BooleanBuilder where = new BooleanBuilder();
 
-        builder.and(QProduct.product.productStatus.eq(ProductStatus.ACTIVE));
+        where.and(QProduct.product.productStatus.eq(ProductStatus.ACTIVE));
 
         // TODO : 리팩토링 필요
         if (productId > 0 && ProductSorter.RECENT.getSorter().equals(sorter)) {
-            builder.and(QProduct.product.id.lt(productId));
+            where.and(QProduct.product.id.lt(productId));
         }
 
+        ComparableExpression<?> sortField = (ComparableExpression<?>) productSorter.getSortField();
+        Long lastId = productId; // 프론트에서 넘겨줌
+        Comparable<?> lastValue = lastSortValue; // 예: 마지막 orderCnt 값
+
+        where.andAnyOf(
+                sortField.lt((Comparable) lastValue),
+                sortField.eq((Comparable) lastValue).and(QProduct.product.id.gt(lastId))
+        );
+
         if (keyword != null) {
-            builder.and(QProduct.product.productName.productName.contains(keyword));
-            builder.and(QProduct.product.productContent.productContent.contains(keyword));
+            where.and(QProduct.product.productName.productName.contains(keyword));
+            where.and(QProduct.product.productContent.productContent.contains(keyword));
         }
 
         List<Product> findProducts = queryFactory
                 .selectFrom(QProduct.product)
-                .where(builder)
+                .where(where)
                 .orderBy(orderSpecifier)
                 .limit(PRODUCTS_PAGE_SIZE)
                 .fetch();
