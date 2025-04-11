@@ -23,7 +23,7 @@ public class QProductRepository {
 
     private final EntityManager em;
     private final JPAQueryFactory queryFactory;
-    public static final int PRODUCTS_PAGE_SIZE = 5;
+    public static final int PRODUCTS_PAGE_SIZE = 8;
 
     public QProductRepository(EntityManager em) {
         this.em = em;
@@ -37,27 +37,27 @@ public class QProductRepository {
 
         where.and(QProduct.product.productStatus.eq(ProductStatus.ACTIVE));
 
-        if (ProductSorter.RECENT.getSorter().equals(sorter)) {
+        if (productId > 0L && ProductSorter.RECENT.getSorter().equals(sorter)) {
             where.and(QProduct.product.id.lt(productId));
-        } else if (lastSortValue > 0L && ProductSorter.ORDERS.getSorter().equals(sorter)) {
+        } else if (lastSortValue != null && lastSortValue >= 0L && ProductSorter.ORDERS.getSorter().equals(sorter)) {
             where.and(
                     QProduct.product.orderCnt.lt(lastSortValue)
                             .or(QProduct.product.orderCnt.eq(Long.valueOf(lastSortValue).intValue())
                                     .and(QProduct.product.id.gt(productId)))
             );
-        } else if (lastSortValue > 0L && ProductSorter.REVIEWS.getSorter().equals(sorter)) {
+        } else if (lastSortValue != null && lastSortValue >= 0L && ProductSorter.REVIEWS.getSorter().equals(sorter)) {
             where.and(
                     QProduct.product.reviewCnt.lt(lastSortValue)
                             .or(QProduct.product.reviewCnt.eq(Long.valueOf(lastSortValue).intValue())
                                     .and(QProduct.product.id.gt(productId)))
             );
-        } else if (lastSortValue > 0L && ProductSorter.PRICE_ASC.getSorter().equals(sorter)) {
+        } else if (lastSortValue != null && lastSortValue > 0L && ProductSorter.PRICE_ASC.getSorter().equals(sorter)) {
             where.and(
                     QProduct.product.price.price.gt(lastSortValue)
                             .or(QProduct.product.price.price.eq(lastSortValue)
                                     .and(QProduct.product.id.gt(productId)))
             );
-        } else if (lastSortValue > 0L && ProductSorter.PRICE_DESC.getSorter().equals(sorter)) {
+        } else if (lastSortValue != null && lastSortValue > 0L && ProductSorter.PRICE_DESC.getSorter().equals(sorter)) {
             where.and(
                     QProduct.product.price.price.lt(lastSortValue)
                             .or(QProduct.product.price.price.eq(lastSortValue)

@@ -9,6 +9,7 @@ import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.email.Email;
 import com.personal.skin_api.order.repository.OrderRepository;
 import com.personal.skin_api.order.repository.entity.Order;
+import com.personal.skin_api.order.service.OrderService;
 import com.personal.skin_api.payment.repository.PaymentRepository;
 import com.personal.skin_api.payment.repository.entity.Payment;
 import com.personal.skin_api.payment.service.dto.request.PaymentCreateServiceRequest;
@@ -16,9 +17,11 @@ import com.personal.skin_api.payment.service.dto.request.PaymentFindServiceReque
 import com.personal.skin_api.payment.service.dto.response.PaymentDetailResponse;
 import com.personal.skin_api.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -27,6 +30,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderRepository orderRepository;
     private final MemberRepository memberRepository;
     private final PaymentRepository paymentRepository;
+    private final OrderService orderService;
 
     @Override
     @Transactional
@@ -34,14 +38,18 @@ public class PaymentServiceImpl implements PaymentService {
         Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
+        log.info("PaymentService order = {}", request.getOrderUid());
+
         Order order = orderRepository.findByOrderUid(request.getOrderUid())
                 .orElseThrow(() -> new RestApiException(OrderErrorCode.CAN_NOT_FOUND_ORDER));
+
+        log.info("PaymentService order = {}", order.getId());
 
         compareMember(member.getEmail(), order.getOrdererEmail());
 
         paymentRepository.save(request.toEntity(order));
 
-        order.paidOrder();
+        orderService.changeOrderStatusToPaid(order.getOrderUid());
     }
 
     @Override

@@ -62,7 +62,6 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            log.info("요청 정보 = {}", request.getCookies());
             String token = resolveToken(request);
 
             validate(token);

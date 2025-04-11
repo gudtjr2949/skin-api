@@ -23,6 +23,7 @@ import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ import static com.personal.skin_api.common.util.MerchantUidGenerator.generateMer
 
 @Aspect
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
@@ -144,6 +146,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findByOrderUid(orderUid)
                 .orElseThrow(() -> new RestApiException(OrderErrorCode.CAN_NOT_FOUND_ORDER));
         order.paidOrder();
+        log.info("OrderService order = {}", order.getId());
 
         Product product = productRepository.findById(order.getProductId())
                 .orElseThrow(() -> new RestApiException(ProductErrorCode.PRODUCT_NOT_FOUND));

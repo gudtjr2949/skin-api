@@ -69,6 +69,8 @@ public class ProductServiceImpl implements ProductService {
                         .productId(product.getId())
                         .productName(product.getProductName())
                         .price(product.getPrice())
+                        .orderCnt(product.getOrderCnt())
+                        .reviewCnt(product.getReviewCnt())
                         .build())
                 .toList();
 
