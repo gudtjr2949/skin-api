@@ -2,6 +2,7 @@ package com.personal.skin_api.member.controller;
 
 import com.personal.skin_api.common.dto.CommonResponse;
 import com.personal.skin_api.common.security.JwtFilter;
+import com.personal.skin_api.common.security.JwtTokenConstant;
 import com.personal.skin_api.member.controller.request.*;
 import com.personal.skin_api.member.service.MemberService;
 import com.personal.skin_api.member.service.dto.request.MemberFindDetailServiceRequest;
@@ -74,7 +75,7 @@ public class MemberController {
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setSecure(true);
         accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(1800);
+        accessTokenCookie.setMaxAge((int) (JwtTokenConstant.accessExpirationTime / 1000));
 
         // 쿠키를 응답에 추가
         response.addCookie(accessTokenCookie);
@@ -97,12 +98,27 @@ public class MemberController {
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setSecure(true);
         accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(1800);
+        accessTokenCookie.setMaxAge((int) (JwtTokenConstant.accessExpirationTime / 1000));
 
         // 쿠키를 응답에 추가
         response.addCookie(accessTokenCookie);
 
         return ResponseEntity.ok().body(null);
+    }
+
+    @DeleteMapping("/logout")
+    public ResponseEntity<CommonResponse> logout(HttpServletResponse response,
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
+        memberService.logout(userDetails.getUsername());
+
+        // Access Token 쿠키 삭제
+        Cookie deleteAccessToken = new Cookie("accessToken", null);
+        deleteAccessToken.setPath("/");
+        deleteAccessToken.setHttpOnly(true);
+        deleteAccessToken.setMaxAge(0);
+        response.addCookie(deleteAccessToken);
+
+        return ResponseEntity.ok().body(new CommonResponse(200, "로그아웃 성공"));
     }
 
     @GetMapping("/request-cert-code-find-email")
