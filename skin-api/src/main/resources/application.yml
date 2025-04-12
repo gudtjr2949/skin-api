@@ -28,8 +28,8 @@ spring:
   jwt:
     secret: ${JWT_SECRET_KEY}
     token:
-      access-expiration-time: 600000
-      refresh-expiration-time: 3600000
+      access-expiration-time: 600000 # 10분
+      refresh-expiration-time: 1800000 # 30분
 
 coolsms:
   api:
