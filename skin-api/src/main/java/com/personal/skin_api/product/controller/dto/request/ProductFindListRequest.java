@@ -10,12 +10,14 @@ public class ProductFindListRequest {
     private Long productId;
     private String sorter;
     private String keyword;
+    private Long lastSortValue;
 
     public ProductFindListServiceRequest toService() {
         return ProductFindListServiceRequest.builder()
                 .productId(productId)
                 .sorter(sorter)
                 .keyword(keyword)
+                .lastSortValue(lastSortValue)
                 .build();
     }
 }

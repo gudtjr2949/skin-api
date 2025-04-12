@@ -12,12 +12,14 @@ import com.personal.skin_api.member.service.dto.response.MemberLoginResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/members")
@@ -86,6 +88,7 @@ public class MemberController {
     @GetMapping("/reissue-access-token")
     public ResponseEntity<Object> reissueAccessToken(@CookieValue("accessToken") String accessToken,
                                                      HttpServletResponse response) {
+        log.info("토큰 재발급 실행 = {}", accessToken);
         String email = JwtFilter.getEmailFromToken(accessToken);
         String newAccessToken = memberService.reissueToken(email);
 

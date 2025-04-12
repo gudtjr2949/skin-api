@@ -23,7 +23,6 @@ public class QOrderRepository {
         this.queryFactory = new JPAQueryFactory(em);
     }
 
-
     public List<Order> findMyOrderList(Long orderId, Member member, String keyword, int year) {
         BooleanBuilder builder = new BooleanBuilder();
 

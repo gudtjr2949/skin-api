@@ -73,4 +73,8 @@ public class Review extends BaseEntity {
     public String getReviewerEmail() {
         return member.getEmail();
     }
+
+    public Long getProductId() {
+        return product.getId();
+    }
 }

@@ -115,6 +115,17 @@ public abstract class AbstractIntegrationTest {
                 .build());
     }
 
+    protected Product createProductWithPrice(Member member, Long price) {
+        return productRepository.save(Product.builder()
+                .member(member)
+                .productName(productName)
+                .productContent(productContent)
+                .blogUrl(blogUrl)
+                .fileUrl(fileUrl)
+                .price(price)
+                .build());
+    }
+
     protected Order createOrder(final Member member, final Product product, final String orderUid) {
         return orderRepository.save(Order.createBeforePayOrder(member, product, orderUid));
     }
