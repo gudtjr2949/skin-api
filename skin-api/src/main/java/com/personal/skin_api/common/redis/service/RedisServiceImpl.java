@@ -87,6 +87,18 @@ public class RedisServiceImpl implements RedisService {
         }
     }
 
+    @Override
+    public void deleteRefreshToken(RedisDeleteRefreshTokenServiceRequest request) {
+        String key = generateKey(request.getPurpose().toString(), request.getEmail());
+
+        try {
+            redisTemplate.delete(key);
+        } catch (Exception e) {
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     /**
      * Redis에 저장할 키를 생성한다
      * @param firstKey 첫 번째 키 (목적을 나타냄)

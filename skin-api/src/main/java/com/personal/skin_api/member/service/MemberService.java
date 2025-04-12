@@ -20,6 +20,7 @@ public interface MemberService {
     void modifyPassword(MemberModifyPasswordServiceRequest request);
     MemberDetailResponse findMemberDetail(MemberFindDetailServiceRequest request);
     void modifyMemberDetail(MemberModifyDetailServiceRequest request);
+    void logout(String email);
     void withdraw(MemberWithdrawServiceRequest request);
 
 }

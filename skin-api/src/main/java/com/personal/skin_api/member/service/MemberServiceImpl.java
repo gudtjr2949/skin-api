@@ -333,6 +333,14 @@ class MemberServiceImpl implements MemberService {
         findMember.modifyMemberInfo(request);
     }
 
+    @Override
+    public void logout(String email) {
+        redisService.deleteRefreshToken(RedisDeleteRefreshTokenServiceRequest.builder()
+                .purpose(TokenPurpose.REFRESH_TOKEN)
+                .email(email)
+                .build());
+    }
+
     /**
      * 회원탈퇴를 진행한다.
      * @param request 회원탈퇴에 필요한 정보
