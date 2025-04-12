@@ -3,11 +3,12 @@ package com.personal.skin_api.payment.controller.dto.request;
 import com.personal.skin_api.payment.service.dto.request.PaymentCreateServiceRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@AllArgsConstructor
+@Getter
 @NoArgsConstructor
 public class PaymentCreateRequest {
     private String impUid;

@@ -3,7 +3,6 @@ package com.personal.skin_api.product.repository.entity;
 import com.personal.skin_api.common.entity.BaseEntity;
 import com.personal.skin_api.member.repository.entity.Member;
 
-import com.personal.skin_api.order.repository.entity.Order;
 import com.personal.skin_api.product.repository.entity.blogurl.BlogUrl;
 import com.personal.skin_api.product.repository.entity.fileurl.FileUrl;
 import com.personal.skin_api.product.repository.entity.price.Price;
@@ -14,9 +13,6 @@ import jakarta.persistence.*;
 
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -36,8 +32,11 @@ public class Product extends BaseEntity {
     @Embedded
     private ProductContent productContent;
 
-    @OneToMany(mappedBy = "product")
-    private List<Order> orders = new ArrayList<>();
+    @Column(name = "ORDER_CNT")
+    private int orderCnt;
+
+    @Column(name = "REVIEW_CNT")
+    private int reviewCnt;
 
     @Embedded
     private BlogUrl blogUrl;
@@ -96,7 +95,21 @@ public class Product extends BaseEntity {
         this.productStatus = ProductStatus.REPORTED;
     }
 
+    public void increaseOrder() {
+        orderCnt++;
+    }
 
+    public void decreaseOrder() {
+        orderCnt--;
+    }
+
+    public void increaseReview() {
+        reviewCnt++;
+    }
+
+    public void decreaseReview() {
+        reviewCnt--;
+    }
 
     public Long getId() {
         return id;
@@ -132,5 +145,13 @@ public class Product extends BaseEntity {
 
     public ProductStatus getProductStatus() {
         return productStatus;
+    }
+
+    public int getOrderCnt() {
+        return orderCnt;
+    }
+
+    public int getReviewCnt() {
+        return reviewCnt;
     }
 }
