@@ -67,7 +67,7 @@ public class OrderController {
         return ResponseEntity.ok().body(response);
     }
     
-    @GetMapping("/orders/writable-reviews")
+    @GetMapping("/writable-reviews")
     public ResponseEntity<WritableReviewOrderListResponse> findWritableReviewsOrder(@RequestParam Long orderId,
                                                            @AuthenticationPrincipal UserDetails userDetails) {
         WritableReviewOrderListResponse response = orderService.findWritableReviewOrderList(WritableReviewOrderServiceRequest.builder()
