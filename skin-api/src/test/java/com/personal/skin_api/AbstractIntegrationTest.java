@@ -130,6 +130,10 @@ public abstract class AbstractIntegrationTest {
         return orderRepository.save(Order.createBeforePayOrder(member, product, orderUid));
     }
 
+    protected Order createPaidOrder(final Member member, final Product product, final String orderUid) {
+        return orderRepository.save(Order.createPaidOrder(member, product, orderUid));
+    }
+
     protected Payment createPayment(final Order order) {
         return paymentRepository.save(Payment.builder()
                 .price(price)
