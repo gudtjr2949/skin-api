@@ -6,9 +6,11 @@ import com.personal.skin_api.order.service.dto.request.OrderCreateBeforePaidServ
 import com.personal.skin_api.order.service.dto.request.OrderCreateTableServiceRequest;
 import com.personal.skin_api.order.service.dto.request.OrderDetailServiceRequest;
 
+import com.personal.skin_api.order.service.dto.request.WritableReviewOrderServiceRequest;
 import com.personal.skin_api.order.service.dto.response.OrderCreateTableResponse;
 import com.personal.skin_api.order.service.dto.response.OrderDetailResponse;
 import com.personal.skin_api.order.service.dto.response.OrderListResponse;
+import com.personal.skin_api.order.service.dto.response.WritableReviewOrderListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -61,6 +63,17 @@ public class OrderController {
     public ResponseEntity<OrderListResponse> findOrderList(@RequestBody OrderListRequest request,
                                                            @AuthenticationPrincipal UserDetails userDetails) {
         OrderListResponse response = orderService.findMyOrderList(request.toService(userDetails.getUsername()));
+
+        return ResponseEntity.ok().body(response);
+    }
+    
+    @GetMapping("/orders/writable-reviews")
+    public ResponseEntity<WritableReviewOrderListResponse> findWritableReviewsOrder(@RequestParam Long orderId,
+                                                           @AuthenticationPrincipal UserDetails userDetails) {
+        WritableReviewOrderListResponse response = orderService.findWritableReviewOrderList(WritableReviewOrderServiceRequest.builder()
+                .orderId(orderId)
+                .email(userDetails.getUsername())
+                .build());
 
         return ResponseEntity.ok().body(response);
     }
