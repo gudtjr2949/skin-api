@@ -9,14 +9,12 @@ import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
 import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.order.repository.OrderRepository;
+import com.personal.skin_api.order.service.dto.request.*;
+import com.personal.skin_api.order.service.dto.response.WritableReviewOrderListResponse;
 import com.personal.skin_api.payment.repository.PaymentRepository;
 import com.personal.skin_api.order.repository.entity.Order;
 import com.personal.skin_api.order.repository.entity.OrderStatus;
 import com.personal.skin_api.payment.repository.entity.Payment;
-import com.personal.skin_api.order.service.dto.request.OrderCreateBeforePaidServiceRequest;
-import com.personal.skin_api.order.service.dto.request.OrderCreateTableServiceRequest;
-import com.personal.skin_api.order.service.dto.request.OrderDetailServiceRequest;
-import com.personal.skin_api.order.service.dto.request.OrderListServiceRequest;
 import com.personal.skin_api.order.service.dto.response.OrderCreateTableResponse;
 import com.personal.skin_api.order.service.dto.response.OrderDetailResponse;
 import com.personal.skin_api.order.service.dto.response.OrderListResponse;
@@ -129,5 +127,34 @@ class OrderServiceTest extends AbstractIntegrationTest {
         // then
         assertThat(myOrderList).isNotNull();
         assertThat(myOrderList.getOrderResponses()).hasSize(ORDER_PAGE_SIZE);
+    }
+    
+    @Test
+    void 주문과_결제를_완료했지만_후기를_작성하지_않은_주문_목록을_조회한다() {
+        // given
+        int orderCnt = 5;
+        Member member = createGeneralMemberWithEmail("tester@naver.com");
+
+        for (int i = 0 ; i < orderCnt ; i++) {
+            Product product = createProduct(createGeneralMember());
+            String orderUid = MerchantUidGenerator.generateMerchantUid();
+            Order order = createPaidOrder(member, product, orderUid);
+            createPayment(order);
+
+            // 절반만 후기 작성
+            if (i % 2 == 0) {
+                createReview(member, product, order);
+            }
+        }
+        WritableReviewOrderServiceRequest request = WritableReviewOrderServiceRequest.builder()
+                .orderId(0L)
+                .email(member.getEmail())
+                .build();
+
+        // when
+        WritableReviewOrderListResponse writableReviewOrderList = orderService.findWritableReviewOrderList(request);
+
+        // then
+        assertThat(writableReviewOrderList.getOrderResponses()).hasSize(orderCnt/2);
     }
 }
