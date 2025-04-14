@@ -58,4 +58,74 @@ class QOrderRepositoryTest extends AbstractIntegrationTest {
         assertThat(myOrders.get(0).getId()).isEqualTo(lastOrder.getId());
         assertThat(myOrders.get(ORDER_PAGE_SIZE-1).getId()).isEqualTo(firstOrder.getId());
     }
+
+    @Test
+    void 주문과_결제를_완료했지만_후기를_작성하지_않은_주문_목록을_조회한다() {
+        // given
+        int reviewCnt = 5;
+        Member member = createGeneralMemberWithEmail("tester@naver.com");
+
+        for (int i = 0 ; i < reviewCnt ; i++) {
+            Product product = createProduct(createGeneralMember());
+            String orderUid = MerchantUidGenerator.generateMerchantUid();
+            Order order = createPaidOrder(member, product, orderUid);
+            createPayment(order);
+
+            // 절반만 후기 작성
+            if (i % 2 == 0) {
+                createReview(member, product, order);
+            }
+        }
+
+        // when
+        List<Order> writableReviewsOrderList = qOrderRepository.findWritableReviewsOrderList(0L, member);
+
+        // then
+        assertThat(writableReviewsOrderList).hasSize(reviewCnt / 2);
+    }
+
+    @Test
+    void 모든_주문의_리뷰를_작성했다면_조회되지_않는다() {
+        // given
+        int reviewCnt = 5;
+        Member member = createGeneralMemberWithEmail("tester@naver.com");
+
+        for (int i = 0 ; i < reviewCnt ; i++) {
+            Product product = createProduct(createGeneralMember());
+            String orderUid = MerchantUidGenerator.generateMerchantUid();
+            Order order = createPaidOrder(member, product, orderUid);
+            createPayment(order);
+            createReview(member, product, order);
+        }
+
+        // when
+        List<Order> writableReviewsOrderList = qOrderRepository.findWritableReviewsOrderList(0L, member);
+
+        // then
+        assertThat(writableReviewsOrderList).hasSize(0);
+    }
+
+    @Test
+    void 주문_목록에서_결제가_완료되지_않은_제품은_조회_목록에서_제외된다() {
+        // given
+        int reviewCnt = 5;
+        Member member = createGeneralMemberWithEmail("tester@naver.com");
+
+        for (int i = 0 ; i < reviewCnt ; i++) {
+            Product product = createProduct(createGeneralMember());
+            String orderUid = MerchantUidGenerator.generateMerchantUid();
+            if (i % 2 == 0) { // 결제 X
+                Order order = createOrder(member, product, orderUid);
+            } else { // 결제 O
+                Order order = createPaidOrder(member, product, orderUid);
+                createPayment(order);
+            }
+        }
+
+        // when
+        List<Order> writableReviewsOrderList = qOrderRepository.findWritableReviewsOrderList(0L, member);
+
+        // then
+        assertThat(writableReviewsOrderList).hasSize(reviewCnt / 2);
+    }
 }

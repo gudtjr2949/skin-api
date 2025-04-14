@@ -7,6 +7,7 @@ import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.payment.repository.entity.Payment;
 import com.personal.skin_api.product.repository.entity.Product;
 
+import com.personal.skin_api.review.repository.entity.Review;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
@@ -35,6 +36,9 @@ public class Order extends BaseEntity {
     @OneToOne(mappedBy = "order")
     private Payment payment;
 
+    @OneToOne(mappedBy = "order")
+    private Review review;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "ORDER_STATUS")
     private OrderStatus orderStatus;
@@ -49,6 +53,10 @@ public class Order extends BaseEntity {
 
     public static Order createBeforePayOrder(final Member member, final Product product, final String orderUid) {
         return new Order(member, product, orderUid, OrderStatus.WAITING);
+    }
+
+    public static Order createPaidOrder(final Member member, final Product product, final String orderUid) {
+        return new Order(member, product, orderUid, OrderStatus.PAID);
     }
 
     private Order(final Member member, final Product product, final String orderUid, final OrderStatus orderStatus) {

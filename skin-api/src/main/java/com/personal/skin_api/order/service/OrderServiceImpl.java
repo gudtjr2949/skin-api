@@ -9,18 +9,12 @@ import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.email.Email;
 import com.personal.skin_api.order.repository.OrderRepository;
 import com.personal.skin_api.order.repository.entity.OrderStatus;
-import com.personal.skin_api.order.service.dto.response.OrderLineResponse;
+import com.personal.skin_api.order.service.dto.request.*;
+import com.personal.skin_api.order.service.dto.response.*;
 import com.personal.skin_api.payment.repository.PaymentRepository;
 import com.personal.skin_api.order.repository.QOrderRepository;
 import com.personal.skin_api.order.repository.entity.Order;
 
-import com.personal.skin_api.order.service.dto.request.OrderCreateBeforePaidServiceRequest;
-import com.personal.skin_api.order.service.dto.request.OrderCreateTableServiceRequest;
-import com.personal.skin_api.order.service.dto.request.OrderDetailServiceRequest;
-import com.personal.skin_api.order.service.dto.request.OrderListServiceRequest;
-import com.personal.skin_api.order.service.dto.response.OrderCreateTableResponse;
-import com.personal.skin_api.order.service.dto.response.OrderDetailResponse;
-import com.personal.skin_api.order.service.dto.response.OrderListResponse;
 import com.personal.skin_api.product.repository.ProductRepository;
 import com.personal.skin_api.product.repository.entity.Product;
 
@@ -142,6 +136,24 @@ public class OrderServiceImpl implements OrderService {
         return new OrderListResponse(orderResponses);
     }
 
+    @Override
+    public WritableReviewOrderListResponse findWritableReviewOrderList(WritableReviewOrderServiceRequest request) {
+        Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        List<Order> writableReviewsOrderList = qOrderRepository.findWritableReviewsOrderList(request.getOrderId(), member);
+
+        List<WritableReviewOrderLineResponse> orderResponses = writableReviewsOrderList.stream()
+                .map(order -> WritableReviewOrderLineResponse.builder()
+                        .productName(order.getProductName())
+                        .orderUid(order.getOrderUid())
+                        .createdAt(order.getCreatedAt())
+                        .build())
+                .toList();
+
+        return new WritableReviewOrderListResponse(orderResponses);
+    }
+
     private OrderLineResponse createOrderLineResponse(Order order, String productName) {
         return OrderLineResponse.builder()
                 .productName(productName)
@@ -166,7 +178,6 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findByOrderUid(orderUid)
                 .orElseThrow(() -> new RestApiException(OrderErrorCode.CAN_NOT_FOUND_ORDER));
         order.paidOrder();
-        log.info("OrderService order = {}", order.getId());
 
         Product product = productRepository.findById(order.getProductId())
                 .orElseThrow(() -> new RestApiException(ProductErrorCode.PRODUCT_NOT_FOUND));
