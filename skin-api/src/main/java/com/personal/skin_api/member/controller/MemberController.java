@@ -106,10 +106,11 @@ public class MemberController {
         return ResponseEntity.ok().body(null);
     }
 
-    @DeleteMapping("/logout")
+    @PostMapping("/logout")
     public ResponseEntity<CommonResponse> logout(HttpServletResponse response,
                                                  @AuthenticationPrincipal UserDetails userDetails) {
         memberService.logout(userDetails.getUsername());
+        log.info("진입");
 
         // Access Token 쿠키 삭제
         Cookie deleteAccessToken = new Cookie("accessToken", null);

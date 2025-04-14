@@ -42,18 +42,18 @@ public class WebSecurityConfig {
         http.exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint).accessDeniedHandler(jwtAccessDeniedHandler));
 
         // 권한 규칙 설정
-        http.logout((logoutConfig) -> {
-            logoutConfig.logoutUrl("/api/v1/members/logout")
-                    .addLogoutHandler((request, response, authentication) -> {
-                        HttpSession session = request.getSession();
-                        session.invalidate();
-                    });
-            logoutConfig.logoutSuccessHandler((request, response, authentication) -> {
-                response.setStatus(HttpStatus.OK.value());
-                response.getWriter().write("logout");
-                response.getWriter().flush();
-            });
-        });
+//        http.logout((logoutConfig) -> {
+//            logoutConfig.logoutUrl("/api/v1/members/logout")
+//                    .addLogoutHandler((request, response, authentication) -> {
+//                        HttpSession session = request.getSession();
+//                        session.invalidate();
+//                    });
+//            logoutConfig.logoutSuccessHandler((request, response, authentication) -> {
+//                response.setStatus(HttpStatus.OK.value());
+//                response.getWriter().write("logout");
+//                response.getWriter().flush();
+//            });
+//        });
 
         http.addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();

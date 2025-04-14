@@ -16,10 +16,7 @@ import com.personal.skin_api.product.repository.entity.ProductStatus;
 import com.personal.skin_api.review.repository.QReviewRepository;
 import com.personal.skin_api.review.repository.ReviewRepository;
 import com.personal.skin_api.review.repository.entity.Review;
-import com.personal.skin_api.review.service.dto.request.ReviewCreateServiceRequest;
-import com.personal.skin_api.review.service.dto.request.ReviewDeleteServiceRequest;
-import com.personal.skin_api.review.service.dto.request.ReviewFindListServiceRequest;
-import com.personal.skin_api.review.service.dto.request.ReviewModifyServiceRequest;
+import com.personal.skin_api.review.service.dto.request.*;
 import com.personal.skin_api.review.service.dto.response.ReviewDetailResponse;
 import com.personal.skin_api.review.service.dto.response.ReviewListResponse;
 import lombok.RequiredArgsConstructor;
@@ -85,6 +82,25 @@ public class ReviewServiceImpl implements ReviewService {
         List<Review> productReviews = qReviewRepository.findProductReviews(product.getId(), request.getReviewId());
 
         List<ReviewDetailResponse> reviewDetailResponses = productReviews.stream()
+                .map(review -> ReviewDetailResponse.builder()
+                        .reviewId(review.getId())
+                        .reviewContent(review.getReviewContent())
+                        .nickname(review.getReviewerNickname())
+                        .createdAt(review.getCreatedAt())
+                        .build())
+                .toList();
+
+        return new ReviewListResponse(reviewDetailResponses);
+    }
+
+    @Override
+    public ReviewListResponse findMyReviewList(ReviewFindMyListServiceRequest request) {
+        Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        List<Review> myProductReviewList = qReviewRepository.findMyProductReviewList(request.getReviewId(), request.getEmail());
+
+        List<ReviewDetailResponse> reviewDetailResponses = myProductReviewList.stream()
                 .map(review -> ReviewDetailResponse.builder()
                         .reviewId(review.getId())
                         .reviewContent(review.getReviewContent())

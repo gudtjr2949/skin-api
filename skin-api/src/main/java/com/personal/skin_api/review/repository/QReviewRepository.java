@@ -1,5 +1,6 @@
 package com.personal.skin_api.review.repository;
 
+import com.personal.skin_api.member.repository.entity.email.Email;
 import com.personal.skin_api.review.repository.entity.QReview;
 import com.personal.skin_api.review.repository.entity.Review;
 import com.personal.skin_api.review.repository.entity.ReviewStatus;
@@ -43,6 +44,23 @@ public class QReviewRepository {
         return findReviews;
     }
 
+    public List<Review> findMyProductReviewList(Long reviewId, String email) {
+        BooleanBuilder builder = new BooleanBuilder();
 
+        builder.and(QReview.review.reviewStatus.eq(ReviewStatus.ACTIVE));
+        builder.and(QReview.review.member.email.eq(new Email(email)));
 
+        if (reviewId > 0) {
+            builder.and(QReview.review.id.lt(reviewId));
+        }
+
+        List<Review> findReviews = queryFactory
+                .selectFrom(QReview.review)
+                .where(builder)
+                .orderBy(QReview.review.id.desc())
+                .limit(REVIEWS_PAGE_SIZE)
+                .fetch();
+
+        return findReviews;
+    }
 }
