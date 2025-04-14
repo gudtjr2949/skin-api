@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ReviewService {
     void createReview(ReviewCreateServiceRequest request);
-    ReviewListResponse findReviewList(ReviewFindListServiceRequest request);
+    ReviewListResponse findProductReviewList(ReviewFindListServiceRequest request);
     ReviewListResponse findMyReviewList(ReviewFindMyListServiceRequest request);
     int findProductReviewCount(Long productId);
     void modifyReview(ReviewModifyServiceRequest request);

@@ -6,6 +6,7 @@ import com.personal.skin_api.review.controller.dto.request.ReviewFindListRequest
 import com.personal.skin_api.review.controller.dto.request.ReviewModifyRequest;
 import com.personal.skin_api.review.service.ReviewService;
 import com.personal.skin_api.review.service.dto.request.ReviewDeleteServiceRequest;
+import com.personal.skin_api.review.service.dto.request.ReviewFindMyListServiceRequest;
 import com.personal.skin_api.review.service.dto.response.ReviewListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class ReviewController {
 
     @PostMapping("/list")
     public ResponseEntity<ReviewListResponse> findReviewList(@RequestBody ReviewFindListRequest request) {
-        ReviewListResponse response = reviewService.findReviewList(request.toService());
+        ReviewListResponse response = reviewService.findProductReviewList(request.toService());
 
         return ResponseEntity.ok().body(response);
     }
@@ -54,9 +55,14 @@ public class ReviewController {
         return ResponseEntity.ok().body(new CommonResponse(200, "후기 삭제 성공"));
     }
 
-    @GetMapping("/mylist")
-    public ResponseEntity<Object> myReviewList(@RequestParam Long reviewId,
+    @GetMapping("/written-reviews")
+    public ResponseEntity<ReviewListResponse> myReviewList(@RequestParam Long reviewId,
                                                @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok().body(null);
+        ReviewListResponse response = reviewService.findMyReviewList(ReviewFindMyListServiceRequest.builder()
+                .reviewId(reviewId)
+                .email(userDetails.getUsername())
+                .build());
+
+        return ResponseEntity.ok().body(response);
     }
 }
