@@ -20,6 +20,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -31,7 +34,7 @@ public class MemberController {
     @GetMapping("/request-cert-code-signup-email")
     public ResponseEntity<Object> requestCertCodeForSignUpEmail(@RequestParam("email") String email) {
         memberService.sendCertMailForCheckEmail(email);
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(new CommonResponse(200, "이메일 인증용 인증코드 요청 성공"));
     }
 
     @PostMapping("/check-cert-code-signup-email")
@@ -49,19 +52,19 @@ public class MemberController {
     @GetMapping("/request-cert-code-signup-phone")
     public ResponseEntity<Object> requestCertCodeForSignUpPhone(@RequestParam("phone") String phone) {
         memberService.sendCertMailForCheckPhone(phone);
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(new CommonResponse(200, "핸드폰 인증용 인증코드 요청 성공"));
     }
 
     @PostMapping("/check-cert-code-signup-phone")
     public ResponseEntity<Object> checkCertCodeForSignUpPhone(@RequestBody MemberCheckCertSmsForCheckPhoneRequest request) {
         memberService.checkCertSmsForCheckPhone(request.toService());
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(new CommonResponse(200, "핸드폰 인증 성공"));
     }
 
     @PostMapping("/signup")
     public ResponseEntity<Object> signUp(@RequestBody MemberSignUpRequest request) {
         memberService.signUp(request.toService());
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(new CommonResponse(200, "회원가입 성공"));
     }
 
     @PostMapping("/login")
@@ -103,7 +106,7 @@ public class MemberController {
         // 쿠키를 응답에 추가
         response.addCookie(accessTokenCookie);
 
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(new CommonResponse(200, "Access Token 재발급 성공"));
     }
 
     @PostMapping("/logout")
@@ -125,7 +128,7 @@ public class MemberController {
     @GetMapping("/request-cert-code-find-email")
     public ResponseEntity<Object> requestCertCodeForFindEmail(@RequestParam("phone") String phone) {
         memberService.sendCertSmsForFindEmail(phone);
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(new CommonResponse(200, "이메일 찾기용 인증코드 요청 성공"));
     }
 
     @PostMapping("/check-cert-code-find-email")
@@ -137,19 +140,19 @@ public class MemberController {
     @GetMapping("/request-cert-code-find-password")
     public ResponseEntity<Object> requestCertCodeForFindPassword(@RequestParam("email") String email) {
         memberService.sendCertMailForFindPassword(email);
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(new CommonResponse(200, "비밀번호 찾기용 인증코드 요청 성공"));
     }
 
     @PostMapping("/check-cert-code-find-password")
     public ResponseEntity<Object> checkCertCodeFindPassword(@RequestBody MemberCheckCertSmsForFindPasswordRequest request) {
         memberService.findPassword(request.toService());
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(new CommonResponse(200, "비밀번호 찾기용 인증코드 검증 성공"));
     }
 
     @PostMapping("/modify-password")
     public ResponseEntity<Object> modifyPassword(@RequestBody MemberModifyPasswordRequest request) {
         memberService.modifyPassword(request.toService());
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(new CommonResponse(200, "비밀번호 수정 성공"));
     }
 
     @GetMapping("/detail")
@@ -165,7 +168,7 @@ public class MemberController {
     public ResponseEntity<Object> modifyMemberDetail(@RequestBody MemberModifyDetailRequest request,
                                                      @AuthenticationPrincipal UserDetails userDetails) {
         memberService.modifyMemberDetail(request.toService(userDetails.getUsername()));
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(new CommonResponse(200, "회원 정보 수정 성공"));
     }
 
     @PostMapping("/withdraw")
@@ -174,6 +177,11 @@ public class MemberController {
                 .email(userDetails.getUsername())
                 .build());
 
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(new CommonResponse(200, "회원 탈퇴 성공"));
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<Object> myPage(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok().body(Map.of("email", userDetails.getUsername()));
     }
 }
