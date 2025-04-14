@@ -143,7 +143,7 @@ class ReviewServiceTest extends AbstractIntegrationTest {
                 .reviewId(0L)
                 .build();
 
-        ReviewListResponse reviewList = reviewService.findReviewList(request);
+        ReviewListResponse reviewList = reviewService.findProductReviewList(request);
 
         // then
         assertThat(reviewList.getReviewDetailResponses()).hasSize(reviewCnt);

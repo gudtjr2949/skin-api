@@ -73,9 +73,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
 
-
     @Override
-    public ReviewListResponse findReviewList(ReviewFindListServiceRequest request) {
+    public ReviewListResponse findProductReviewList(ReviewFindListServiceRequest request) {
         Product product = productRepository.findByIdAndProductStatus(request.getProductId(), ProductStatus.ACTIVE)
                 .orElseThrow(() -> new RestApiException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
