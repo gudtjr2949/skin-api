@@ -53,4 +53,10 @@ public class ReviewController {
 
         return ResponseEntity.ok().body(new CommonResponse(200, "후기 삭제 성공"));
     }
+
+    @GetMapping("/mylist")
+    public ResponseEntity<Object> myReviewList(@RequestParam Long reviewId,
+                                               @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok().body(null);
+    }
 }

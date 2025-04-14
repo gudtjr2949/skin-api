@@ -8,6 +8,8 @@ import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.email.Email;
 import com.personal.skin_api.order.repository.OrderRepository;
+import com.personal.skin_api.order.repository.entity.OrderStatus;
+import com.personal.skin_api.order.service.dto.response.OrderLineResponse;
 import com.personal.skin_api.payment.repository.PaymentRepository;
 import com.personal.skin_api.order.repository.QOrderRepository;
 import com.personal.skin_api.order.repository.entity.Order;
@@ -100,6 +102,18 @@ public class OrderServiceImpl implements OrderService {
         return response;
     }
 
+    private OrderDetailResponse createOrderDetailResponse(Order order, String memberName) {
+        return OrderDetailResponse.builder()
+                .orderUid(order.getOrderUid())
+                .memberName(memberName)
+                .productName(order.getProductName())
+                .price(order.getPaymentPrice())
+                .payMethod(order.getPayMethod())
+                .paidAt(order.getPaidAt())
+                .createdAt(order.getCreatedAt())
+                .build();
+    }
+
     private OrderDetailResponse createOrderDetailResponseWhenNoPayment(Order order, String memberName) {
         return OrderDetailResponse.builder()
                 .orderUid(order.getOrderUid())
@@ -116,27 +130,33 @@ public class OrderServiceImpl implements OrderService {
 
         List<Order> orderList = qOrderRepository.findMyOrderList(request.getOrderId(), member, request.getKeyword(), request.getYear());
 
-        List<OrderDetailResponse> orderResponses = orderList.stream()
+        List<OrderLineResponse> orderResponses = orderList.stream()
                 .map(order -> {
                     if (order.getPayment() == null) {
-                        return createOrderDetailResponseWhenNoPayment(order, member.getMemberName());
+                        return createOrderLineResponseBeforePaid(order, order.getProductName());
                     }
-                    return createOrderDetailResponse(order, member.getMemberName());
+                    return createOrderLineResponse(order, order.getProductName());
                 })
                 .toList();
 
         return new OrderListResponse(orderResponses);
     }
 
-    private OrderDetailResponse createOrderDetailResponse(Order order, String memberName) {
-        return OrderDetailResponse.builder()
-                .orderUid(order.getOrderUid())
-                .memberName(memberName)
-                .productName(order.getProductName())
+    private OrderLineResponse createOrderLineResponse(Order order, String productName) {
+        return OrderLineResponse.builder()
+                .productName(productName)
                 .price(order.getPaymentPrice())
-                .payMethod(order.getPayMethod())
-                .paidAt(order.getPaidAt())
-                .createdAt(order.getCreatedAt())
+                .orderUid(order.getOrderUid())
+                .orderStatus(order.getOrderStatus().toString())
+                .build();
+    }
+
+    private OrderLineResponse createOrderLineResponseBeforePaid(Order order, String productName) {
+        return OrderLineResponse.builder()
+                .productName(productName)
+                .price(0L)
+                .orderUid(order.getOrderUid())
+                .orderStatus(OrderStatus.WAITING.toString())
                 .build();
     }
 

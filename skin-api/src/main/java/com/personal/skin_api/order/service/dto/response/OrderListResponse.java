@@ -6,9 +6,9 @@ import java.util.List;
 
 @Getter
 public class OrderListResponse {
-    private List<OrderDetailResponse> orderResponses;
+    private List<OrderLineResponse> orderResponses;
 
-    public OrderListResponse(final List<OrderDetailResponse> orderResponses) {
+    public OrderListResponse(final List<OrderLineResponse> orderResponses) {
         this.orderResponses = orderResponses;
     }
 }
