@@ -17,6 +17,7 @@ import com.personal.skin_api.review.repository.QReviewRepository;
 import com.personal.skin_api.review.repository.ReviewRepository;
 import com.personal.skin_api.review.repository.entity.Review;
 import com.personal.skin_api.review.service.dto.request.*;
+import com.personal.skin_api.review.service.dto.response.ReviewDetailForModifyResponse;
 import com.personal.skin_api.review.service.dto.response.ReviewDetailResponse;
 import com.personal.skin_api.review.service.dto.response.ReviewListResponse;
 import lombok.RequiredArgsConstructor;
@@ -86,6 +87,7 @@ public class ReviewServiceImpl implements ReviewService {
                         .reviewContent(review.getReviewContent())
                         .nickname(review.getReviewerNickname())
                         .createdAt(review.getCreatedAt())
+                        .star(review.getStar())
                         .build())
                 .toList();
 
@@ -102,13 +104,32 @@ public class ReviewServiceImpl implements ReviewService {
         List<ReviewDetailResponse> reviewDetailResponses = myProductReviewList.stream()
                 .map(review -> ReviewDetailResponse.builder()
                         .reviewId(review.getId())
+                        .productName(review.getProductName())
                         .reviewContent(review.getReviewContent())
                         .nickname(review.getReviewerNickname())
                         .createdAt(review.getCreatedAt())
+                        .star(review.getStar())
                         .build())
                 .toList();
 
         return new ReviewListResponse(reviewDetailResponses);
+    }
+
+    @Override
+    public ReviewDetailForModifyResponse findReviewDetailForModify(ReviewDetailForModifyServiceRequest request) {
+        Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Review review = reviewRepository.findById(request.getReviewId())
+                .orElseThrow(() -> new RestApiException(ReviewErrorCode.CAN_NOT_FOUND_REVIEW));
+
+        checkReviewerPermission(member, review);
+
+        return ReviewDetailForModifyResponse.builder()
+                .reviewId(review.getId())
+                .reviewContent(review.getReviewContent())
+                .star(review.getStar())
+                .build();
     }
 
     @Override
@@ -132,7 +153,8 @@ public class ReviewServiceImpl implements ReviewService {
 
         checkReviewerPermission(member, review);
 
-        review.modifyReviewStatus(request.getNewReviewContent());
+        review.modifyReviewContent(request.getNewReviewContent());
+        review.modifyReviewStar(request.getStar());
     }
 
     @Override

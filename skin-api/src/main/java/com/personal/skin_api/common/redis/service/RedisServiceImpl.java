@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -65,10 +66,13 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public void saveRefreshToken(RedisSaveRefreshTokenServiceRequest request) {
-        String key = generateKey(request.getPurpose().toString(), request.getEmail());
+    public String saveRefreshToken(RedisSaveRefreshTokenServiceRequest request) {
+        String refreshUUID = UUID.randomUUID().toString();
+        String key = generateKey(request.getPurpose().toString(), refreshUUID);
+
         try {
             redisTemplate.opsForValue().set(key, request.getRefreshToken(), Duration.ofMillis(JwtTokenConstant.refreshExpirationTime));
+            return refreshUUID;
         } catch (Exception e) {
             log.error("Refresh Token 저장 에러 발생");
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
@@ -77,7 +81,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public String findRefreshToken(RedisFindRefreshTokenServiceRequest request) {
-        String key = generateKey(request.getPurpose().toString(), request.getEmail());
+        String key = generateKey(request.getPurpose().toString(), request.getRefreshUUID());
 
         try {
             String findRefreshToken = redisTemplate.opsForValue().get(key).toString();
@@ -89,7 +93,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void deleteRefreshToken(RedisDeleteRefreshTokenServiceRequest request) {
-        String key = generateKey(request.getPurpose().toString(), request.getEmail());
+        String key = generateKey(request.getPurpose().toString(), request.getRefreshUUID());
 
         try {
             redisTemplate.delete(key);

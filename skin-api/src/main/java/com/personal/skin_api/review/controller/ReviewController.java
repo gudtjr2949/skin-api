@@ -6,7 +6,9 @@ import com.personal.skin_api.review.controller.dto.request.ReviewFindListRequest
 import com.personal.skin_api.review.controller.dto.request.ReviewModifyRequest;
 import com.personal.skin_api.review.service.ReviewService;
 import com.personal.skin_api.review.service.dto.request.ReviewDeleteServiceRequest;
+import com.personal.skin_api.review.service.dto.request.ReviewDetailForModifyServiceRequest;
 import com.personal.skin_api.review.service.dto.request.ReviewFindMyListServiceRequest;
+import com.personal.skin_api.review.service.dto.response.ReviewDetailForModifyResponse;
 import com.personal.skin_api.review.service.dto.response.ReviewListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,14 +27,12 @@ public class ReviewController {
     public ResponseEntity<Object> createReview(@RequestBody ReviewCreateRequest request,
                                                @AuthenticationPrincipal UserDetails userDetails) {
         reviewService.createReview(request.toService(userDetails.getUsername()));
-
         return ResponseEntity.ok().body(new CommonResponse(200, "후기 작성 성공"));
     }
 
     @PostMapping("/list")
     public ResponseEntity<ReviewListResponse> findReviewList(@RequestBody ReviewFindListRequest request) {
         ReviewListResponse response = reviewService.findProductReviewList(request.toService());
-
         return ResponseEntity.ok().body(response);
     }
 
@@ -40,19 +40,28 @@ public class ReviewController {
     public ResponseEntity<Object> modifyReview(@RequestBody ReviewModifyRequest request,
                                                @AuthenticationPrincipal UserDetails userDetails) {
         reviewService.modifyReview(request.toService(userDetails.getUsername()));
-
         return ResponseEntity.ok().body(new CommonResponse(200, "후기 수정 성공"));
     }
 
-    @DeleteMapping("/delete")
+    @PostMapping("/delete")
     public ResponseEntity<Object> deleteReview(@RequestParam Long reviewId,
                                                @AuthenticationPrincipal UserDetails userDetails) {
         reviewService.deleteReview(ReviewDeleteServiceRequest.builder()
                 .reviewId(reviewId)
                 .email(userDetails.getUsername())
                 .build());
-
         return ResponseEntity.ok().body(new CommonResponse(200, "후기 삭제 성공"));
+    }
+
+    @GetMapping("/detail-modify")
+    public ResponseEntity<ReviewDetailForModifyResponse> detailReviewForModify(@RequestParam Long reviewId,
+                                               @AuthenticationPrincipal UserDetails userDetails) {
+        ReviewDetailForModifyResponse response = reviewService.findReviewDetailForModify(ReviewDetailForModifyServiceRequest.builder()
+                .reviewId(reviewId)
+                .email(userDetails.getUsername())
+                .build());
+
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/written-reviews")

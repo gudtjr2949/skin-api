@@ -4,7 +4,6 @@ import com.personal.skin_api.common.entity.BaseEntity;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.order.repository.entity.Order;
 import com.personal.skin_api.product.repository.entity.Product;
-import com.personal.skin_api.product.repository.entity.ProductStatus;
 import com.personal.skin_api.review.repository.entity.review_content.ReviewContent;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -33,21 +32,33 @@ public class Review extends BaseEntity {
     @Embedded
     private ReviewContent reviewContent;
 
+    @Column(name = "STAR")
+    private int star;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "REVIEW_STATUS")
     private ReviewStatus reviewStatus;
 
     @Builder
-    private Review(final Product product, final Order order, final Member member, final String reviewContent) {
+    private Review(final Product product,
+                   final Order order,
+                   final Member member,
+                   final String reviewContent,
+                   final int star) {
         this.product = product;
         this.order = order;
         this.member = member;
         this.reviewContent = new ReviewContent(reviewContent);
         this.reviewStatus = ReviewStatus.ACTIVE;
+        this.star = star;
     }
 
-    public void modifyReviewStatus(final String newReviewContent) {
+    public void modifyReviewContent(final String newReviewContent) {
         this.reviewContent = new ReviewContent(newReviewContent);
+    }
+
+    public void modifyReviewStar(final int newStar) {
+        this.star = newStar;
     }
 
     public void deleteReview() {
@@ -76,5 +87,13 @@ public class Review extends BaseEntity {
 
     public Long getProductId() {
         return product.getId();
+    }
+
+    public String getProductName() {
+        return product.getProductName();
+    }
+
+    public int getStar() {
+        return star;
     }
 }

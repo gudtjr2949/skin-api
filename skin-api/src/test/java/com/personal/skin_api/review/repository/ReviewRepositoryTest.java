@@ -128,7 +128,7 @@ class ReviewRepositoryTest extends JpaAbstractIntegrationTest {
         String newReviewContent = "수정한 후기입니다. 수장한 후기입니다.";
 
         // when
-        review.modifyReviewStatus(newReviewContent);
+        review.modifyReviewContent(newReviewContent);
         Optional<Review> byId = reviewRepository.findById(review.getId());
 
         // then

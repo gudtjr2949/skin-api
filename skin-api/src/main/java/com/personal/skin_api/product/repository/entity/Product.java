@@ -96,19 +96,21 @@ public class Product extends BaseEntity {
     }
 
     public void increaseOrder() {
-        orderCnt++;
+        orderCnt = orderCnt+1;
     }
 
     public void decreaseOrder() {
-        orderCnt--;
+        if (orderCnt-1 <= 0) orderCnt = 0;
+        else orderCnt = orderCnt-1;
     }
 
     public void increaseReview() {
-        reviewCnt++;
+        reviewCnt = reviewCnt+1;
     }
 
     public void decreaseReview() {
-        reviewCnt--;
+        if (reviewCnt-1 <= 0) reviewCnt = 0;
+        else reviewCnt = reviewCnt-1;
     }
 
     public Long getId() {

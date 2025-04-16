@@ -13,12 +13,17 @@ public class ReviewCreateServiceRequest {
     private String orderUid;
     private String email;
     private String reviewContent;
+    private int star;
 
     @Builder
-    private ReviewCreateServiceRequest(final String orderUid, final String email, final String reviewContent) {
+    private ReviewCreateServiceRequest(final String orderUid,
+                                       final String email,
+                                       final String reviewContent,
+                                       final int star) {
         this.orderUid = orderUid;
         this.email = email;
         this.reviewContent = reviewContent;
+        this.star = star;
     }
 
     public Review toEntity(Member member, Product product, Order order) {
@@ -27,6 +32,7 @@ public class ReviewCreateServiceRequest {
                 .product(product)
                 .order(order)
                 .reviewContent(reviewContent)
+                .star(star)
                 .build();
     }
 }

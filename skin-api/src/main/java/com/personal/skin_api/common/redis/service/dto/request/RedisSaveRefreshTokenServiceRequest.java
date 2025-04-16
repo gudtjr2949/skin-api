@@ -8,17 +8,12 @@ import lombok.Getter;
 @Getter
 public class RedisSaveRefreshTokenServiceRequest {
     private final TokenPurpose purpose;
-    private final Email email;
     private final String refreshToken;
 
     @Builder
-    private RedisSaveRefreshTokenServiceRequest(final TokenPurpose purpose, final String email, final String refreshToken) {
+    private RedisSaveRefreshTokenServiceRequest(final TokenPurpose purpose,
+                                                final String refreshToken) {
         this.purpose = purpose;
-        this.email = new Email(email);
         this.refreshToken = refreshToken;
-    }
-
-    public String getEmail() {
-        return email.getEmail();
     }
 }

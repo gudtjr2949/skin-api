@@ -5,6 +5,7 @@ import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.common.redis.TokenPurpose;
 import com.personal.skin_api.common.redis.service.RedisService;
 import com.personal.skin_api.common.redis.service.dto.request.*;
+import com.personal.skin_api.common.security.JwtFilter;
 import com.personal.skin_api.common.security.JwtTokenConstant;
 import com.personal.skin_api.common.security.JwtTokenProvider;
 import com.personal.skin_api.common.util.CertCodeGenerator;
@@ -23,9 +24,15 @@ import com.personal.skin_api.member.service.dto.response.*;
 import com.personal.skin_api.sms.service.SmsPurpose;
 import com.personal.skin_api.sms.service.SmsService;
 import com.personal.skin_api.sms.service.dto.SmsSendCertServiceRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static com.personal.skin_api.common.exception.member.MemberErrorCode.*;
 
@@ -166,43 +173,71 @@ class MemberServiceImpl implements MemberService {
         String accessToken = jwtTokenProvider.generateJwt(request.getEmail(), JwtTokenConstant.accessExpirationTime);
         String refreshToken = jwtTokenProvider.generateJwt(request.getEmail(), JwtTokenConstant.refreshExpirationTime);
 
-
-        redisService.saveRefreshToken(RedisSaveRefreshTokenServiceRequest.builder()
+        String refreshUUID = redisService.saveRefreshToken(RedisSaveRefreshTokenServiceRequest.builder()
                 .purpose(TokenPurpose.REFRESH_TOKEN)
-                .email(loginMember.getEmail())
                 .refreshToken(refreshToken)
                 .build());
-
 
         return MemberLoginResponse.builder()
                 .member(loginMember)
                 .accessToken(accessToken)
+                .refreshUUID(refreshUUID)
                 .build();
     }
 
     @Override
-    public String reissueToken(String email) {
-        Member reissuedMember = memberRepository.findMemberByEmail(new Email(email))
-                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+    public List<Cookie> logout(String refreshUUID) {
+        redisService.deleteRefreshToken(RedisDeleteRefreshTokenServiceRequest.builder()
+                .refreshUUID(refreshUUID)
+                .purpose(TokenPurpose.REFRESH_TOKEN)
+                .build());
 
+        return deleteHttpOnlyCookie();
+    }
+
+    private List<Cookie> deleteHttpOnlyCookie() {
+        Cookie deleteAccessToken = new Cookie("accessToken", null);
+        deleteAccessToken.setPath("/");
+        deleteAccessToken.setHttpOnly(true);
+        deleteAccessToken.setMaxAge(0);
+
+        Cookie deleteRefreshUUID = new Cookie("refreshUUID", null);
+        deleteRefreshUUID.setPath("/");
+        deleteRefreshUUID.setHttpOnly(true);
+        deleteRefreshUUID.setMaxAge(0);
+
+        return List.of(deleteAccessToken, deleteRefreshUUID);
+    }
+
+    @Override
+    public MemberReissueTokenResponse reissueToken(String refreshUUID, HttpServletResponse response) {
         String refreshToken = redisService.findRefreshToken(RedisFindRefreshTokenServiceRequest.builder()
                 .purpose(TokenPurpose.REFRESH_TOKEN)
-                .email(email).build());
+                .refreshUUID(refreshUUID)
+                .build());
 
         if (refreshToken == null) {
+            deleteHttpOnlyCookie().forEach(response::addCookie);
             throw new RestApiException(REQUIRED_RE_LOGIN);
         }
+
+        String email = JwtFilter.getEmailFromToken(refreshToken);
+
+        Member reissuedMember = memberRepository.findMemberByEmail(new Email(email))
+                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
         String newAccessToken = jwtTokenProvider.generateJwt(email, JwtTokenConstant.accessExpirationTime);
         String newRefreshToken = jwtTokenProvider.generateJwt(email, JwtTokenConstant.refreshExpirationTime);
 
-        redisService.saveRefreshToken(RedisSaveRefreshTokenServiceRequest.builder()
+        String newRefreshUUID = redisService.saveRefreshToken(RedisSaveRefreshTokenServiceRequest.builder()
                 .purpose(TokenPurpose.REFRESH_TOKEN)
-                .email(email)
                 .refreshToken(newRefreshToken)
                 .build());
 
-        return newAccessToken;
+        return MemberReissueTokenResponse.builder()
+                .newAccessToken(newAccessToken)
+                .newRefreshUUID(newRefreshUUID)
+                .build();
     }
 
     @Override
@@ -331,14 +366,6 @@ class MemberServiceImpl implements MemberService {
         Member findMember = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
         findMember.modifyMemberInfo(request);
-    }
-
-    @Override
-    public void logout(String email) {
-        redisService.deleteRefreshToken(RedisDeleteRefreshTokenServiceRequest.builder()
-                .purpose(TokenPurpose.REFRESH_TOKEN)
-                .email(email)
-                .build());
     }
 
     /**

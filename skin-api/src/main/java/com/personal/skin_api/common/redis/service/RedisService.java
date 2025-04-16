@@ -7,7 +7,7 @@ public interface RedisService {
     void saveSmsCertification(RedisSaveSmsCertServiceRequest request);
     String findMailCertification(RedisFindMailCertServiceRequest request);
     String findSmsCertification(RedisFindSmsCertServiceRequest request);
-    void saveRefreshToken(RedisSaveRefreshTokenServiceRequest request);
+    String saveRefreshToken(RedisSaveRefreshTokenServiceRequest request);
     String findRefreshToken(RedisFindRefreshTokenServiceRequest request);
     void deleteRefreshToken(RedisDeleteRefreshTokenServiceRequest request);
 }

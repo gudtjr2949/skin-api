@@ -10,7 +10,9 @@ import com.personal.skin_api.member.service.dto.request.MemberWithdrawServiceReq
 import com.personal.skin_api.member.service.dto.response.MemberDetailResponse;
 import com.personal.skin_api.member.service.dto.response.MemberFindEmailResponse;
 import com.personal.skin_api.member.service.dto.response.MemberLoginResponse;
+import com.personal.skin_api.member.service.dto.response.MemberReissueTokenResponse;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -74,53 +78,65 @@ public class MemberController {
 
         // accessToken 헤더에 담기
         Cookie accessTokenCookie = new Cookie("accessToken", loginResponse.getAccessToken());
-
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setSecure(true);
         accessTokenCookie.setPath("/");
         accessTokenCookie.setMaxAge((int) (JwtTokenConstant.accessExpirationTime / 1000));
 
+        Cookie refreshUUIDCookie = new Cookie("refreshUUID", loginResponse.getRefreshUUID());
+        refreshUUIDCookie.setHttpOnly(true);
+        refreshUUIDCookie.setSecure(true);
+        refreshUUIDCookie.setPath("/");
+        refreshUUIDCookie.setMaxAge((int) (JwtTokenConstant.refreshExpirationTime / 1000));
+
         // 쿠키를 응답에 추가
         response.addCookie(accessTokenCookie);
+        response.addCookie(refreshUUIDCookie);
 
-        // 쿠키 만든 후, 응답 Body에 있는 AccessToken 제거
+        // 쿠키 만든 후, 응답 Body에 있는 AccessToken, refreshUUID 제거
         loginResponse.removeAccessToken();
+        loginResponse.removeRefreshUUID();
 
         return ResponseEntity.ok().body(loginResponse);
     }
 
     @GetMapping("/reissue-access-token")
-    public ResponseEntity<Object> reissueAccessToken(@CookieValue("accessToken") String accessToken,
+    public ResponseEntity<Object> reissueAccessToken(@CookieValue("refreshUUID") String refreshUUID,
                                                      HttpServletResponse response) {
-        log.info("토큰 재발급 실행 = {}", accessToken);
-        String email = JwtFilter.getEmailFromToken(accessToken);
-        String newAccessToken = memberService.reissueToken(email);
+        log.info("토큰 재발급 실행 = {}", refreshUUID);
+        MemberReissueTokenResponse reissueTokenResponse = memberService.reissueToken(refreshUUID, response);
 
-        Cookie accessTokenCookie = new Cookie("accessToken", newAccessToken);
-
+        Cookie accessTokenCookie = new Cookie("accessToken", reissueTokenResponse.getNewAccessToken());
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setSecure(true);
         accessTokenCookie.setPath("/");
         accessTokenCookie.setMaxAge((int) (JwtTokenConstant.accessExpirationTime / 1000));
 
+        Cookie refreshUUIDCookie = new Cookie("refreshUUID", reissueTokenResponse.getNewRefreshUUID());
+        refreshUUIDCookie.setHttpOnly(true);
+        refreshUUIDCookie.setSecure(true);
+        refreshUUIDCookie.setPath("/");
+        refreshUUIDCookie.setMaxAge((int) (JwtTokenConstant.refreshExpirationTime / 1000));
+
         // 쿠키를 응답에 추가
         response.addCookie(accessTokenCookie);
+        response.addCookie(refreshUUIDCookie);
 
         return ResponseEntity.ok().body(new CommonResponse(200, "Access Token 재발급 성공"));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<CommonResponse> logout(HttpServletResponse response,
-                                                 @AuthenticationPrincipal UserDetails userDetails) {
-        memberService.logout(userDetails.getUsername());
-        log.info("진입");
+    public ResponseEntity<CommonResponse> logout(HttpServletRequest request, HttpServletResponse response) {
+        log.info("로그아웃 로직 진입");
 
-        // Access Token 쿠키 삭제
-        Cookie deleteAccessToken = new Cookie("accessToken", null);
-        deleteAccessToken.setPath("/");
-        deleteAccessToken.setHttpOnly(true);
-        deleteAccessToken.setMaxAge(0);
-        response.addCookie(deleteAccessToken);
+        String refreshUUID  = Arrays.stream(request.getCookies())
+                .filter(cookie -> "accessToken".equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst().get();
+
+        List<Cookie> cookies = memberService.logout(refreshUUID);
+
+        cookies.forEach(response::addCookie);
 
         return ResponseEntity.ok().body(new CommonResponse(200, "로그아웃 성공"));
     }

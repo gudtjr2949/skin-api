@@ -159,7 +159,8 @@ public class OrderServiceImpl implements OrderService {
                 .productName(productName)
                 .price(order.getPaymentPrice())
                 .orderUid(order.getOrderUid())
-                .orderStatus(order.getOrderStatus().toString())
+                .orderStatus(order.getOrderStatus().getMessage())
+                .createdAt(order.getCreatedAt())
                 .build();
     }
 
@@ -168,7 +169,8 @@ public class OrderServiceImpl implements OrderService {
                 .productName(productName)
                 .price(0L)
                 .orderUid(order.getOrderUid())
-                .orderStatus(OrderStatus.WAITING.toString())
+                .orderStatus(OrderStatus.WAITING.getMessage())
+                .createdAt(order.getCreatedAt())
                 .build();
     }
 

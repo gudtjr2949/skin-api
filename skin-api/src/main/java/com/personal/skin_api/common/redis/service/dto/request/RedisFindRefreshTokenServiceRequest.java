@@ -9,15 +9,11 @@ import lombok.Getter;
 @Getter
 public class RedisFindRefreshTokenServiceRequest {
     private final TokenPurpose purpose;
-    private final Email email;
+    private final String refreshUUID;
 
     @Builder
-    private RedisFindRefreshTokenServiceRequest(final TokenPurpose purpose, final String email) {
+    private RedisFindRefreshTokenServiceRequest(final TokenPurpose purpose, final String refreshUUID) {
         this.purpose = purpose;
-        this.email = new Email(email);
-    }
-
-    public String getEmail() {
-        return email.getEmail();
+        this.refreshUUID = refreshUUID;
     }
 }

@@ -7,12 +7,12 @@ import lombok.Getter;
 @Getter
 public class RedisDeleteRefreshTokenServiceRequest {
 
-    private String email;
+    private String refreshUUID;
     private TokenPurpose purpose;
 
     @Builder
-    private RedisDeleteRefreshTokenServiceRequest(final String email, final TokenPurpose purpose) {
-        this.email = email;
+    private RedisDeleteRefreshTokenServiceRequest(final String refreshUUID, final TokenPurpose purpose) {
+        this.refreshUUID = refreshUUID;
         this.purpose = purpose;
     }
 }

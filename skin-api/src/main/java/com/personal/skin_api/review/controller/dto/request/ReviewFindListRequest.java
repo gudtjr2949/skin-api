@@ -1,7 +1,9 @@
 package com.personal.skin_api.review.controller.dto.request;
 
 import com.personal.skin_api.review.service.dto.request.ReviewFindListServiceRequest;
+import lombok.Getter;
 
+@Getter
 public class ReviewFindListRequest {
     private Long productId;
     private Long reviewId;
