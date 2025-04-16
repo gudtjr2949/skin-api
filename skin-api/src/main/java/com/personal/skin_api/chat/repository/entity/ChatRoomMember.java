@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 public class ChatRoomMember {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
     private Long id;
 
     @ManyToOne
@@ -17,7 +17,7 @@ public class ChatRoomMember {
     private Member member;
 
     @ManyToOne
-    @JoinColumn(name = "CHATROOM_ID")
+    @JoinColumn(name = "CHAT_ROOM_ID")
     private ChatRoom chatRoom;
 
     @Builder
@@ -26,4 +26,10 @@ public class ChatRoomMember {
         this.member = member;
         this.chatRoom = chatRoom;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    // TODO : 아마 chatRoomId랑 chatRoomTitle 정보 리턴 필요할 듯..?
 }

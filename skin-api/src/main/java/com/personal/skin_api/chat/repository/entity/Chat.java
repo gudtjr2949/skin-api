@@ -20,7 +20,7 @@ public class Chat {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CHATROOM_ID")
+    @JoinColumn(name = "CHAT_ROOM_ID")
     private ChatRoom chatRoom;
 
     @Embedded
