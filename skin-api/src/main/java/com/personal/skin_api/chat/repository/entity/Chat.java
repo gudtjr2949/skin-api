@@ -35,6 +35,10 @@ public class Chat {
         this.chatContent = new ChatContent(chatContent);
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getChatContent() {
         return chatContent.getChatContent();
     }

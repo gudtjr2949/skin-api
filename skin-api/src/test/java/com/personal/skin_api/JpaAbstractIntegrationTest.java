@@ -1,5 +1,6 @@
 package com.personal.skin_api;
 
+import com.personal.skin_api.chat.repository.ChatRepository;
 import com.personal.skin_api.chat.repository.ChatRoomMemberRepository;
 import com.personal.skin_api.chat.repository.ChatRoomRepository;
 import com.personal.skin_api.chat.repository.entity.ChatRoom;
@@ -44,6 +45,9 @@ public abstract class JpaAbstractIntegrationTest {
     protected ReviewRepository reviewRepository;
 
     @Autowired
+    protected ChatRepository chatRepository;
+
+    @Autowired
     protected ChatRoomRepository chatRoomRepository;
 
     @Autowired
@@ -51,6 +55,7 @@ public abstract class JpaAbstractIntegrationTest {
 
     @AfterEach
     void tearDown() {
+        chatRepository.deleteAllInBatch();
         chatRoomMemberRepository.deleteAllInBatch();
         chatRoomRepository.deleteAllInBatch();
         reviewRepository.deleteAllInBatch();
