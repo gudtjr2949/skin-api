@@ -92,4 +92,10 @@ public abstract class EntityAbstractIntegrationTest {
                 .order(order)
                 .build();
     }
+
+    protected ChatRoom createChatRoom() {
+        return ChatRoom.builder()
+                .product(createProduct(createGeneralMember()))
+                .build();
+    }
 }

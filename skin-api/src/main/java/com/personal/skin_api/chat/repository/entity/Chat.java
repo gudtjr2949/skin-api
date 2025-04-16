@@ -34,4 +34,8 @@ public class Chat {
         this.chatRoom = chatRoom;
         this.chatContent = new ChatContent(chatContent);
     }
+
+    public String getChatContent() {
+        return chatContent.getChatContent();
+    }
 }
