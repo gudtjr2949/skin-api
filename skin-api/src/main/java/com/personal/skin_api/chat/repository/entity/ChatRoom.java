@@ -28,4 +28,8 @@ public class ChatRoom extends BaseEntity {
         this.product = product;
         this.chatRoomTitle = new ChatRoomTitle(product.getProductName());
     }
+
+    public Long getId() {
+        return id;
+    }
 }
