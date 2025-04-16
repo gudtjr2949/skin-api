@@ -1,5 +1,6 @@
 package com.personal.skin_api;
 
+import com.personal.skin_api.chat.repository.entity.ChatRoom;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
 import com.personal.skin_api.member.repository.entity.MemberStatus;
@@ -41,6 +42,7 @@ public abstract class EntityAbstractIntegrationTest {
      */
     private static String impUid = "imp_123456789876";
     private static String payMethod = "card";
+
 
     protected Member createGeneralMember() {
         return Member.builder()
