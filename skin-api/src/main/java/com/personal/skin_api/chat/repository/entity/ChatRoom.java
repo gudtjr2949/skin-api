@@ -1,5 +1,7 @@
 package com.personal.skin_api.chat.repository.entity;
 
+import com.personal.skin_api.chat.repository.entity.room_title.ChatRoomTitle;
+import com.personal.skin_api.product.repository.entity.Product;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -12,12 +14,17 @@ public class ChatRoom {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "ROOM_TITLE")
-    private String roomTitle;
+    @OneToOne
+    @JoinColumn(name = "PRODUCT_ID")
+    private Product product;
+
+    @Embedded
+    private ChatRoomTitle chatRoomTitle;
 
 
     @Builder
-    private ChatRoom(final String roomTile) {
-        this.roomTitle = roomTile;
+    private ChatRoom(final Product product) {
+        this.product = product;
+        this.chatRoomTitle = new ChatRoomTitle(product.getProductName());
     }
 }
