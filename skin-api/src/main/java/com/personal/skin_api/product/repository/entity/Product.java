@@ -1,5 +1,6 @@
 package com.personal.skin_api.product.repository.entity;
 
+import com.personal.skin_api.chat.repository.entity.ChatRoom;
 import com.personal.skin_api.common.entity.BaseEntity;
 import com.personal.skin_api.member.repository.entity.Member;
 
@@ -49,6 +50,9 @@ public class Product extends BaseEntity {
 
     @Embedded
     private ProductViews productViews;
+
+    @OneToOne(mappedBy = "product")
+    private ChatRoom chatRoom;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "PRODUCT_STATUS")

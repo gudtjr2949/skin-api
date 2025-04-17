@@ -1,5 +1,10 @@
 package com.personal.skin_api;
 
+import com.personal.skin_api.chat.repository.ChatRepository;
+import com.personal.skin_api.chat.repository.ChatRoomMemberRepository;
+import com.personal.skin_api.chat.repository.ChatRoomRepository;
+import com.personal.skin_api.chat.repository.entity.ChatRoom;
+import com.personal.skin_api.chat.repository.entity.ChatRoomMember;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
@@ -39,8 +44,20 @@ public abstract class JpaAbstractIntegrationTest {
     @Autowired
     protected ReviewRepository reviewRepository;
 
+    @Autowired
+    protected ChatRepository chatRepository;
+
+    @Autowired
+    protected ChatRoomRepository chatRoomRepository;
+
+    @Autowired
+    protected ChatRoomMemberRepository chatRoomMemberRepository;
+
     @AfterEach
     void tearDown() {
+        chatRepository.deleteAllInBatch();
+        chatRoomMemberRepository.deleteAllInBatch();
+        chatRoomRepository.deleteAllInBatch();
         reviewRepository.deleteAllInBatch();
         paymentRepository.deleteAllInBatch();
         orderRepository.deleteAllInBatch();
@@ -135,6 +152,20 @@ public abstract class JpaAbstractIntegrationTest {
                 .product(product)
                 .order(order)
                 .reviewContent(reviewContent)
+                .build());
+    }
+
+    protected ChatRoom createChatRoom() {
+        return chatRoomRepository.save(ChatRoom.builder()
+                .product(createProduct(createGeneralMember()))
+                .build());
+    }
+
+    protected ChatRoomMember createChatRoomMember(final Member member,
+                                                  final ChatRoom chatRoom) {
+        return chatRoomMemberRepository.save(ChatRoomMember.builder()
+                .member(member)
+                .chatRoom(chatRoom)
                 .build());
     }
 }
