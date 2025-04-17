@@ -1,5 +1,11 @@
 package com.personal.skin_api;
 
+import com.personal.skin_api.chat.repository.ChatRepository;
+import com.personal.skin_api.chat.repository.ChatRoomMemberRepository;
+import com.personal.skin_api.chat.repository.ChatRoomRepository;
+import com.personal.skin_api.chat.repository.entity.Chat;
+import com.personal.skin_api.chat.repository.entity.ChatRoom;
+import com.personal.skin_api.chat.repository.entity.ChatRoomMember;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
@@ -40,8 +46,20 @@ public abstract class AbstractIntegrationTest {
     @Autowired
     protected ReviewRepository reviewRepository;
 
+    @Autowired
+    protected ChatRepository chatRepository;
+
+    @Autowired
+    protected ChatRoomRepository chatRoomRepository;
+
+    @Autowired
+    protected ChatRoomMemberRepository chatRoomMemberRepository;
+
     @AfterEach
     void tearDown() {
+        chatRoomMemberRepository.deleteAllInBatch();
+        chatRepository.deleteAllInBatch();
+        chatRoomRepository.deleteAllInBatch();
         reviewRepository.deleteAllInBatch();
         paymentRepository.deleteAllInBatch();
         orderRepository.deleteAllInBatch();
@@ -150,6 +168,30 @@ public abstract class AbstractIntegrationTest {
                 .product(product)
                 .order(order)
                 .reviewContent(reviewContent)
+                .build());
+    }
+
+    protected ChatRoom createChatRoom(final Product product) {
+        return chatRoomRepository.save(ChatRoom.builder()
+                .product(product)
+                .build());
+    }
+
+    protected Chat createChat(final ChatRoom chatRoom,
+                              final Member member,
+                              final String chatContent) {
+        return chatRepository.save(Chat.builder()
+                .chatRoom(chatRoom)
+                .member(member)
+                .chatContent(chatContent)
+                .build());
+    }
+
+    protected ChatRoomMember createChatRoomMember(final ChatRoom chatRoom,
+                                                  final Member member) {
+        return chatRoomMemberRepository.save(ChatRoomMember.builder()
+                .chatRoom(chatRoom)
+                .member(member)
                 .build());
     }
 }
