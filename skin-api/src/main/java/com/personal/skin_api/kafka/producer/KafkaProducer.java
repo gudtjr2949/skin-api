@@ -2,8 +2,12 @@ package com.personal.skin_api.kafka.producer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.personal.skin_api.common.exception.CommonErrorCode;
+import com.personal.skin_api.common.exception.KafkaErrorCode;
+import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.kafka.dto.KafkaChat;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +22,12 @@ public class KafkaProducer {
         String jsonInString = "";
         try {
             jsonInString = objectMapper.writeValueAsString(kafkaChat);
-        } catch(JsonProcessingException e) {
-            e.printStackTrace();
+            kafkaTemplate.send(topic, jsonInString);
+        } catch (JsonProcessingException e) {
+            throw new RestApiException(CommonErrorCode.JSON_TO_STRING_ERROR);
+        } catch (KafkaException kafkaException) {
+            throw new RestApiException(KafkaErrorCode.KAFKA_SEND_ERROR);
         }
-        kafkaTemplate.send(topic, jsonInString);
     }
 
 }

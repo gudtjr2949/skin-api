@@ -3,6 +3,7 @@ package com.personal.skin_api.chat.repository;
 import com.personal.skin_api.JpaAbstractIntegrationTest;
 import com.personal.skin_api.chat.repository.entity.ChatRoom;
 import com.personal.skin_api.chat.repository.entity.ChatRoomMember;
+import com.personal.skin_api.chat.repository.entity.ChatRoomMemberStatus;
 import com.personal.skin_api.member.repository.entity.Member;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -69,7 +70,8 @@ class ChatRoomMemberRepositoryTest extends JpaAbstractIntegrationTest {
         }
 
         // when
-        List<ChatRoomMember> chatRoomList = chatRoomMemberRepository.findChatRoomMemberByMember(member);
+        List<ChatRoomMember> chatRoomList = chatRoomMemberRepository.findChatRoomMemberByMemberAndChatRoomMemberStatus(member,
+                ChatRoomMemberStatus.ENTERED);
 
         // then
         assertThat(chatRoomList).hasSize(enteredChatRoomCnt);

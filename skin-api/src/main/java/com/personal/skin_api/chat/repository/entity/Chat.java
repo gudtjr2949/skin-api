@@ -42,4 +42,8 @@ public class Chat {
     public String getChatContent() {
         return chatContent.getChatContent();
     }
+
+    public String getNickname() {
+        return member.getNickname();
+    }
 }

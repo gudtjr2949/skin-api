@@ -7,14 +7,14 @@ import lombok.Getter;
 public class ChatResponse {
     private Long chatId;
     private String nickname;
-    private String content;
+    private String chatContent;
 
     @Builder
     private ChatResponse(final Long chatId,
                          final String nickname,
-                         final String content) {
+                         final String chatContent) {
         this.chatId = chatId;
         this.nickname = nickname;
-        this.content = content;
+        this.chatContent = chatContent;
     }
 }

@@ -12,6 +12,7 @@ public enum CommonErrorCode implements ErrorCode {
     INVALID_HTTP_METHOD(HttpStatus.BAD_REQUEST, "잘못된 HTTP Method 요청입니다."),
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "리소스를 찾을 수 없습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부에서 에러가 발생했습니다."),
+    JSON_TO_STRING_ERROR(HttpStatus.BAD_REQUEST, "JSON에서 String 변환 과정에서 에러가 발생했습니다.")
     ;
 
     private final HttpStatus httpStatus;

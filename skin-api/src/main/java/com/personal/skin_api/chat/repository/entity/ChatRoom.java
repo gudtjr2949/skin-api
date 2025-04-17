@@ -32,4 +32,8 @@ public class ChatRoom extends BaseEntity {
     public Long getId() {
         return id;
     }
+
+    public String getChatRoomTitle() {
+        return chatRoomTitle.getChatRoomTitle();
+    }
 }

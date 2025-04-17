@@ -1,6 +1,7 @@
 package com.personal.skin_api.chat.repository.entity;
 
 import com.personal.skin_api.member.repository.entity.Member;
+import com.personal.skin_api.product.repository.entity.ProductStatus;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -20,16 +21,35 @@ public class ChatRoomMember {
     @JoinColumn(name = "CHAT_ROOM_ID")
     private ChatRoom chatRoom;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "CHAT_ROOM_MEMBER_STATUS")
+    private ChatRoomMemberStatus chatRoomMemberStatus;
+
     @Builder
     private ChatRoomMember(final Member member,
                            final ChatRoom chatRoom) {
         this.member = member;
         this.chatRoom = chatRoom;
+        this.chatRoomMemberStatus = ChatRoomMemberStatus.ENTERED;
+    }
+
+    public void exitChatRoomMember() {
+        this.chatRoomMemberStatus = ChatRoomMemberStatus.EXITED;
     }
 
     public Long getId() {
         return id;
     }
 
-    // TODO : 아마 chatRoomId랑 chatRoomTitle 정보 리턴 필요할 듯..?
+    public String getChatRoomTitle() {
+        return chatRoom.getChatRoomTitle();
+    }
+
+    public Long getChatRoomId() {
+        return chatRoom.getId();
+    }
+
+    public ChatRoomMemberStatus getChatRoomMemberStatus() {
+        return chatRoomMemberStatus;
+    }
 }

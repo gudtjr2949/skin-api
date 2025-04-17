@@ -7,14 +7,14 @@ import lombok.Getter;
 public class KafkaChat {
     private Long chatRoomId;
     private String nickname;
-    private String content;
+    private String chatContent;
 
     @Builder
     private KafkaChat(final Long chatRoomId,
                       final String nickname,
-                      final String content) {
+                      final String chatContent) {
         this.chatRoomId = chatRoomId;
         this.nickname = nickname;
-        this.content = content;
+        this.chatContent = chatContent;
     }
 }
