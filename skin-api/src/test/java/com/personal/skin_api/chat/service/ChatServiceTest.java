@@ -47,10 +47,11 @@ class ChatServiceTest extends AbstractIntegrationTest {
     @Test
     void 채팅방에_접속한다() {
         // given
+        Member member = createGeneralMemberWithEmail("enter@naver.com");
         Product product = createProduct(createGeneralMember());
         ChatRoom chatRoom = createChatRoom(product);
         ChatRoomEnterServiceRequest request = ChatRoomEnterServiceRequest.builder()
-                .chatId(0L)
+                .email(member.getEmail())
                 .chatRoomId(chatRoom.getId())
                 .build();
 
@@ -113,7 +114,7 @@ class ChatServiceTest extends AbstractIntegrationTest {
         IntStream.range(0, chatCnt).forEach(i -> createChat(chatRoom, member, i + "번째 메시지입니다."));
 
         ChatRoomEnterServiceRequest request = ChatRoomEnterServiceRequest.builder()
-                .chatId(0L)
+                .email(member.getEmail())
                 .chatRoomId(chatRoom.getId())
                 .build();
 
@@ -139,17 +140,19 @@ class ChatServiceTest extends AbstractIntegrationTest {
         Chat preChat = createChat(chatRoom, member, "가장 최근 조회된 채팅입니다.");
         IntStream.range(0, chatCnt-1).forEach(i -> createChat(chatRoom, member, i + "번째 메시지입니다."));
 
-        ChatRoomEnterServiceRequest request = ChatRoomEnterServiceRequest.builder()
-                .chatId(preChat.getId())
+        ChatListServiceRequest request = ChatListServiceRequest.builder()
+                .email(member.getEmail())
                 .chatRoomId(chatRoom.getId())
+                .chatId(preChat.getId())
                 .build();
 
         // when
-        ChatListResponse chatListResponse = chatService.enterChatRoom(request);
+        ChatListResponse chatListResponse = chatService.findChatList(request);
 
         // then
         assertThat(chatListResponse.getChatResponses().get(0).getChatContent())
                 .isEqualTo(firstChat.getChatContent());
+
         assertThat(chatListResponse.getChatResponses().get(chatListResponse.getChatResponses().size()-1).getChatContent())
                 .isEqualTo(lastChat.getChatContent());
     }
@@ -192,7 +195,10 @@ class ChatServiceTest extends AbstractIntegrationTest {
 
         // when
         chatService.exitChatRoom(request);
-        Optional<ChatRoomMember> chatRoomMember = chatRoomMemberRepository.findChatRoomMemberByChatRoomAndMember(chatRoom, member);
+        Optional<ChatRoomMember> chatRoomMember = chatRoomMemberRepository.findChatRoomMemberByChatRoomAndMemberAndChatRoomMemberStatus(
+                chatRoom,
+                member,
+                ChatRoomMemberStatus.EXITED);
 
         // then
         assertThat(chatRoomMember).isPresent();

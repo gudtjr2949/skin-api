@@ -1,5 +1,6 @@
 package com.personal.skin_api.chat.repository.entity;
 
+import com.personal.skin_api.common.entity.BaseEntity;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.product.repository.entity.ProductStatus;
 import jakarta.persistence.*;
@@ -8,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
-public class ChatRoomMember {
+public class ChatRoomMember extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;

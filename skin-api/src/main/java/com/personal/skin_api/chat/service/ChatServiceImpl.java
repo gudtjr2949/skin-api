@@ -50,24 +50,54 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public ChatListResponse enterChatRoom(ChatRoomEnterServiceRequest request) {
-        List<Chat> chatList = qChatRepository.findChatList(request.getChatId(), request.getChatRoomId());
-
         Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId())
                 .orElseThrow(() -> new RestApiException(ChatErrorCode.CAN_NOT_FOUND_CHATROOM));
 
-        chatRoomMemberRepository.save(ChatRoomMember.builder()
-                .member(member)
-                .chatRoom(chatRoom)
-                .build());
+        if (!chatRoomMemberRepository.findChatRoomMemberByChatRoomAndMemberAndChatRoomMemberStatus(chatRoom, member, ChatRoomMemberStatus.ENTERED).isPresent()) {
+            chatRoomMemberRepository.save(ChatRoomMember.builder()
+                    .member(member)
+                    .chatRoom(chatRoom)
+                    .build());
+        }
 
+        List<Chat> chatList = qChatRepository.findChatList(0L, request.getChatRoomId());
         List<ChatResponse> chatResponses = chatList.stream()
                 .map(chat -> ChatResponse.builder()
                         .chatId(chat.getId())
                         .nickname(chat.getNickname())
                         .chatContent(chat.getChatContent())
+                        .createdAt(chat.getCreatedAt())
+                        .build())
+                .toList();
+
+        return new ChatListResponse(chatResponses);
+    }
+
+    @Override
+    public ChatListResponse findChatList(ChatListServiceRequest request) {
+        Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId())
+                .orElseThrow(() -> new RestApiException(ChatErrorCode.CAN_NOT_FOUND_CHATROOM));
+
+        if (!chatRoomMemberRepository.findChatRoomMemberByChatRoomAndMemberAndChatRoomMemberStatus(chatRoom, member, ChatRoomMemberStatus.ENTERED).isPresent()) {
+            chatRoomMemberRepository.save(ChatRoomMember.builder()
+                    .member(member)
+                    .chatRoom(chatRoom)
+                    .build());
+        }
+
+        List<Chat> chatList = qChatRepository.findChatList(request.getChatId(), request.getChatRoomId());
+        List<ChatResponse> chatResponses = chatList.stream()
+                .map(chat -> ChatResponse.builder()
+                        .chatId(chat.getId())
+                        .nickname(chat.getNickname())
+                        .chatContent(chat.getChatContent())
+                        .createdAt(chat.getCreatedAt())
                         .build())
                 .toList();
 
@@ -122,7 +152,7 @@ public class ChatServiceImpl implements ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId())
                 .orElseThrow(() -> new RestApiException(ChatErrorCode.CAN_NOT_FOUND_CHATROOM));
 
-        ChatRoomMember chatRoomMember = chatRoomMemberRepository.findChatRoomMemberByChatRoomAndMember(chatRoom, member)
+        ChatRoomMember chatRoomMember = chatRoomMemberRepository.findChatRoomMemberByChatRoomAndMemberAndChatRoomMemberStatus(chatRoom, member, ChatRoomMemberStatus.ENTERED)
                 .orElseThrow(() -> new RestApiException(ChatErrorCode.CAN_NOT_FOUND_CHAT_ROOM_MEMBER));
 
         chatRoomMember.exitChatRoomMember();

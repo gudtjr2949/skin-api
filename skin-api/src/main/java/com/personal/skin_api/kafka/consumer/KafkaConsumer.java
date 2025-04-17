@@ -21,7 +21,7 @@ public class KafkaConsumer {
             KafkaChat kafkaChat = objectMapper.readValue(message, KafkaChat.class);
 
             // WebSocket을 통해 해당 채팅방으로 메시지 전송
-            String destination = "/sub/chat/" + kafkaChat.getChatRoomId();
+            String destination = "/sub/chat?chatRoomId=" + kafkaChat.getChatRoomId();
             template.convertAndSend(destination, kafkaChat);
         } catch (Exception e) {
             e.printStackTrace(); // 에러 로그 출력
