@@ -22,12 +22,17 @@ import com.personal.skin_api.kafka.producer.KafkaProducer;
 import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.email.Email;
+import com.personal.skin_api.product.repository.entity.Product;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
+import java.util.HashSet;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -56,7 +61,8 @@ public class ChatServiceImpl implements ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId())
                 .orElseThrow(() -> new RestApiException(ChatErrorCode.CAN_NOT_FOUND_CHATROOM));
 
-        if (!chatRoomMemberRepository.findChatRoomMemberByChatRoomAndMemberAndChatRoomMemberStatus(chatRoom, member, ChatRoomMemberStatus.ENTERED).isPresent()) {
+        if (!chatRoomMemberRepository.
+                findChatRoomMemberByChatRoomAndMemberAndChatRoomMemberStatus(chatRoom, member, ChatRoomMemberStatus.ENTERED).isPresent()) {
             chatRoomMemberRepository.save(ChatRoomMember.builder()
                     .member(member)
                     .chatRoom(chatRoom)
@@ -73,7 +79,12 @@ public class ChatServiceImpl implements ChatService {
                         .build())
                 .toList();
 
-        return new ChatListResponse(chatResponses);
+        return ChatListResponse.builder()
+                .sellerNickname(chatRoom.getSellerNickname())
+                .chatRoomTitle(chatRoom.getChatRoomTitle())
+                .nickname(member.getNickname())
+                .chatResponses(chatResponses)
+                .build();
     }
 
     @Override
@@ -101,7 +112,10 @@ public class ChatServiceImpl implements ChatService {
                         .build())
                 .toList();
 
-        return new ChatListResponse(chatResponses);
+        return ChatListResponse.builder()
+                .chatRoomTitle(chatRoom.getChatRoomTitle())
+                .chatResponses(chatResponses)
+                .build();
     }
 
     // TODO : 가장 최근 메시지 기록이 있는 채팅방 순으로 정렬
@@ -132,15 +146,16 @@ public class ChatServiceImpl implements ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId())
                 .orElseThrow(() -> new RestApiException(ChatErrorCode.CAN_NOT_FOUND_CHATROOM));
 
-        chatRepository.save(request.toEntity(member, chatRoom));
+        Chat chat = chatRepository.save(request.toEntity(member, chatRoom));
 
-        KafkaChat kafkaChat = KafkaChat.builder()
-                .chatRoomId(chatRoom.getId())
-                .nickname(member.getNickname())
-                .chatContent(request.getChatContent())
-                .build();
+        KafkaChat kafkaChat = new KafkaChat(
+                chatRoom.getId(),
+                member.getNickname(),
+                request.getChatContent(),
+                chat.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        );
 
-        kafkaProducer.sendMassage("chat-exchange", kafkaChat);
+        kafkaProducer.sendMessage("chat-exchange", kafkaChat);
     }
 
     @Override
@@ -156,5 +171,14 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new RestApiException(ChatErrorCode.CAN_NOT_FOUND_CHAT_ROOM_MEMBER));
 
         chatRoomMember.exitChatRoomMember();
+    }
+
+    @Override
+    @Transactional
+    public void deleteChatRoom(Product product) {
+        ChatRoom chatRoom = chatRoomRepository.findByProduct(product)
+                .orElseThrow(() -> new RestApiException(ChatErrorCode.CAN_NOT_FOUND_CHATROOM));
+
+        chatRoom.deleteChatRoom();
     }
 }

@@ -13,6 +13,7 @@ public class ProductDetailResponse {
     private final Long price;
     private final String registrantNickname;
     private final int productViews;
+    private final Long chatRoomId;
 
     @Builder
     private ProductDetailResponse(final Long productId,
@@ -21,7 +22,8 @@ public class ProductDetailResponse {
                                   final String blogUrl,
                                   final Long price,
                                   final String registrantNickname,
-                                  final int productViews) {
+                                  final int productViews,
+                                  final Long chatRoomId) {
         this.productId = productId;
         this.productName = productName;
         this.productContent = productContent;
@@ -29,5 +31,6 @@ public class ProductDetailResponse {
         this.price = price;
         this.registrantNickname = registrantNickname;
         this.productViews = productViews;
+        this.chatRoomId = chatRoomId;
     }
 }

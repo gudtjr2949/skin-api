@@ -45,6 +45,9 @@ public class Product extends BaseEntity {
     @Embedded
     private FileUrl fileUrl;
 
+    @Column(name = "THUMBNAIL_URL")
+    private String thumbnailUrl;
+
     @Embedded
     private Price price;
 
@@ -64,12 +67,14 @@ public class Product extends BaseEntity {
                     final String productContent,
                     final String blogUrl,
                     final String fileUrl,
+                    final String thumbnailUrl,
                     final Long price) {
         this.member = member;
         this.productName = new ProductName(productName);
         this.productContent = new ProductContent(productContent);
         this.blogUrl = new BlogUrl(blogUrl);
         this.fileUrl = new FileUrl(fileUrl);
+        this.thumbnailUrl = thumbnailUrl;
         this.price = new Price(price);
         this.productViews = new ProductViews(0);
         this.productStatus = ProductStatus.ACTIVE;
@@ -125,6 +130,10 @@ public class Product extends BaseEntity {
         return member.getEmail();
     }
 
+    public String getMemberNickname() {
+        return member.getNickname();
+    }
+
     public String getProductName() {
         return productName.getProductName();
     }
@@ -159,5 +168,13 @@ public class Product extends BaseEntity {
 
     public int getReviewCnt() {
         return reviewCnt;
+    }
+
+    public Long getChatRoomId() {
+        return chatRoom.getId();
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
     }
 }

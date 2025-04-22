@@ -2,6 +2,10 @@ server:
   port: 8080
 
 spring:
+  batch:
+    jdbc:
+      initialize-schema: always
+
   config:
     import: .env.properties
   datasource:
@@ -15,7 +19,6 @@ spring:
 #      sentinel:
 #        master: mymaster
 #        nodes: 127.0.0.1:26379
-
 
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect	# 이 부분 주의!
@@ -33,13 +36,13 @@ spring:
 
   kafka:
     consumer:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
       group-id: dev1
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     producer:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 

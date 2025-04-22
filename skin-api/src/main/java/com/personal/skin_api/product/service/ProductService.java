@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 public interface ProductService {
     Long registerProduct(ProductRegisterServiceRequest request);
     ProductListResponse findProducts(ProductFindListServiceRequest request);
+    ProductListResponse findProductsWithOffset(ProductFindListServiceRequest request);
     ProductListResponse findMyProducts(ProductFindMyListServiceRequest request);
     ProductDetailResponse findProductDetail(Long productId);
     void modifyProduct(ProductModifyServiceRequest request);

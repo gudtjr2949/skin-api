@@ -36,6 +36,7 @@ public class ProductController {
                                                           @RequestParam("price") String price,
                                                           @RequestParam("blogUrl") String blogUrl,
                                                           @RequestParam("file") MultipartFile file,
+                                                          @RequestParam("thumbnail") MultipartFile thumbnail,
                                                           @AuthenticationPrincipal UserDetails userDetails) {
         Long productId = productService.registerProduct(ProductRegisterServiceRequest.builder()
                 .productName(productName)
@@ -43,6 +44,7 @@ public class ProductController {
                 .blogUrl(blogUrl)
                 .price(Long.parseLong(price))
                 .file(file)
+                .thumbnail(thumbnail)
                 .email(userDetails.getUsername())
                 .build());
 
@@ -55,6 +57,11 @@ public class ProductController {
     @PostMapping("/list")
     public ResponseEntity<ProductListResponse> findProductList(@RequestBody ProductFindListRequest request) {
         return ResponseEntity.ok().body(productService.findProducts(request.toService()));
+    }
+
+    @PostMapping("/list-offset")
+    public ResponseEntity<ProductListResponse> findProductListWithOffset(@RequestBody ProductFindListRequest request) {
+        return ResponseEntity.ok().body(productService.findProductsWithOffset(request.toService()));
     }
 
     @GetMapping("/my-product")

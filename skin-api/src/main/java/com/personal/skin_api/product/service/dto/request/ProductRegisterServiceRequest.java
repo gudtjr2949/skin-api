@@ -13,21 +13,27 @@ public class ProductRegisterServiceRequest {
     private final String blogUrl;
     private final Long price;
     private final MultipartFile file;
+    private final MultipartFile thumbnail;
     private final String email;
 
     @Builder
-    private ProductRegisterServiceRequest(final String productName, final String productContent,
-                                          final String blogUrl, final Long price,
-                                          final MultipartFile file, final String email) {
+    private ProductRegisterServiceRequest(final String productName,
+                                          final String productContent,
+                                          final String blogUrl,
+                                          final Long price,
+                                          final MultipartFile file,
+                                          final MultipartFile thumbnail,
+                                          final String email) {
         this.productName = productName;
         this.productContent = productContent;
         this.blogUrl = blogUrl;
         this.price = price;
         this.file = file;
+        this.thumbnail = thumbnail;
         this.email = email;
     }
 
-    public Product toEntity(Member member, String fileUrl) {
+    public Product toEntity(Member member, String fileUrl, String thumbnailUrl) {
         return Product.builder()
                 .member(member)
                 .productName(productName)
@@ -35,6 +41,7 @@ public class ProductRegisterServiceRequest {
                 .blogUrl(blogUrl)
                 .price(price)
                 .fileUrl(fileUrl)
+                .thumbnailUrl(thumbnailUrl)
                 .build();
     }
 }

@@ -16,6 +16,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/chat")
@@ -28,6 +30,7 @@ public class ChatController {
                                                 @AuthenticationPrincipal UserDetails userDetails) {
         ChatListResponse chatListResponse = chatService.enterChatRoom(ChatRoomEnterServiceRequest.builder()
                 .chatRoomId(chatRoomId)
+                        .email(userDetails.getUsername())
                 .build());
 
         return ResponseEntity.ok().body(chatListResponse);
@@ -46,13 +49,6 @@ public class ChatController {
                 .email(userDetails.getUsername())
                 .build());
         return ResponseEntity.ok().body(response);
-    }
-
-    @MessageMapping("/send") // pub
-    public ResponseEntity<Object> sendChat(@RequestBody ChatSendRequest request,
-                                           @AuthenticationPrincipal UserDetails userDetails) {
-        chatService.sendChat(request.toService(userDetails.getUsername()));
-        return ResponseEntity.ok().body(new CommonResponse(200, "채팅 전송 성공"));
     }
 
     @PostMapping("/exit")

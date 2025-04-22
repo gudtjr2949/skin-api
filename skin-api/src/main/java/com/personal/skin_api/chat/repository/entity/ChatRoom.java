@@ -22,11 +22,16 @@ public class ChatRoom extends BaseEntity {
     @Embedded
     private ChatRoomTitle chatRoomTitle;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "CHAT_ROOM_STATUS")
+    private ChatRoomStatus chatRoomStatus;
+
 
     @Builder
     private ChatRoom(final Product product) {
         this.product = product;
         this.chatRoomTitle = new ChatRoomTitle(product.getProductName());
+        this.chatRoomStatus = ChatRoomStatus.ACTIVE;
     }
 
     public Long getId() {
@@ -35,5 +40,13 @@ public class ChatRoom extends BaseEntity {
 
     public String getChatRoomTitle() {
         return chatRoomTitle.getChatRoomTitle();
+    }
+
+    public void deleteChatRoom() {
+        chatRoomStatus = ChatRoomStatus.DELETED;
+    }
+
+    public String getSellerNickname() {
+        return product.getMemberNickname();
     }
 }

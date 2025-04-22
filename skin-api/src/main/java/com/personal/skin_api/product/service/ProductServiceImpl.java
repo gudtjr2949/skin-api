@@ -1,5 +1,7 @@
 package com.personal.skin_api.product.service;
 
+import com.personal.skin_api.chat.service.ChatService;
+import com.personal.skin_api.chat.service.dto.request.ChatRoomCreateServiceRequest;
 import com.personal.skin_api.common.exception.CommonErrorCode;
 import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.common.exception.member.MemberErrorCode;
@@ -17,10 +19,15 @@ import com.personal.skin_api.product.service.dto.response.ProductListResponse;
 import com.personal.skin_api.product.service.dto.response.ProductResponse;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.personal.skin_api.product.repository.QProductRepository.PRODUCTS_PAGE_SIZE;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +35,7 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     private final S3Service s3Service;
+    private final ChatService chatService;
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
     private final QProductRepository qProductRepository;
@@ -43,14 +51,19 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         String fileUrl = s3Service.uploadFile(request.getFile());
+        String thumbnailUrl = s3Service.uploadFile(request.getThumbnail());
 
-        Product product = request.toEntity(member, fileUrl);
+        Product product = request.toEntity(member, fileUrl, thumbnailUrl);
 
         try {
             productRepository.save(product);
         } catch (Exception e) {
-            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
+            throw new RestApiException(CommonErrorCode.DB_ERROR);
         }
+
+        chatService.createChatRoom(ChatRoomCreateServiceRequest.builder()
+                .product(product)
+                .build());
 
         return product.getId();
     }
@@ -69,6 +82,27 @@ public class ProductServiceImpl implements ProductService {
                         .productId(product.getId())
                         .productName(product.getProductName())
                         .price(product.getPrice())
+                        .thumbnailUrl(product.getThumbnailUrl())
+                        .orderCnt(product.getOrderCnt())
+                        .reviewCnt(product.getReviewCnt())
+                        .build())
+                .toList();
+
+        return new ProductListResponse(productResponses);
+    }
+
+    @Override
+    public ProductListResponse findProductsWithOffset(ProductFindListServiceRequest request) {
+        Pageable pageable = PageRequest.of(0, PRODUCTS_PAGE_SIZE);
+
+        Page<Product> products = productRepository.findByIdGreaterThan(request.getProductId(), pageable);
+
+        List<ProductResponse> productResponses = products.stream()
+                .map(product -> ProductResponse.builder()
+                        .productId(product.getId())
+                        .productName(product.getProductName())
+                        .price(product.getPrice())
+                        .thumbnailUrl(product.getThumbnailUrl())
                         .orderCnt(product.getOrderCnt())
                         .reviewCnt(product.getReviewCnt())
                         .build())
@@ -121,6 +155,7 @@ public class ProductServiceImpl implements ProductService {
                 .registrantNickname(product.getMember())
                 .price(product.getPrice())
                 .productViews(product.getProductViews())
+                .chatRoomId(product.getChatRoomId())
                 .build();
     }
 
@@ -163,6 +198,7 @@ public class ProductServiceImpl implements ProductService {
             throw new RestApiException(ProductErrorCode.CAN_NOT_MODIFY_PRODUCT);
         }
 
+        chatService.deleteChatRoom(product);
         product.deleteProduct();
     }
 }
