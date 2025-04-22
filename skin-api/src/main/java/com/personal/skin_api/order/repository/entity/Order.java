@@ -87,6 +87,10 @@ public class Order extends BaseEntity {
         return product.getProductName();
     }
 
+    public String getProductThumbnailUrl() {
+        return product.getThumbnailUrl();
+    }
+
     public Payment getPayment() {
         return payment;
     }

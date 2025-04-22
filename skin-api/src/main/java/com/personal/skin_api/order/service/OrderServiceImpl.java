@@ -127,9 +127,9 @@ public class OrderServiceImpl implements OrderService {
         List<OrderLineResponse> orderResponses = orderList.stream()
                 .map(order -> {
                     if (order.getPayment() == null) {
-                        return createOrderLineResponseBeforePaid(order, order.getProductName());
+                        return createOrderLineResponseBeforePaid(order, order.getProductName(), order.getProductId(), order.getProductThumbnailUrl());
                     }
-                    return createOrderLineResponse(order, order.getProductName());
+                    return createOrderLineResponse(order, order.getProductName(), order.getProductId(), order.getProductThumbnailUrl());
                 })
                 .toList();
 
@@ -154,9 +154,11 @@ public class OrderServiceImpl implements OrderService {
         return new WritableReviewOrderListResponse(orderResponses);
     }
 
-    private OrderLineResponse createOrderLineResponse(Order order, String productName) {
+    private OrderLineResponse createOrderLineResponse(Order order, String productName, Long productId, String thumbnailUrl) {
         return OrderLineResponse.builder()
+                .productId(productId)
                 .productName(productName)
+                .thumbnailUrl(thumbnailUrl)
                 .price(order.getPaymentPrice())
                 .orderUid(order.getOrderUid())
                 .orderStatus(order.getOrderStatus().getMessage())
@@ -164,10 +166,15 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
-    private OrderLineResponse createOrderLineResponseBeforePaid(Order order, String productName) {
+    private OrderLineResponse createOrderLineResponseBeforePaid(Order order,
+                                                                String productName,
+                                                                Long productId,
+                                                                String thumbnailUrl) {
         return OrderLineResponse.builder()
+                .productId(productId)
                 .productName(productName)
                 .price(0L)
+                .thumbnailUrl(thumbnailUrl)
                 .orderUid(order.getOrderUid())
                 .orderStatus(OrderStatus.WAITING.getMessage())
                 .createdAt(order.getCreatedAt())
