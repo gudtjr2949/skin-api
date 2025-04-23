@@ -3,6 +3,7 @@ package com.personal.skin_api;
 import com.personal.skin_api.chat.repository.ChatRepository;
 import com.personal.skin_api.chat.repository.ChatRoomMemberRepository;
 import com.personal.skin_api.chat.repository.ChatRoomRepository;
+import com.personal.skin_api.chat.repository.MongoChatRepository;
 import com.personal.skin_api.chat.repository.entity.Chat;
 import com.personal.skin_api.chat.repository.entity.ChatRoom;
 import com.personal.skin_api.chat.repository.entity.ChatRoomMember;
@@ -55,9 +56,13 @@ public abstract class AbstractIntegrationTest {
     @Autowired
     protected ChatRoomMemberRepository chatRoomMemberRepository;
 
+    @Autowired
+    protected MongoChatRepository mongoChatRepository;
+
     @AfterEach
     void tearDown() {
         chatRoomMemberRepository.deleteAllInBatch();
+        mongoChatRepository.deleteAll();
         chatRepository.deleteAllInBatch();
         chatRoomRepository.deleteAllInBatch();
         reviewRepository.deleteAllInBatch();

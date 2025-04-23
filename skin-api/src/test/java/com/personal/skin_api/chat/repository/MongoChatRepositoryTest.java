@@ -1,23 +1,15 @@
-package com.personal.skin_api.chat.repository.entity.mongo;
+package com.personal.skin_api.chat.repository;
 
-import com.personal.skin_api.chat.repository.ChatRepository;
-import com.personal.skin_api.common.config.MongoDbConfig;
+import com.personal.skin_api.chat.repository.entity.MongoChat;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.Extensions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,15 +33,15 @@ class MongoChatRepositoryTest {
         Long memberId = 1L;
         Long chatRoomId = 1L;
         String chatContent = "채팅입니다.";
-        Chat chat = Chat.builder()
+        MongoChat chat = MongoChat.builder()
                 .memberId(memberId)
                 .chatRoomId(chatRoomId)
                 .chatContent(chatContent)
                 .build();
 
         // when
-        Chat saveedChat = mongoChatRepository.save(chat);
-        Optional<Chat> byId = mongoChatRepository.findById(saveedChat.getId());
+        MongoChat saveedChat = mongoChatRepository.save(chat);
+        Optional<MongoChat> byId = mongoChatRepository.findById(saveedChat.getId());
 
         // then
         assertThat(byId).isPresent();
@@ -68,13 +60,13 @@ class MongoChatRepositoryTest {
 
         for (int i = 0 ; i < 30 ; i++) {
             String chatContent = i + " 번째 채팅입니다.";
-            Chat chat = Chat.builder()
+            MongoChat chat = MongoChat.builder()
                     .memberId(memberId)
                     .chatRoomId(chatRoomId)
                     .chatContent(chatContent)
                     .build();
 
-            Chat save = mongoChatRepository.save(chat);
+            MongoChat save = mongoChatRepository.save(chat);
 
             if (i == 20) {
                 lastWatchedChatId = save.getId();
@@ -87,7 +79,7 @@ class MongoChatRepositoryTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "id"));
-        List<Chat> chats = mongoChatRepository.findChatByChatRoomIdAndIdLessThanOrderByIdDesc(chatRoomId, lastWatchedChatId, pageable);
+        List<MongoChat> chats = mongoChatRepository.findChatByChatRoomIdAndIdLessThanOrderByIdDesc(chatRoomId, lastWatchedChatId, pageable);
 
         // then
         assertThat(chats).hasSize(20);

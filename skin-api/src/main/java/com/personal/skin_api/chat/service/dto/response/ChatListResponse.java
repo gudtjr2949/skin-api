@@ -7,19 +7,11 @@ import java.util.List;
 
 @Getter
 public class ChatListResponse {
-    private String sellerNickname;
-    private String chatRoomTitle;
-    private String nickname;
+
     private List<ChatResponse> chatResponses;
 
     @Builder
-    private ChatListResponse(final String sellerNickname,
-                             final String chatRoomTitle,
-                             final String nickname,
-                             final List<ChatResponse> chatResponses) {
-        this.sellerNickname = sellerNickname;
-        this.chatRoomTitle = chatRoomTitle;
-        this.nickname = nickname;
+    private ChatListResponse(final List<ChatResponse> chatResponses) {
         this.chatResponses = chatResponses;
     }
 }

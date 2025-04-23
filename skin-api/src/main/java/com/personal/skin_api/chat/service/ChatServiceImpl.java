@@ -1,18 +1,9 @@
 package com.personal.skin_api.chat.service;
 
-import com.personal.skin_api.chat.repository.ChatRepository;
-import com.personal.skin_api.chat.repository.ChatRoomMemberRepository;
-import com.personal.skin_api.chat.repository.ChatRoomRepository;
-import com.personal.skin_api.chat.repository.QChatRepository;
-import com.personal.skin_api.chat.repository.entity.Chat;
-import com.personal.skin_api.chat.repository.entity.ChatRoom;
-import com.personal.skin_api.chat.repository.entity.ChatRoomMember;
-import com.personal.skin_api.chat.repository.entity.ChatRoomMemberStatus;
+import com.personal.skin_api.chat.repository.*;
+import com.personal.skin_api.chat.repository.entity.*;
 import com.personal.skin_api.chat.service.dto.request.*;
-import com.personal.skin_api.chat.service.dto.response.ChatListResponse;
-import com.personal.skin_api.chat.service.dto.response.ChatResponse;
-import com.personal.skin_api.chat.service.dto.response.ChatRoomListResponse;
-import com.personal.skin_api.chat.service.dto.response.ChatRoomResponse;
+import com.personal.skin_api.chat.service.dto.response.*;
 import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.common.exception.chat.ChatErrorCode;
 import com.personal.skin_api.common.exception.member.MemberErrorCode;
@@ -28,8 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.HashSet;
 import java.util.List;
 
 @Slf4j
@@ -39,11 +30,11 @@ import java.util.List;
 public class ChatServiceImpl implements ChatService {
 
     private final KafkaProducer kafkaProducer;
-    private final ChatRepository chatRepository;
-    private final QChatRepository qChatRepository;
     private final MemberRepository memberRepository;
+    private final ChatManageContext chatManageContext;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    public static final String STRATEGY_KEY = "mongoChatRepositoryAdapter";
 
     @Override
     @Transactional
@@ -54,7 +45,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional
-    public ChatListResponse enterChatRoom(ChatRoomEnterServiceRequest request) {
+    public ChatRoomEnterResponse enterChatRoom(ChatRoomEnterServiceRequest request) {
         Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
@@ -69,51 +60,23 @@ public class ChatServiceImpl implements ChatService {
                     .build());
         }
 
-        List<Chat> chatList = qChatRepository.findChatList(0L, request.getChatRoomId());
-        List<ChatResponse> chatResponses = chatList.stream()
-                .map(chat -> ChatResponse.builder()
-                        .chatId(chat.getId())
-                        .nickname(chat.getNickname())
-                        .chatContent(chat.getChatContent())
-                        .createdAt(chat.getCreatedAt())
-                        .build())
-                .toList();
 
-        return ChatListResponse.builder()
+        return ChatRoomEnterResponse.builder()
                 .sellerNickname(chatRoom.getSellerNickname())
+                .myNickname(member.getNickname())
                 .chatRoomTitle(chatRoom.getChatRoomTitle())
-                .nickname(member.getNickname())
-                .chatResponses(chatResponses)
                 .build();
     }
 
     @Override
     public ChatListResponse findChatList(ChatListServiceRequest request) {
-        Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
-                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-
         ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId())
                 .orElseThrow(() -> new RestApiException(ChatErrorCode.CAN_NOT_FOUND_CHATROOM));
 
-        if (!chatRoomMemberRepository.findChatRoomMemberByChatRoomAndMemberAndChatRoomMemberStatus(chatRoom, member, ChatRoomMemberStatus.ENTERED).isPresent()) {
-            chatRoomMemberRepository.save(ChatRoomMember.builder()
-                    .member(member)
-                    .chatRoom(chatRoom)
-                    .build());
-        }
-
-        List<Chat> chatList = qChatRepository.findChatList(request.getChatId(), request.getChatRoomId());
-        List<ChatResponse> chatResponses = chatList.stream()
-                .map(chat -> ChatResponse.builder()
-                        .chatId(chat.getId())
-                        .nickname(chat.getNickname())
-                        .chatContent(chat.getChatContent())
-                        .createdAt(chat.getCreatedAt())
-                        .build())
-                .toList();
+        ChatManageStrategy strategy = chatManageContext.getStrategy(STRATEGY_KEY);
+        List<ChatResponse> chatResponses = strategy.findChatList(chatRoom.getId(), request.getChatId());
 
         return ChatListResponse.builder()
-                .chatRoomTitle(chatRoom.getChatRoomTitle())
                 .chatResponses(chatResponses)
                 .build();
     }
@@ -146,13 +109,14 @@ public class ChatServiceImpl implements ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId())
                 .orElseThrow(() -> new RestApiException(ChatErrorCode.CAN_NOT_FOUND_CHATROOM));
 
-        Chat chat = chatRepository.save(request.toEntity(member, chatRoom));
+        ChatManageStrategy strategy = chatManageContext.getStrategy(STRATEGY_KEY);
+        LocalDateTime createdAt = strategy.save(chatRoom, member, request.getChatContent());
 
         KafkaChat kafkaChat = new KafkaChat(
                 chatRoom.getId(),
                 member.getNickname(),
                 request.getChatContent(),
-                chat.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                createdAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         );
 
         kafkaProducer.sendMessage("chat-exchange", kafkaChat);

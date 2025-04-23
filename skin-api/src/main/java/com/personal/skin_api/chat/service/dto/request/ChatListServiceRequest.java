@@ -5,16 +5,13 @@ import lombok.Getter;
 
 @Getter
 public class ChatListServiceRequest {
-    private Long chatId;
+    private String chatId;
     private Long chatRoomId;
-    private String email;
 
     @Builder
-    private ChatListServiceRequest(final Long chatId,
-                                   final Long chatRoomId,
-                                   final String email) {
+    private ChatListServiceRequest(final String chatId,
+                                   final Long chatRoomId) {
         this.chatId = chatId;
         this.chatRoomId = chatRoomId;
-        this.email = email;
     }
 }

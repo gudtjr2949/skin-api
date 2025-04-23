@@ -1,22 +1,26 @@
-package com.personal.skin_api.chat.repository.entity.mongo;
+package com.personal.skin_api.chat.repository.entity;
 
 import com.personal.skin_api.chat.repository.entity.chat_content.ChatContent;
 import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
+@ToString
 @NoArgsConstructor
 @Document(collection = "chats")
-public class Chat {
+public class MongoChat {
 
     @Id
     private String id;
 
     private Long memberId;
+
+    private String memberNickname;
 
     private Long chatRoomId;
 
@@ -26,10 +30,12 @@ public class Chat {
     private LocalDateTime createdAt;
 
     @Builder
-    private Chat(final Long memberId,
-                 final Long chatRoomId,
-                 final String chatContent) {
+    private MongoChat(final Long memberId,
+                      final String memberNickname,
+                      final Long chatRoomId,
+                      final String chatContent) {
         this.memberId = memberId;
+        this.memberNickname = memberNickname;
         this.chatRoomId = chatRoomId;
         this.chatContent = new ChatContent(chatContent);
     }
@@ -40,6 +46,14 @@ public class Chat {
 
     public String getChatContent() {
         return chatContent.getChatContent();
+    }
+
+    public String getMemberNickname() {
+        return memberNickname;
+    }
+
+    public Long getChatRoomId() {
+        return chatRoomId;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -7,6 +7,7 @@ import com.personal.skin_api.chat.service.dto.request.ChatRoomEnterServiceReques
 import com.personal.skin_api.chat.service.dto.request.ChatRoomExitServiceRequest;
 import com.personal.skin_api.chat.service.dto.request.ChatRoomListServiceRequest;
 import com.personal.skin_api.chat.service.dto.response.ChatListResponse;
+import com.personal.skin_api.chat.service.dto.response.ChatRoomEnterResponse;
 import com.personal.skin_api.chat.service.dto.response.ChatRoomListResponse;
 import com.personal.skin_api.common.dto.CommonResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,20 +27,19 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping("/enter")
-    public ResponseEntity<ChatListResponse> enterChatRoom(@RequestParam Long chatRoomId,
+    public ResponseEntity<ChatRoomEnterResponse> enterChatRoom(@RequestParam Long chatRoomId,
                                                 @AuthenticationPrincipal UserDetails userDetails) {
-        ChatListResponse chatListResponse = chatService.enterChatRoom(ChatRoomEnterServiceRequest.builder()
+        ChatRoomEnterResponse response = chatService.enterChatRoom(ChatRoomEnterServiceRequest.builder()
                 .chatRoomId(chatRoomId)
-                        .email(userDetails.getUsername())
+                .email(userDetails.getUsername())
                 .build());
 
-        return ResponseEntity.ok().body(chatListResponse);
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/chat-list")
-    public ResponseEntity<ChatListResponse> findChatList(@RequestBody ChatListRequest request,
-                                               @AuthenticationPrincipal UserDetails userDetails) {
-        ChatListResponse response = chatService.findChatList(request.toService(userDetails.getUsername()));
+    public ResponseEntity<ChatListResponse> findChatList(@RequestBody ChatListRequest request) {
+        ChatListResponse response = chatService.findChatList(request.toService());
         return ResponseEntity.ok().body(response);
     }
     

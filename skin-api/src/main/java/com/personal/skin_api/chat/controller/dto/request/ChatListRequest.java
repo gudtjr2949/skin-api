@@ -7,13 +7,12 @@ import lombok.Getter;
 @Getter
 public class ChatListRequest {
     private Long chatRoomId;
-    private Long chatId;
+    private String chatId;
 
-    public ChatListServiceRequest toService(final String email) {
+    public ChatListServiceRequest toService() {
         return ChatListServiceRequest.builder()
                 .chatId(chatId)
                 .chatRoomId(chatRoomId)
-                .email(email)
                 .build();
     }
 }

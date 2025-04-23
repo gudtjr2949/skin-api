@@ -2,6 +2,7 @@ package com.personal.skin_api.chat.service.dto.request;
 
 import com.personal.skin_api.chat.repository.entity.Chat;
 import com.personal.skin_api.chat.repository.entity.ChatRoom;
+import com.personal.skin_api.chat.repository.entity.MongoChat;
 import com.personal.skin_api.member.repository.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,11 +22,20 @@ public class ChatSendServiceRequest {
         this.chatContent = chatContent;
     }
 
-    public Chat toEntity(final Member member,
-                         final ChatRoom chatRoom) {
+    public Chat toChatEntity(final Member member,
+                             final ChatRoom chatRoom) {
         return Chat.builder()
                 .member(member)
                 .chatRoom(chatRoom)
+                .chatContent(chatContent)
+                .build();
+    }
+
+    public MongoChat toMongoChat(final Member member) {
+        return MongoChat.builder()
+                .chatRoomId(chatRoomId)
+                .memberId(member.getId())
+                .memberNickname(member.getNickname())
                 .chatContent(chatContent)
                 .build();
     }
