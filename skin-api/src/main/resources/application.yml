@@ -42,13 +42,15 @@ spring:
 
   kafka:
     consumer:
-      bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
+#      bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
+      bootstrap-servers: 127.0.0.1:54815
       group-id: dev1
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     producer:
-      bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
+#      bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
+      bootstrap-servers: 127.0.0.1:54815
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
