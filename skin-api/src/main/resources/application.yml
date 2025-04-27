@@ -11,6 +11,7 @@ spring:
     url: ${DB_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   data:
     redis:
       host: ${REDIS_HOST}
@@ -33,7 +34,7 @@ spring:
         show-sql: true
         format-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
   jwt:
     secret: ${JWT_SECRET_KEY}
     token:
@@ -42,15 +43,13 @@ spring:
 
   kafka:
     consumer:
-#      bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
-      bootstrap-servers: 127.0.0.1:54815
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
       group-id: dev1
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     producer:
-#      bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
-      bootstrap-servers: 127.0.0.1:54815
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
