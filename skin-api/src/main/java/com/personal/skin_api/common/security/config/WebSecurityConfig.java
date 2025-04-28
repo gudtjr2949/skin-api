@@ -5,6 +5,7 @@ import com.personal.skin_api.common.security.JwtFilter;
 import com.personal.skin_api.member.repository.entity.MemberRole;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,6 +24,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class WebSecurityConfig {
 
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -43,26 +46,10 @@ public class WebSecurityConfig {
 
         http.exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint).accessDeniedHandler(jwtAccessDeniedHandler));
 
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // ✅ Preflight 요청 허용
-                        .requestMatchers("/api/v1/**").hasAuthority(MemberRole.GENERAL.toString()) // ✅ /api/v1/** 는 USER 권한 필요
-                        .anyRequest().permitAll() // 나머지는 모두 허용
-                );
-
-        // 권한 규칙 설정
-//        http.logout((logoutConfig) -> {
-//            logoutConfig.logoutUrl("/api/v1/members/logout")
-//                    .addLogoutHandler((request, response, authentication) -> {
-//                        HttpSession session = request.getSession();
-//                        session.invalidate();
-//                    });
-//            logoutConfig.logoutSuccessHandler((request, response, authentication) -> {
-//                response.setStatus(HttpStatus.OK.value());
-//                response.getWriter().write("logout");
-//                response.getWriter().flush();
-//            });
-//        });
+        http.authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .anyRequest().permitAll()
+        );
 
         http.addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();

@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -77,21 +78,26 @@ public class MemberController {
         MemberLoginResponse loginResponse = memberService.login(request.toService());
 
         // accessToken 헤더에 담기
-        Cookie accessTokenCookie = new Cookie("accessToken", loginResponse.getAccessToken());
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(true);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge((int) (JwtTokenConstant.accessExpirationTime / 1000));
+        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", loginResponse.getAccessToken())
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge((int) (JwtTokenConstant.accessExpirationTime / 1000))
+                .build();
 
-        Cookie refreshUUIDCookie = new Cookie("refreshUUID", loginResponse.getRefreshUUID());
-        refreshUUIDCookie.setHttpOnly(true);
-        refreshUUIDCookie.setSecure(true);
-        refreshUUIDCookie.setPath("/");
-        refreshUUIDCookie.setMaxAge((int) (JwtTokenConstant.refreshExpirationTime / 1000));
+        ResponseCookie refreshUUIDCookie = ResponseCookie.from("accessToken", loginResponse.getRefreshUUID())
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge((int) (JwtTokenConstant.refreshExpirationTime / 1000))
+                .build();
+
 
         // 쿠키를 응답에 추가
-        response.addCookie(accessTokenCookie);
-        response.addCookie(refreshUUIDCookie);
+        response.addHeader("Set-Cookie", accessTokenCookie.toString());
+        response.addHeader("Set-Cookie", refreshUUIDCookie.toString());
 
         // 쿠키 만든 후, 응답 Body에 있는 AccessToken, refreshUUID 제거
         loginResponse.removeAccessToken();
@@ -106,21 +112,27 @@ public class MemberController {
         log.info("토큰 재발급 실행 = {}", refreshUUID);
         MemberReissueTokenResponse reissueTokenResponse = memberService.reissueToken(refreshUUID, response);
 
-        Cookie accessTokenCookie = new Cookie("accessToken", reissueTokenResponse.getNewAccessToken());
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(true);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge((int) (JwtTokenConstant.accessExpirationTime / 1000));
+        // accessToken 헤더에 담기
+        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", reissueTokenResponse.getNewAccessToken())
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge((int) (JwtTokenConstant.accessExpirationTime / 1000))
+                .build();
 
-        Cookie refreshUUIDCookie = new Cookie("refreshUUID", reissueTokenResponse.getNewRefreshUUID());
-        refreshUUIDCookie.setHttpOnly(true);
-        refreshUUIDCookie.setSecure(true);
-        refreshUUIDCookie.setPath("/");
-        refreshUUIDCookie.setMaxAge((int) (JwtTokenConstant.refreshExpirationTime / 1000));
+        ResponseCookie refreshUUIDCookie = ResponseCookie.from("accessToken", reissueTokenResponse.getNewRefreshUUID())
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge((int) (JwtTokenConstant.refreshExpirationTime / 1000))
+                .build();
 
         // 쿠키를 응답에 추가
-        response.addCookie(accessTokenCookie);
-        response.addCookie(refreshUUIDCookie);
+        response.addHeader("Set-Cookie", accessTokenCookie.toString());
+        response.addHeader("Set-Cookie", refreshUUIDCookie.toString());
+
 
         return ResponseEntity.ok().body(new CommonResponse(200, "Access Token 재발급 성공"));
     }
