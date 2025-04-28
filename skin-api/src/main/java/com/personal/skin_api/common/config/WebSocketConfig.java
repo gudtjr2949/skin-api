@@ -15,7 +15,7 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private String originUrl = "http://localhost:3000";
+    private String originUrl = "https://skin-sale.store";
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
