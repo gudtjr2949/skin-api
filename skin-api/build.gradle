@@ -79,6 +79,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+	// msk
+	implementation("software.amazon.msk:aws-msk-iam-auth:2.0.3")
 }
 
 tasks.named('test') {
