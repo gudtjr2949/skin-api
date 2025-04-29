@@ -86,7 +86,7 @@ public class MemberController {
                 .maxAge((int) (JwtTokenConstant.accessExpirationTime / 1000))
                 .build();
 
-        ResponseCookie refreshUUIDCookie = ResponseCookie.from("accessToken", loginResponse.getRefreshUUID())
+        ResponseCookie refreshUUIDCookie = ResponseCookie.from("refreshUUID", loginResponse.getRefreshUUID())
                 .path("/")
                 .sameSite("None")
                 .httpOnly(true)
@@ -121,7 +121,7 @@ public class MemberController {
                 .maxAge((int) (JwtTokenConstant.accessExpirationTime / 1000))
                 .build();
 
-        ResponseCookie refreshUUIDCookie = ResponseCookie.from("accessToken", reissueTokenResponse.getNewRefreshUUID())
+        ResponseCookie refreshUUIDCookie = ResponseCookie.from("refreshUUID", reissueTokenResponse.getNewRefreshUUID())
                 .path("/")
                 .sameSite("None")
                 .httpOnly(true)
