@@ -1,7 +1,5 @@
 package com.personal.skin_api.common.security;
 
-import com.personal.skin_api.common.exception.ErrorCode;
-import com.personal.skin_api.common.exception.GlobalExceptionHandler;
 import com.personal.skin_api.common.exception.JwtErrorCode;
 import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.member.repository.entity.MemberRole;
@@ -23,6 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -35,6 +34,8 @@ import static com.personal.skin_api.common.security.JwtTokenConstant.secretKey;
 @Slf4j
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
+
+    private final UserDetailsService userDetailsService;
 
     private static final List<String> EXCLUDE_URLS = List.of(
             "/actuator/prometheus",
@@ -64,17 +65,17 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String token = resolveToken(request);
-            validate(token);
+
+            validateToken(token);
 
             String email = getEmailFromToken(token);
 
-            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(MemberRole.GENERAL.toString()));
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                     email,
-                    "null",
-                    authorities);
+                    "", // 만약 JWT 토큰 인증을 거친 경우 비밀번호는 따로 필요없음
+                    List.of(new SimpleGrantedAuthority(MemberRole.GENERAL.toString())));
 
-            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
 
             // 접근한 유저의 authentication 객체를 SecurityContextHolder 에 저장함
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -97,8 +98,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
     }
 
-
-    private boolean validate(final String token) {
+    private boolean validateToken(final String token) {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
@@ -108,7 +108,6 @@ public class JwtFilter extends OncePerRequestFilter {
             throw new RestApiException(JwtErrorCode.INVALID_JWT);
         }
     }
-
 
     private String resolveToken(HttpServletRequest request) {
         try {

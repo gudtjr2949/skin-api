@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -75,7 +77,11 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest request,
                                                      HttpServletResponse response) {
+        Log infoLog = LogFactory.getLog("INFO_LOG");
+        infoLog.debug("로그입니다.");
+
         MemberLoginResponse loginResponse = memberService.login(request.toService());
+
 
         // accessToken 헤더에 담기
         ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", loginResponse.getAccessToken())
@@ -117,7 +123,7 @@ public class MemberController {
                 .path("/")
                 .sameSite("None")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .maxAge((int) (JwtTokenConstant.accessExpirationTime / 1000))
                 .build();
 
@@ -125,7 +131,7 @@ public class MemberController {
                 .path("/")
                 .sameSite("None")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .maxAge((int) (JwtTokenConstant.refreshExpirationTime / 1000))
                 .build();
 

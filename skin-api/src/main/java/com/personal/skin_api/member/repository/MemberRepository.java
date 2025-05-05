@@ -1,6 +1,7 @@
 package com.personal.skin_api.member.repository;
 
 import com.personal.skin_api.member.repository.entity.Member;
+import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.member.repository.entity.email.Email;
 import com.personal.skin_api.member.repository.entity.member_name.MemberName;
 import com.personal.skin_api.member.repository.entity.nickname.Nickname;
@@ -14,6 +15,7 @@ import java.util.Optional;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findMemberByEmail(Email email);
+    Optional<Member> findMemberByEmailAndStatus(Email email, MemberStatus status);
     Optional<Member> findMemberByNickname(Nickname nickname);
     Optional<Member> findMemberByPhone(Phone phone);
     Optional<Member> findMemberByEmailAndPassword(Email email, Password password);

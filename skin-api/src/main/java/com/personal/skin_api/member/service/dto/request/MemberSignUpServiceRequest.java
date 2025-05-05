@@ -3,6 +3,8 @@ package com.personal.skin_api.member.service.dto.request;
 import com.personal.skin_api.member.repository.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static com.personal.skin_api.member.repository.entity.MemberRole.GENERAL;
 import static com.personal.skin_api.member.repository.entity.MemberStatus.ACTIVE;

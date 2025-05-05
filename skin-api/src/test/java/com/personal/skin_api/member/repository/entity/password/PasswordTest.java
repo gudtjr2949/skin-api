@@ -1,7 +1,10 @@
 package com.personal.skin_api.member.repository.entity.password;
 
 import com.personal.skin_api.common.exception.RestApiException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.*;

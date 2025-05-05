@@ -13,6 +13,7 @@ import jakarta.persistence.*;
 
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static com.personal.skin_api.member.repository.entity.MemberRole.*;
 import static com.personal.skin_api.member.repository.entity.MemberStatus.*;
@@ -49,7 +50,14 @@ public class Member extends BaseEntity {
     private MemberRole role;
 
     @Builder
-    private Member(final String email, final String password, final String memberName, final String nickname, final String phone, final MemberStatus status, final MemberRole role) {
+    private Member(final String email,
+                   final String password,
+                   final String memberName,
+                   final String nickname,
+                   final String phone,
+                   final MemberStatus status,
+                   final MemberRole role,
+                   PasswordEncoder passwordEncoder) {
         this.email = new Email(email);
         this.password = new Password(password);
         this.memberName = new MemberName(memberName);
@@ -99,5 +107,9 @@ public class Member extends BaseEntity {
 
     public MemberStatus getStatus() {
         return status;
+    }
+
+    public String getRole() {
+        return role.toString();
     }
 }

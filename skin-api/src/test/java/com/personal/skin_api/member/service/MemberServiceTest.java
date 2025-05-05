@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -46,7 +47,8 @@ class MemberServiceTest {
 
         // when
         memberService.signUp(signUpRequest);
-        Optional<Member> findMember = memberRepository.findMemberByEmailAndPassword(new Email(signUpRequest.getEmail()), new Password(signUpRequest.getPassword()));
+        Optional<Member> findMember = memberRepository.findMemberByEmailAndPassword(new Email(signUpRequest.getEmail()),
+                new Password(signUpRequest.getPassword()));
 
         // then
         assertThat(findMember).isPresent();

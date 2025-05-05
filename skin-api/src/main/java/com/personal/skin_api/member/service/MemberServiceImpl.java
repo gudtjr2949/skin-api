@@ -28,6 +28,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -45,7 +47,6 @@ class MemberServiceImpl implements MemberService {
     private final RedisService redisService;
     private final CertCodeGenerator codeGenerator;
     private final JwtTokenProvider jwtTokenProvider;
-
 
     /**
      * 회원가입에 입력된 이메일에 인증코드를 전송한다.
@@ -167,7 +168,8 @@ class MemberServiceImpl implements MemberService {
      */
     @Override
     public MemberLoginResponse login(MemberLoginServiceRequest request) {
-        Member loginMember = memberRepository.findMemberByEmailAndPassword(new Email(request.getEmail()), new Password(request.getPassword()))
+        Member loginMember = memberRepository.findMemberByEmailAndPassword(new Email(request.getEmail()),
+                        new Password(request.getPassword()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
         String accessToken = jwtTokenProvider.generateJwt(request.getEmail(), JwtTokenConstant.accessExpirationTime);
