@@ -3,8 +3,10 @@ package com.personal.skin_api.member.controller.request;
 import com.personal.skin_api.member.service.dto.request.MemberSignUpServiceRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
+@ToString
 @NoArgsConstructor
 public class MemberSignUpRequest {
     private String email;
