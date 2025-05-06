@@ -1,5 +1,6 @@
 package com.personal.skin_api.common.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -17,11 +18,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import static com.personal.skin_api.common.exception.CommonErrorCode.*;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(RestApiException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(RestApiException e) {
         ErrorCode errorCode = e.getErrorCode();
+        log.error("🌐 [GLOBAL EXCEPTION] {} - {}", e.getClass().getSimpleName(), e.getErrorCode().getMessage());
         return ResponseEntity.status(errorCode.getHttpStatus().value()).body(makeErrorResponseBody(errorCode));
     }
 

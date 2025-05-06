@@ -82,6 +82,8 @@ dependencies {
 
 	// msk
 	implementation("software.amazon.msk:aws-msk-iam-auth:2.0.3")
+
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
 
 tasks.named('test') {
