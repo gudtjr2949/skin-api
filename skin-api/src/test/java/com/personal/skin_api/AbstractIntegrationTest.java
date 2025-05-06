@@ -11,6 +11,7 @@ import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberRole;
 import com.personal.skin_api.member.repository.entity.MemberStatus;
+import com.personal.skin_api.member.service.MemberPasswordEncryption;
 import com.personal.skin_api.order.repository.OrderRepository;
 import com.personal.skin_api.order.repository.entity.Order;
 import com.personal.skin_api.payment.repository.PaymentRepository;
@@ -58,6 +59,9 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected MongoChatRepository mongoChatRepository;
+
+    @Autowired
+    protected MemberPasswordEncryption memberPasswordEncryption;
 
     @AfterEach
     void tearDown() {
@@ -116,6 +120,18 @@ public abstract class AbstractIntegrationTest {
     }
 
     protected Member createGeneralMemberWithEmail(final String email) {
+        return memberRepository.save(Member.builder()
+                .email(email)
+                .password(password)
+                .memberName(memberName)
+                .nickname(nickname)
+                .phone(phone)
+                .status(MemberStatus.ACTIVE)
+                .role(MemberRole.GENERAL)
+                .build());
+    }
+
+    protected Member createGeneralMemberWithPassword(final String password) {
         return memberRepository.save(Member.builder()
                 .email(email)
                 .password(password)

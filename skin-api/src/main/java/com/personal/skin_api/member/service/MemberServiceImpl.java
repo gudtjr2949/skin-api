@@ -28,12 +28,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static com.personal.skin_api.common.exception.member.MemberErrorCode.*;
@@ -47,6 +43,7 @@ class MemberServiceImpl implements MemberService {
     private final RedisService redisService;
     private final CertCodeGenerator codeGenerator;
     private final JwtTokenProvider jwtTokenProvider;
+    private final MemberPasswordEncryption memberPasswordEncryption;
 
     /**
      * 회원가입에 입력된 이메일에 인증코드를 전송한다.
@@ -143,7 +140,11 @@ class MemberServiceImpl implements MemberService {
     @Override
     public void signUp(final MemberSignUpServiceRequest request) {
         checkDuplicatedMemberInfo(request);
-        Member signUpMember = request.toEntity();
+        Password password = Password.fromRaw(request.getPassword());
+        String encodedPassword = memberPasswordEncryption.encodePassword(password.getPassword());
+        Member signUpMember = request.toEntity(encodedPassword);
+
+        // 문제없이 Member 엔티티 객체가 생성됨
         memberRepository.save(signUpMember);
     }
 
@@ -168,9 +169,10 @@ class MemberServiceImpl implements MemberService {
      */
     @Override
     public MemberLoginResponse login(MemberLoginServiceRequest request) {
-        Member loginMember = memberRepository.findMemberByEmailAndPassword(new Email(request.getEmail()),
-                        new Password(request.getPassword()))
+        Member loginMember = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+
+        memberPasswordEncryption.comparePassword(request.getPassword(), loginMember.getPassword());
 
         String accessToken = jwtTokenProvider.generateJwt(request.getEmail(), JwtTokenConstant.accessExpirationTime);
         String refreshToken = jwtTokenProvider.generateJwt(request.getEmail(), JwtTokenConstant.refreshExpirationTime);
@@ -340,7 +342,10 @@ class MemberServiceImpl implements MemberService {
         Member findMember = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
-        findMember.modifyPassword(request.getNewPassword());
+        Password rawPassword = Password.fromRaw(request.getNewPassword());
+        String encodedPassword = memberPasswordEncryption.encodePassword(rawPassword.getPassword());
+
+        findMember.modifyPassword(encodedPassword);
     }
 
     /**

@@ -56,10 +56,9 @@ public class Member extends BaseEntity {
                    final String nickname,
                    final String phone,
                    final MemberStatus status,
-                   final MemberRole role,
-                   PasswordEncoder passwordEncoder) {
+                   final MemberRole role) {
         this.email = new Email(email);
-        this.password = new Password(password);
+        this.password = Password.fromEncoded(password);
         this.memberName = new MemberName(memberName);
         this.nickname = new Nickname(nickname);
         this.phone = new Phone(phone);
@@ -68,13 +67,17 @@ public class Member extends BaseEntity {
     }
 
     public void modifyPassword(final String newPassword) {
-        this.password = this.password.modifyPassword(newPassword);
+        this.password = Password.fromEncoded(newPassword);
     }
 
     public void modifyMemberInfo(final MemberModifyDetailServiceRequest request) {
         this.memberName = new MemberName(request.getNewMemberName());
         this.nickname = new Nickname(request.getNewNickname());
         this.phone = new Phone(request.getNewPhone());
+    }
+
+    public void setEncodedPassword(final String encodedPassword) {
+        this.password = password.setEncodedPassword(encodedPassword);
     }
 
     public void withdraw() {

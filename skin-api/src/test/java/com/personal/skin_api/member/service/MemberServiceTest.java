@@ -1,7 +1,7 @@
 package com.personal.skin_api.member.service;
 
+import com.personal.skin_api.AbstractIntegrationTest;
 import com.personal.skin_api.common.exception.RestApiException;
-import com.personal.skin_api.member.repository.MemberRepository;
 import com.personal.skin_api.member.repository.entity.Member;
 import com.personal.skin_api.member.repository.entity.MemberStatus;
 import com.personal.skin_api.member.repository.entity.email.Email;
@@ -13,24 +13,16 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class MemberServiceTest {
-    
-    @Autowired
-    MemberService memberService;
+class MemberServiceTest extends AbstractIntegrationTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    private MemberService memberService;
 
     @Value("${sample.email}")
     private String email;
@@ -43,23 +35,36 @@ class MemberServiceTest {
     @Test
     void 회원가입을_성공하면_회원_객체가_생성된다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
 
         // when
         memberService.signUp(signUpRequest);
-        Optional<Member> findMember = memberRepository.findMemberByEmailAndPassword(new Email(signUpRequest.getEmail()),
-                new Password(signUpRequest.getPassword()));
+        Optional<Member> findMember = memberRepository.findMemberByEmail(new Email(signUpRequest.getEmail()));
 
         // then
         assertThat(findMember).isPresent();
         assertThat(findMember.get().getEmail()).isEqualTo(signUpRequest.getEmail());
-        assertThat(findMember.get().getPassword()).isEqualTo(signUpRequest.getPassword());
+    }
+
+    @Test
+    void 회원가입_시_비밀번호가_암호화되어_저장된다() {
+        // given
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
+        String rawPassword = signUpRequest.getPassword();
+
+        // when
+        memberService.signUp(signUpRequest);
+        Optional<Member> findMember = memberRepository.findMemberByEmail(new Email(signUpRequest.getEmail()));
+
+        // then
+        assertThat(findMember).isPresent();
+        assertThatNoException().isThrownBy(() -> memberPasswordEncryption.comparePassword(rawPassword, findMember.get().getPassword()));
     }
     
     @Test
     void 회원가입에_입력한_이메일에_검증용_인증코드를_전송한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
 
         // when & then
@@ -69,7 +74,7 @@ class MemberServiceTest {
     @Test
     void 이메일_검증용_인증코드를_검증한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
 
         String code = memberService.sendCertMailForCheckEmail(signUpRequest.getEmail());
@@ -86,7 +91,7 @@ class MemberServiceTest {
     @Test
     void 닉네임_중복_체크_시_이미_가입된_닉네임이라면_예외가_발생한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
         String duplicatedNickname = signUpRequest.getNickname();
 
@@ -97,7 +102,7 @@ class MemberServiceTest {
     @Test
     void 전화번호_중복_체크_시_이미_가입된_전화번호라면_예외가_발생한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
         String duplicatedPhone = signUpRequest.getPhone();
 
@@ -108,7 +113,7 @@ class MemberServiceTest {
     @Test
     void 회원가입_정보에_입력한_이메일_전화번호_닉네임중_하나라도_이미_존재하는_경우_예외가_발생한다() {
         // given
-        MemberSignUpServiceRequest firstSignUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest firstSignUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(firstSignUpRequest);
 
         MemberSignUpServiceRequest sameEmailSignUpRequest = createSignUpNeedParameterRequest(firstSignUpRequest.getEmail(), "asd1234!", "홍길동", "홍길동전", "01011112222");
@@ -126,7 +131,7 @@ class MemberServiceTest {
     @Test
     void 로그인_시도_시_입력한_이메일_비밀번호와_일치하는_회원정보가_없는_경우_예외가_발생한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
 
         String wrongEmail = "zxc456@naver.com";
@@ -145,7 +150,7 @@ class MemberServiceTest {
     @Test
     void 입력한_이메일과_비밀번호가_존재한다면_회원정보를_반환한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
         MemberLoginServiceRequest loginRequest = createLoginMember(signUpRequest.getEmail(), signUpRequest.getPassword());
 
@@ -199,7 +204,7 @@ class MemberServiceTest {
     @Test
     void 비밀번호_재설정용_인증코드를_전송한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
 
         // when & then
@@ -209,7 +214,7 @@ class MemberServiceTest {
     @Test
     void 비밀번호를_찾기_위해_입력한_사용자_이름_이메일중_하나라도_회원정보에_없는_경우_예외가_발생한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
         String code = memberService.sendCertMailForFindPassword(signUpRequest.getEmail());
 
@@ -233,7 +238,7 @@ class MemberServiceTest {
     @Test
     void 비밀번호를_찾기_위해_입력한_인증코드가_다른_경우_예외가_발생한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
         String code = memberService.sendCertMailForFindPassword(signUpRequest.getEmail());
 
@@ -251,7 +256,7 @@ class MemberServiceTest {
     @Test
     void 비밀번호를_재설정하기_위해_입력한_사용자_이름_이메일_인증코드가_존재한다면_정상처리한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
         String code = memberService.sendCertMailForFindPassword(signUpRequest.getEmail());
 
@@ -265,7 +270,7 @@ class MemberServiceTest {
     @Test
     void 비밀번호를_재설정한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
         String newPassword = "zxc1234!";
 
@@ -280,14 +285,14 @@ class MemberServiceTest {
 
         // then
         assertThat(findMember).isPresent();
-        assertThat(findMember.get().getPassword()).isEqualTo(newPassword);
+        assertThatNoException().isThrownBy(() -> memberPasswordEncryption.comparePassword(newPassword, findMember.get().getPassword()));
     }
     
     
     @Test
     void 마이페이지_조회_시_입력된_이메일이_없는_정보인_경우_예외가_발생한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
         String wrongEmail = "zxc123@naver.com";
 
@@ -300,7 +305,7 @@ class MemberServiceTest {
     @Test
     void 마이페이지에_사용할_회원정보를_이메일을_통해_조회한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
 
         // when
@@ -318,7 +323,7 @@ class MemberServiceTest {
     @Test
     void 수정_가능한_모든_회원정보를_수정한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
         String newMemberName = "김영희";
         String newNickname = "홍길동전";
@@ -340,7 +345,7 @@ class MemberServiceTest {
     @Test
     void 회원이름만_수정한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
         String newMemberName = "김영희";
 
@@ -359,7 +364,7 @@ class MemberServiceTest {
     @Test
     void 닉네임만_수정한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
         String newNickname = "홍길동전";
 
@@ -378,7 +383,7 @@ class MemberServiceTest {
     @Test
     void 전화번호만_수정한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
         String newPhone = "01098765432";
 
@@ -398,7 +403,7 @@ class MemberServiceTest {
     @Test
     void 회원_탈퇴한다() {
         // given
-        MemberSignUpServiceRequest signUpRequest = createSignUpNoParameterRequest();
+        MemberSignUpServiceRequest signUpRequest = createGeneralMemberSignupRequest();
         memberService.signUp(signUpRequest);
         MemberWithdrawServiceRequest withdrawRequest = MemberWithdrawServiceRequest.builder()
                 .email(signUpRequest.getEmail())
@@ -454,7 +459,7 @@ class MemberServiceTest {
                 .build();
     }
 
-    private MemberSignUpServiceRequest createSignUpNoParameterRequest() {
+    private MemberSignUpServiceRequest createGeneralMemberSignupRequest() {
         return MemberSignUpServiceRequest.builder()
                 .email(this.email)
                 .password("asd1234!")

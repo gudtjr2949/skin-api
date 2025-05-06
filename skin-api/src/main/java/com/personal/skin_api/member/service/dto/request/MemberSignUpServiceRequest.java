@@ -18,7 +18,11 @@ public class MemberSignUpServiceRequest {
     private final String phone;
 
     @Builder
-    private MemberSignUpServiceRequest(final String email, final String password, final String memberName, final String nickname, final String phone) {
+    private MemberSignUpServiceRequest(final String email,
+                                       final String password,
+                                       final String memberName,
+                                       final String nickname,
+                                       final String phone) {
         this.email = email;
         this.password = password;
         this.memberName = memberName;
@@ -26,10 +30,10 @@ public class MemberSignUpServiceRequest {
         this.phone = phone;
     }
 
-    public Member toEntity() {
+    public Member toEntity(final String encodedPassword) {
         return Member.builder()
                 .email(email)
-                .password(password)
+                .password(encodedPassword)
                 .memberName(memberName)
                 .nickname(nickname)
                 .phone(phone)

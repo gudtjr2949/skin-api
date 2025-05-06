@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
+import static com.personal.skin_api.member.repository.entity.password.Password.*;
 import static org.assertj.core.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -18,7 +19,7 @@ class PasswordTest {
         String nullPassword = null;
 
         // when & then
-        assertThatThrownBy(() -> new Password(nullPassword)).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> fromRaw(nullPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test
@@ -27,7 +28,7 @@ class PasswordTest {
         String containsBlankPassword = " abcdefg "; // 공백 포함 8자
 
         // when & then
-        assertThatThrownBy(() -> new Password(containsBlankPassword)).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> fromRaw(containsBlankPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test
@@ -36,7 +37,7 @@ class PasswordTest {
         String shortPassword = "";
 
         // when & then
-        assertThatThrownBy(() -> new Password(shortPassword)).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> fromRaw(shortPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test
@@ -45,7 +46,7 @@ class PasswordTest {
         String longPassword = "abcdefghijklmnopqrxtu";
 
         // when & then
-        assertThatThrownBy(() -> new Password(longPassword)).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> fromRaw(longPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test
@@ -54,7 +55,7 @@ class PasswordTest {
         String noAlphabetPassword = "1234567!";
 
         // when & then
-        assertThatThrownBy(() -> new Password(noAlphabetPassword)).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> fromRaw(noAlphabetPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test
@@ -63,7 +64,7 @@ class PasswordTest {
         String noNumberPassword = "abcdefgh!";
 
         // when & then
-        assertThatThrownBy(() -> new Password(noNumberPassword)).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> fromRaw(noNumberPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test
@@ -72,7 +73,7 @@ class PasswordTest {
         String noSpecialCharacterPassword = "asd12345";
 
         // when & then
-        assertThatThrownBy(() -> new Password(noSpecialCharacterPassword)).isInstanceOf(RestApiException.class);
+        assertThatThrownBy(() -> fromRaw(noSpecialCharacterPassword)).isInstanceOf(RestApiException.class);
     }
 
     @Test
@@ -81,7 +82,7 @@ class PasswordTest {
         String normalPassword = "asd1234!";
 
         // when
-        Password password = new Password(normalPassword);
+        Password password = fromRaw(normalPassword);
 
         // then
         assertThat(password.getPassword()).isEqualTo(normalPassword);
@@ -91,7 +92,7 @@ class PasswordTest {
     void 비밀번호를_재설정할_때_이전에_사용했던_비밀번호를_재사용하려는_경우_예외가_발생한다() {
         // given
         String beforePassword = "asd1234!";
-        Password password = new Password(beforePassword);
+        Password password = fromRaw(beforePassword);
 
         // when & then
         assertThatThrownBy(() -> password.modifyPassword(beforePassword)).isInstanceOf(RestApiException.class);
@@ -101,7 +102,7 @@ class PasswordTest {
     void 비밀번호를_수정할_때_이전에_사용한_비밀번호가_아니지만_기존_비밀번호_기준에_부합하지_않는_경우_예외가_발생한다() {
         // given
         String beforePassword = "asd1234!";
-        Password password = new Password(beforePassword);
+        Password password = fromRaw(beforePassword);
         String newAndShortPassword = "asd123";
 
         // when & then
@@ -112,7 +113,8 @@ class PasswordTest {
     void 비밀번호가_정상적으로_수정된다() {
         // given
         String beforePassword = "asd1234!";
-        Password password = new Password(beforePassword);
+        Password password = fromRaw(beforePassword);
+
         String newPassword = "asd5678!";
 
         // when
