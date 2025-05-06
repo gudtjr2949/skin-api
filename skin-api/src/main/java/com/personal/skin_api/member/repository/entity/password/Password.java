@@ -15,16 +15,29 @@ public class Password {
     private String password;
 
      public Password(final String password) {
-        validate(password);
         this.password = password;
     }
 
-    private void validate(final String password) {
+    public static Password fromPlain(final String rawPassword) {
+        validate(rawPassword);
+        return new Password(rawPassword);
+    }
+
+    public static Password fromEncoded(final String encodedPassword) {
+        return new Password(encodedPassword);
+    }
+
+    private static void validate(final String password) {
          PasswordStrategyContext.runStrategy(password);
     }
 
     public String getPassword() {
         return password;
+    }
+
+    public Password setEncodedPassword(final String encodedPassword) {
+         this.password = encodedPassword;
+         return this;
     }
 
     public Password modifyPassword(final String newPassword) {

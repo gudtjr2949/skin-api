@@ -35,9 +35,7 @@ class MemberPasswordEncryptionTest extends AbstractIntegrationTest {
         String encodedPassword = memberPasswordEncryption.encodePassword(rawPassword);
 
         // when & then
-        assertDoesNotThrow(() ->
-                memberPasswordEncryption.comparePassword(rawPassword, encodedPassword)
-        );
+        assertThatNoException().isThrownBy(() -> memberPasswordEncryption.comparePassword(rawPassword, encodedPassword));
     }
     
     @Test

@@ -47,6 +47,7 @@ class MemberServiceImpl implements MemberService {
     private final RedisService redisService;
     private final CertCodeGenerator codeGenerator;
     private final JwtTokenProvider jwtTokenProvider;
+    private final MemberPasswordEncryption memberPasswordEncryption;
 
     /**
      * 회원가입에 입력된 이메일에 인증코드를 전송한다.
@@ -143,7 +144,11 @@ class MemberServiceImpl implements MemberService {
     @Override
     public void signUp(final MemberSignUpServiceRequest request) {
         checkDuplicatedMemberInfo(request);
-        Member signUpMember = request.toEntity();
+        Password password = Password.fromPlain(request.getPassword());
+        String encodedPassword = memberPasswordEncryption.encodePassword(password.getPassword());
+        Member signUpMember = request.toEntity(encodedPassword);
+
+        // 문제없이 Member 엔티티 객체가 생성됨
         memberRepository.save(signUpMember);
     }
 
@@ -168,9 +173,10 @@ class MemberServiceImpl implements MemberService {
      */
     @Override
     public MemberLoginResponse login(MemberLoginServiceRequest request) {
-        Member loginMember = memberRepository.findMemberByEmailAndPassword(new Email(request.getEmail()),
-                        new Password(request.getPassword()))
+        Member loginMember = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+
+        memberPasswordEncryption.comparePassword(request.getPassword(), loginMember.getPassword());
 
         String accessToken = jwtTokenProvider.generateJwt(request.getEmail(), JwtTokenConstant.accessExpirationTime);
         String refreshToken = jwtTokenProvider.generateJwt(request.getEmail(), JwtTokenConstant.refreshExpirationTime);
