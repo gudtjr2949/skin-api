@@ -3,8 +3,6 @@ package com.personal.skin_api.member.repository.entity.password;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 // TODO : 일반 문자열 형태의 비밀번호 암호화 & 복호화 기능 추가 필요
 @Embeddable
@@ -14,11 +12,11 @@ public class Password {
     @Column(name = "PASSWORD")
     private String password;
 
-     public Password(final String password) {
+     private Password(final String password) {
         this.password = password;
     }
 
-    public static Password fromPlain(final String rawPassword) {
+    public static Password fromRaw(final String rawPassword) {
         validate(rawPassword);
         return new Password(rawPassword);
     }

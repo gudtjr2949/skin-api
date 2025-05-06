@@ -67,7 +67,7 @@ public class Member extends BaseEntity {
     }
 
     public void modifyPassword(final String newPassword) {
-        this.password = this.password.modifyPassword(newPassword);
+        this.password = Password.fromEncoded(newPassword);
     }
 
     public void modifyMemberInfo(final MemberModifyDetailServiceRequest request) {

@@ -28,12 +28,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static com.personal.skin_api.common.exception.member.MemberErrorCode.*;
@@ -144,7 +140,7 @@ class MemberServiceImpl implements MemberService {
     @Override
     public void signUp(final MemberSignUpServiceRequest request) {
         checkDuplicatedMemberInfo(request);
-        Password password = Password.fromPlain(request.getPassword());
+        Password password = Password.fromRaw(request.getPassword());
         String encodedPassword = memberPasswordEncryption.encodePassword(password.getPassword());
         Member signUpMember = request.toEntity(encodedPassword);
 
@@ -346,7 +342,10 @@ class MemberServiceImpl implements MemberService {
         Member findMember = memberRepository.findMemberByEmail(new Email(request.getEmail()))
                 .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
 
-        findMember.modifyPassword(request.getNewPassword());
+        Password rawPassword = Password.fromRaw(request.getNewPassword());
+        String encodedPassword = memberPasswordEncryption.encodePassword(rawPassword.getPassword());
+
+        findMember.modifyPassword(encodedPassword);
     }
 
     /**

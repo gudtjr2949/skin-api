@@ -9,6 +9,7 @@ import com.personal.skin_api.member.repository.entity.nickname.Nickname;
 import com.personal.skin_api.member.repository.entity.password.Password;
 
 import com.personal.skin_api.member.repository.entity.phone.Phone;
+import com.personal.skin_api.member.service.MemberPasswordEncryption;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.*;
 class MemberRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    private MemberRepository memberRepository;
 
     @Test
     void 사용자를_생성하고_조회한다() {
@@ -83,21 +84,6 @@ class MemberRepositoryTest {
         assertThat(findMember).isPresent();
         assertThat(findMember.get().getEmail()).isEqualTo(member.getEmail());
         assertThat(findMember.get().getMemberName()).isEqualTo(member.getMemberName());
-    }
-
-    @Test
-    void 입력된_이메일_패스워드가_데이터베이스에_존재한다면_로그인에_성공한다() {
-        // given
-        Member member = createMember();
-        memberRepository.save(member);
-
-        // when
-        Optional<Member> loginMember = memberRepository.findMemberByEmailAndPassword(new Email(member.getEmail()),
-                new Password(member.getPassword()));
-
-        // then
-        assertThat(loginMember).isPresent();
-        assertThat(loginMember.get().getId()).isEqualTo(member.getId());
     }
 
     @Test
