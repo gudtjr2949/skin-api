@@ -127,6 +127,18 @@ public abstract class AbstractIntegrationTest {
                 .build());
     }
 
+    protected Member createGeneralMemberWithPassword(final String password) {
+        return memberRepository.save(Member.builder()
+                .email(email)
+                .password(password)
+                .memberName(memberName)
+                .nickname(nickname)
+                .phone(phone)
+                .status(MemberStatus.ACTIVE)
+                .role(MemberRole.GENERAL)
+                .build());
+    }
+
     protected Product createProduct(Member member) {
         return productRepository.save(Product.builder()
                 .member(member)

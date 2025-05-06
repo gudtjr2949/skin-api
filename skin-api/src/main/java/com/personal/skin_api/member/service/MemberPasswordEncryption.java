@@ -12,7 +12,6 @@ public class MemberPasswordEncryption {
 
     private final PasswordEncoder passwordEncoder;
 
-
     public String encodePassword(final String rawPassword) {
         String encodedPassword = passwordEncoder.encode(rawPassword);
         return encodedPassword;
