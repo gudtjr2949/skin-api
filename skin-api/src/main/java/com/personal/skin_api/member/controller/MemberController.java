@@ -77,9 +77,6 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest request,
                                                      HttpServletResponse response) {
-        Log infoLog = LogFactory.getLog("INFO_LOG");
-        infoLog.debug("로그입니다.");
-
         MemberLoginResponse loginResponse = memberService.login(request.toService());
 
         // accessToken 헤더에 담기
@@ -87,7 +84,7 @@ public class MemberController {
                 .path("/")
                 .sameSite("None")
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .maxAge((int) (JwtTokenConstant.accessExpirationTime / 1000))
                 .build();
 
@@ -95,7 +92,7 @@ public class MemberController {
                 .path("/")
                 .sameSite("None")
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .maxAge((int) (JwtTokenConstant.refreshExpirationTime / 1000))
                 .build();
 

@@ -137,7 +137,7 @@ public class RedisServiceImpl implements RedisService {
 
         Set<ZSetOperations.TypedTuple<Object>> messageIds;
 
-        if (request.getChatId() == 0) {
+        if (request.getChatId() == null || request.getChatId().equals(null) ||  request.getChatId().equals(0L)) {
             messageIds = redisTemplate.opsForZSet()
                     .reverseRangeWithScores(roomKey, 0, CHAT_SIZE-1);
         } else {
