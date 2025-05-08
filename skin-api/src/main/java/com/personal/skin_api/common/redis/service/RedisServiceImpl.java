@@ -1,23 +1,33 @@
 package com.personal.skin_api.common.redis.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personal.skin_api.common.exception.CommonErrorCode;
 import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.common.redis.service.dto.request.*;
+import com.personal.skin_api.common.redis.service.dto.RedisChat;
 import com.personal.skin_api.common.security.JwtTokenConstant;
+import com.personal.skin_api.common.util.TimeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static com.personal.skin_api.chat.repository.ChatManageStrategy.CHAT_SIZE;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RedisServiceImpl implements RedisService {
+
     private static final long MAIL_TTL = 3, SMS_TTL = 3;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
+
 
     @Override
     public void saveMailCertification(RedisSaveMailCertServiceRequest request) {
@@ -100,6 +110,60 @@ public class RedisServiceImpl implements RedisService {
         } catch (Exception e) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Override
+    public LocalDateTime saveChat(RedisSaveChatServiceRequest request) {
+        Long messageId = redisTemplate.opsForValue().increment("chat:message:id:seq");
+
+        String messageKey = "chat:message:" + messageId;
+
+        Long now = System.currentTimeMillis();
+        Map<String, Object> messageMap = new HashMap<>();
+        messageMap.put("memberNickname", request.getMemberNickname());
+        messageMap.put("chatContent", request.getChatContent());
+        messageMap.put("createdAt", now);
+
+        redisTemplate.opsForHash().putAll(messageKey, messageMap);
+        String roomKey = "chat:room:" + request.getChatRoomId();
+        redisTemplate.opsForZSet().add(roomKey, messageId, messageId);
+
+        return TimeConverter.toLocalDateTime(now);
+    }
+
+    @Override
+    public List<RedisChat> findChatList(RedisFindChatListServiceRequest request) {
+        String roomKey = "chat:room:" + request.getChatRoomId();
+
+        Set<ZSetOperations.TypedTuple<Object>> messageIds;
+
+        if (request.getChatId() == 0) {
+            messageIds = redisTemplate.opsForZSet()
+                    .reverseRangeWithScores(roomKey, 0, CHAT_SIZE-1);
+        } else {
+            messageIds = redisTemplate.opsForZSet()
+                    .reverseRangeByScoreWithScores(roomKey, 0, request.getChatId() - 1, 0, CHAT_SIZE);
+        }
+
+        List<RedisChat> chatList = new ArrayList<>();
+        for (ZSetOperations.TypedTuple<Object> tuple : messageIds) {
+            String messageKey = "chat:message:" + tuple.getValue();
+            Map<Object, Object> entries = redisTemplate.opsForHash().entries(messageKey);
+
+            if (!entries.isEmpty()) {
+                Long messageId = Long.parseLong(tuple.getValue().toString());
+                RedisChat chat = RedisChat.builder()
+                        .id(messageId)
+                        .chatContent((String) entries.get("chatContent"))
+                        .memberNickname((String) entries.get("memberNickname"))
+                        .createdAt(TimeConverter.toLocalDateTime(
+                                Long.parseLong(entries.get("createdAt").toString())))
+                        .build();
+                chatList.add(chat);
+            }
+        }
+
+        return chatList;
     }
 
 

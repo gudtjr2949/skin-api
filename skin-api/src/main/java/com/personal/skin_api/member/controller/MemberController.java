@@ -82,13 +82,12 @@ public class MemberController {
 
         MemberLoginResponse loginResponse = memberService.login(request.toService());
 
-
         // accessToken 헤더에 담기
         ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", loginResponse.getAccessToken())
                 .path("/")
                 .sameSite("None")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .maxAge((int) (JwtTokenConstant.accessExpirationTime / 1000))
                 .build();
 
@@ -96,7 +95,7 @@ public class MemberController {
                 .path("/")
                 .sameSite("None")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .maxAge((int) (JwtTokenConstant.refreshExpirationTime / 1000))
                 .build();
 

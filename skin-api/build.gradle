@@ -84,6 +84,8 @@ dependencies {
 	implementation("software.amazon.msk:aws-msk-iam-auth:2.0.3")
 
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('test') {

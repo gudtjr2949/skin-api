@@ -24,6 +24,7 @@ import com.personal.skin_api.review.repository.entity.Review;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
@@ -32,6 +33,9 @@ import java.util.List;
 @SpringBootTest
 @ActiveProfiles("test")
 public abstract class AbstractIntegrationTest {
+
+    @Autowired
+    protected RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     protected MemberRepository memberRepository;
@@ -65,6 +69,7 @@ public abstract class AbstractIntegrationTest {
 
     @AfterEach
     void tearDown() {
+        redisTemplate.getConnectionFactory().getConnection().flushDb();
         chatRoomMemberRepository.deleteAllInBatch();
         mongoChatRepository.deleteAll();
         chatRepository.deleteAllInBatch();
