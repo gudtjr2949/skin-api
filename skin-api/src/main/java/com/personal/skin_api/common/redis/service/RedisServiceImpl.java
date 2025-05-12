@@ -1,6 +1,5 @@
 package com.personal.skin_api.common.redis.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personal.skin_api.common.exception.CommonErrorCode;
 import com.personal.skin_api.common.exception.RestApiException;
 import com.personal.skin_api.common.redis.service.dto.request.*;
@@ -26,8 +25,6 @@ public class RedisServiceImpl implements RedisService {
 
     private static final long MAIL_TTL = 3, SMS_TTL = 3;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper;
-
 
     @Override
     public void saveMailCertification(RedisSaveMailCertServiceRequest request) {
@@ -84,7 +81,6 @@ public class RedisServiceImpl implements RedisService {
             redisTemplate.opsForValue().set(key, request.getRefreshToken(), Duration.ofMillis(JwtTokenConstant.refreshExpirationTime));
             return refreshUUID;
         } catch (Exception e) {
-            log.error("Refresh Token 저장 에러 발생");
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
@@ -114,9 +110,9 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public LocalDateTime saveChat(RedisSaveChatServiceRequest request) {
-        Long messageId = redisTemplate.opsForValue().increment("chat:message:id:seq");
+        Long messageId = redisTemplate.opsForValue().increment("chat:message:id:seq"); // 채팅 메시지 고유 ID 생성
 
-        String messageKey = "chat:message:" + messageId;
+        String messageKey = "chat:message:" + messageId; // Redis에 저장할 때 사용할 채팅 메시지 해시 키
 
         Long now = System.currentTimeMillis();
         Map<String, Object> messageMap = new HashMap<>();

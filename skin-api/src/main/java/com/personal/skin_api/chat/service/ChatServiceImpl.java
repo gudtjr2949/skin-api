@@ -34,7 +34,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatManageContext chatManageContext;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
-    public static final String STRATEGY_KEY = "redisChatRepositoryAdapter";
+    public static final String STRATEGY_KEY = "mongoChatRepositoryAdapter";
 
     @Override
     @Transactional
