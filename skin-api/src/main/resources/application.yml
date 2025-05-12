@@ -77,6 +77,9 @@ coolsms:
 naver:
   name: ${NAVER_NAME}
   password: ${NAVER_PASSWORD}
+  request-token-uri: https://nid.naver.com/oauth2.0/token
+  client-id: ${NAVER_CLIENT_ID}
+  client-secret: ${NAVER_CLIENT_SECRET}
 
 sample:
   email: ${SAMPLE_EMAIL}
