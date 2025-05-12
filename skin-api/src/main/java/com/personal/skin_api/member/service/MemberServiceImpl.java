@@ -140,7 +140,7 @@ class MemberServiceImpl implements MemberService {
     @Override
     public void signUp(final MemberSignUpServiceRequest request) {
         checkDuplicatedMemberInfo(request);
-        Password password = Password.fromRaw(request.getPassword());
+        Password password = Password.fromRaw(request.getPassword()); // 비밀번호 적합성 검증
         String encodedPassword = memberPasswordEncryption.encodePassword(password.getPassword());
         Member signUpMember = request.toEntity(encodedPassword);
 

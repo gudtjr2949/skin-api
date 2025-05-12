@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static com.personal.skin_api.member.repository.entity.AuthProvider.*;
 import static com.personal.skin_api.member.repository.entity.MemberRole.*;
 import static com.personal.skin_api.member.repository.entity.MemberStatus.*;
 
@@ -49,6 +50,10 @@ public class Member extends BaseEntity {
     @Column(nullable = false, name = "ROLE")
     private MemberRole role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "AUTH")
+    private AuthProvider authProvider;
+
     @Builder
     private Member(final String email,
                    final String password,
@@ -56,7 +61,8 @@ public class Member extends BaseEntity {
                    final String nickname,
                    final String phone,
                    final MemberStatus status,
-                   final MemberRole role) {
+                   final MemberRole role,
+                   final String provider) {
         this.email = new Email(email);
         this.password = Password.fromEncoded(password);
         this.memberName = new MemberName(memberName);
@@ -64,6 +70,26 @@ public class Member extends BaseEntity {
         this.phone = new Phone(phone);
         this.status = status;
         this.role = role;
+        this.authProvider = AuthProvider.toAuthProvider(provider);
+    }
+
+    public static Member fromOAuth(final String email,
+                                   final String memberName,
+                                   final String nickName,
+                                   final String phone,
+                                   final String provider) {
+        return Member.builder()
+                .email(email)
+                .password(Password.fromOAuth())
+                .memberName(memberName)
+                .nickname(nickName)
+                .phone(phone)
+                .status(ACTIVE)
+                .role(GENERAL)
+                .provider(provider)
+                .status(ACTIVE)
+                .role(GENERAL)
+                .build();
     }
 
     public void modifyPassword(final String newPassword) {
@@ -114,5 +140,9 @@ public class Member extends BaseEntity {
 
     public String getRole() {
         return role.toString();
+    }
+
+    public AuthProvider getAuthProvider() {
+        return authProvider;
     }
 }
