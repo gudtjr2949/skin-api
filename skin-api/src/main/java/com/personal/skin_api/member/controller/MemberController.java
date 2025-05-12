@@ -77,11 +77,7 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest request,
                                                      HttpServletResponse response) {
-        Log infoLog = LogFactory.getLog("INFO_LOG");
-        infoLog.debug("로그입니다.");
-
         MemberLoginResponse loginResponse = memberService.login(request.toService());
-
 
         // accessToken 헤더에 담기
         ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", loginResponse.getAccessToken())

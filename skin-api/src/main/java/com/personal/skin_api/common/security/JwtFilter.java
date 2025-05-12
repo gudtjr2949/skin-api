@@ -70,12 +70,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
             String email = getEmailFromToken(token);
 
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(MemberRole.GENERAL.toString()));
+
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                     email,
                     "", // 만약 JWT 토큰 인증을 거친 경우 비밀번호는 따로 필요없음
-                    List.of(new SimpleGrantedAuthority(MemberRole.GENERAL.toString())));
+                    authorities);
 
-            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
 
             // 접근한 유저의 authentication 객체를 SecurityContextHolder 에 저장함
             SecurityContextHolder.getContext().setAuthentication(authentication);
