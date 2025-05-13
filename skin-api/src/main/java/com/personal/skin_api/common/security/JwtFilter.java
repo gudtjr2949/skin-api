@@ -46,6 +46,7 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/members/signup",
             "/api/v1/members/check-duplicated-nickname",
             "/api/v1/members/login",
+            "/api/v1/members/naver-login",
             "/api/v1/batch/add-product",
             "/api/v1/members/reissue-access-token",
             "/api/v1/members/request-cert-code-find-email",

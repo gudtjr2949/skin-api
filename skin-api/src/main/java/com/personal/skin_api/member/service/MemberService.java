@@ -16,6 +16,8 @@ public interface MemberService {
     void checkPhoneDuplicated(String phone);
     void signUp(MemberSignUpServiceRequest request);
     MemberLoginResponse login(MemberLoginServiceRequest request);
+    MemberLoginResponse naverLogin(MemberOAuthLoginServiceRequest request);
+    void setupOAuthNickname(MemberOAuthNicknameSetupServiceRequest request);
     MemberReissueTokenResponse reissueToken(String refreshUUID, HttpServletResponse response);
     String sendCertSmsForFindEmail(String phone);
     MemberFindEmailResponse findEmail(MemberFindEmailServiceRequest request);
@@ -26,5 +28,4 @@ public interface MemberService {
     void modifyMemberDetail(MemberModifyDetailServiceRequest request);
     List<Cookie> logout(String refreshUUID);
     void withdraw(MemberWithdrawServiceRequest request);
-
 }
