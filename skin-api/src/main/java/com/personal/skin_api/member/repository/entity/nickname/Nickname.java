@@ -12,6 +12,8 @@ public class Nickname {
 
     @Column(name = "NICKNAME")
     private String nickname;
+    public static final String OAUTH_NOT_SET = "NOTSET";
+
 
     public Nickname(final String nickname) {
         validate(nickname);
