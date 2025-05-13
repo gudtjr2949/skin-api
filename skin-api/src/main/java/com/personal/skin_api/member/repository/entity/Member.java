@@ -75,14 +75,13 @@ public class Member extends BaseEntity {
 
     public static Member fromOAuth(final String email,
                                    final String memberName,
-                                   final String nickName,
                                    final String phone,
                                    final String provider) {
         return Member.builder()
                 .email(email)
                 .password(Password.fromOAuth())
                 .memberName(memberName)
-                .nickname(nickName)
+                .nickname(Nickname.OAUTH_NOT_SET)
                 .phone(phone)
                 .status(ACTIVE)
                 .role(GENERAL)
@@ -102,8 +101,8 @@ public class Member extends BaseEntity {
         this.phone = new Phone(request.getNewPhone());
     }
 
-    public void setEncodedPassword(final String encodedPassword) {
-        this.password = password.setEncodedPassword(encodedPassword);
+    public void modifyNickname(final String nickname) {
+        this.nickname = new Nickname(nickname);
     }
 
     public void withdraw() {

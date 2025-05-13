@@ -2,6 +2,9 @@ package com.personal.skin_api.member.service;
 
 import com.personal.skin_api.common.exception.RestApiException;
 
+import com.personal.skin_api.common.oauth.naver.NaverConfig;
+import com.personal.skin_api.common.oauth.naver.NaverOAuthClient;
+import com.personal.skin_api.common.oauth.naver.dto.response.OAuthMemberInfoResponse;
 import com.personal.skin_api.common.redis.TokenPurpose;
 import com.personal.skin_api.common.redis.service.RedisService;
 import com.personal.skin_api.common.redis.service.dto.request.*;
@@ -26,16 +29,21 @@ import com.personal.skin_api.sms.service.SmsService;
 import com.personal.skin_api.sms.service.dto.SmsSendCertServiceRequest;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.personal.skin_api.common.exception.member.MemberErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final MailService mailService;
@@ -44,6 +52,9 @@ class MemberServiceImpl implements MemberService {
     private final CertCodeGenerator codeGenerator;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberPasswordEncryption memberPasswordEncryption;
+    private final NaverConfig naverConfig;
+    private final NaverOAuthClient naverOAuthClient;
+    private final RestTemplate restTemplate;
 
     /**
      * 회원가입에 입력된 이메일에 인증코드를 전송한다.
@@ -138,6 +149,7 @@ class MemberServiceImpl implements MemberService {
      * @param request 일반 사용자 회원가입에 필요한 정보
      */
     @Override
+    @Transactional
     public void signUp(final MemberSignUpServiceRequest request) {
         checkDuplicatedMemberInfo(request);
         Password password = Password.fromRaw(request.getPassword()); // 비밀번호 적합성 검증
@@ -187,6 +199,61 @@ class MemberServiceImpl implements MemberService {
                 .accessToken(accessToken)
                 .refreshUUID(refreshUUID)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public MemberLoginResponse naverLogin(MemberOAuthLoginServiceRequest request) {
+        // request.getCode()을 통해 Naver에서 회원 정보 조회 (email, name, phone 등..)
+        String naverAccessToken = toRequestAccessToken(request.getCode());
+        OAuthMemberInfoResponse naverResponse = naverOAuthClient.requestMemberInfo(naverAccessToken);
+
+        // TODO : 리팩토링 필요!! 그런데 어떻게..?
+        Optional<Member> optionalMember = memberRepository.findMemberByEmail(new Email(naverResponse.getEmail()));
+        Member member;
+
+        if (optionalMember.isPresent()) {
+            member = optionalMember.get();
+        } else {
+            member = memberRepository.save(
+                    request.toEntity(
+                            naverResponse.getEmail(),
+                            naverResponse.getMemberName(),
+                            naverResponse.getPhone(),
+                            "NAVER"
+                    )
+            );
+        }
+
+        String accessToken = jwtTokenProvider.generateJwt(naverResponse.getEmail(), JwtTokenConstant.accessExpirationTime);
+        String refreshToken = jwtTokenProvider.generateJwt(naverResponse.getEmail(), JwtTokenConstant.refreshExpirationTime);
+
+        String refreshUUID = redisService.saveRefreshToken(RedisSaveRefreshTokenServiceRequest.builder()
+                .purpose(TokenPurpose.REFRESH_TOKEN)
+                .refreshToken(refreshToken)
+                .build());
+
+        return MemberLoginResponse.builder()
+                .member(member)
+                .accessToken(accessToken)
+                .refreshUUID(refreshUUID)
+                .build();
+    }
+
+    private String toRequestAccessToken(final String code) {
+        ResponseEntity<NaverTokenResponse> response =
+                restTemplate.exchange(naverConfig.getRequestUrl(code), HttpMethod.GET, null, NaverTokenResponse.class);
+
+        return response.getBody().getAccessToken();
+    }
+
+    @Override
+    @Transactional
+    public void setupOAuthNickname(MemberOAuthNicknameSetupServiceRequest request) {
+        Member member = memberRepository.findMemberByEmail(new Email(request.getEmail()))
+                .orElseThrow(() -> new RestApiException(MEMBER_NOT_FOUND));
+
+        member.modifyNickname(request.getNickname());
     }
 
     @Override

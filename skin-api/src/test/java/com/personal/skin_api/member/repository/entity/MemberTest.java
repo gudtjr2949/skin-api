@@ -70,7 +70,7 @@ class MemberTest {
         String provider = "NAVER";
 
         // when
-        Member member = Member.fromOAuth(email, memberName, nickname, phone, provider);
+        Member member = Member.fromOAuth(email, memberName, phone, provider);
 
         // then
         assertThat(member.getEmail()).isEqualTo(email);

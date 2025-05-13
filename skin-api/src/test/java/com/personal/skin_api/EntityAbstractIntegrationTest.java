@@ -53,6 +53,7 @@ public abstract class EntityAbstractIntegrationTest {
                 .phone(phone)
                 .status(MemberStatus.ACTIVE)
                 .role(MemberRole.GENERAL)
+                .provider("LOCAL")
                 .build();
     }
 
@@ -65,6 +66,7 @@ public abstract class EntityAbstractIntegrationTest {
                 .phone(phone)
                 .status(MemberStatus.ACTIVE)
                 .role(MemberRole.GENERAL)
+                .provider("LOCAL")
                 .build();
     }
 
