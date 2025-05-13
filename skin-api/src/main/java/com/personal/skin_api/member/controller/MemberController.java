@@ -6,6 +6,8 @@ import com.personal.skin_api.common.security.JwtTokenConstant;
 import com.personal.skin_api.member.controller.request.*;
 import com.personal.skin_api.member.service.MemberService;
 import com.personal.skin_api.member.service.dto.request.MemberFindDetailServiceRequest;
+import com.personal.skin_api.member.service.dto.request.MemberOAuthLoginServiceRequest;
+import com.personal.skin_api.member.service.dto.request.MemberOAuthNicknameSetupServiceRequest;
 import com.personal.skin_api.member.service.dto.request.MemberWithdrawServiceRequest;
 import com.personal.skin_api.member.service.dto.response.MemberDetailResponse;
 import com.personal.skin_api.member.service.dto.response.MemberFindEmailResponse;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -106,6 +110,58 @@ public class MemberController {
         loginResponse.removeRefreshUUID();
 
         return ResponseEntity.ok().body(loginResponse);
+    }
+
+    @GetMapping("/naver-login")
+    public ResponseEntity<Object> naverLogin(@RequestParam("code") String code,
+                                             HttpServletResponse response) {
+        log.info("네이버에서 발급받은 코드 = {}", code);
+        MemberOAuthLoginServiceRequest request = MemberOAuthLoginServiceRequest.builder()
+                .code(code)
+                .build();
+
+        MemberLoginResponse loginResponse = memberService.naverLogin(request);
+
+        // accessToken 헤더에 담기
+        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", loginResponse.getAccessToken())
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge((int) (JwtTokenConstant.accessExpirationTime / 1000))
+                .build();
+
+        ResponseCookie refreshUUIDCookie = ResponseCookie.from("refreshUUID", loginResponse.getRefreshUUID())
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge((int) (JwtTokenConstant.refreshExpirationTime / 1000))
+                .build();
+
+
+        // 쿠키를 응답에 추가
+        response.addHeader("Set-Cookie", accessTokenCookie.toString());
+        response.addHeader("Set-Cookie", refreshUUIDCookie.toString());
+
+        // 쿠키 만든 후, 응답 Body에 있는 AccessToken, refreshUUID 제거
+        loginResponse.removeAccessToken();
+        loginResponse.removeRefreshUUID();
+
+        return ResponseEntity.ok().body(loginResponse);
+    }
+    
+    @PostMapping("/set-nickname")
+    public ResponseEntity<CommonResponse> setNickname(@RequestParam String nickname,
+                                              @AuthenticationPrincipal UserDetails userDetails) {
+        MemberOAuthNicknameSetupServiceRequest request = MemberOAuthNicknameSetupServiceRequest.builder()
+                .nickname(nickname)
+                .email(userDetails.getUsername())
+                .build();
+
+        memberService.setupOAuthNickname(request);
+
+        return ResponseEntity.ok().body(new CommonResponse(200, "닉네임 설정 성공"));
     }
 
     @GetMapping("/reissue-access-token")

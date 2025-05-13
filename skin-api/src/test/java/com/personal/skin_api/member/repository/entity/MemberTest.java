@@ -1,5 +1,6 @@
 package com.personal.skin_api.member.repository.entity;
 
+import com.personal.skin_api.member.repository.entity.password.Password;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
@@ -38,5 +39,43 @@ class MemberTest {
                 .status(status)
                 .role(role)
                 .build();
+    }
+
+    @Test
+    void OAuth_회원의_비밀번호는_기본_비밀번호로_설정된다() {
+        // given & when
+        String oauthPassword = Password.fromOAuth();
+
+        // then
+        assertThat(oauthPassword).isEqualTo(Password.fromOAuth());
+    }
+
+    @Test
+    void 서비스명에_맞는_AuthProvider가_생성된다() {
+        // given
+        String provider = "NAVER";
+        AuthProvider authProvider = AuthProvider.toAuthProvider(provider);
+
+        // when & then
+        assertThat(authProvider).isEqualTo(AuthProvider.NAVER);
+    }
+
+    @Test
+    void OAuth로_회원가입을_시도한다() {
+        // given
+        String email = "test123@naver.com";
+        String memberName = "홍길동";
+        String nickname = "길동짱짱";
+        String phone = "01012345678";
+        String provider = "NAVER";
+
+        // when
+        Member member = Member.fromOAuth(email, memberName, phone, provider);
+
+        // then
+        assertThat(member.getEmail()).isEqualTo(email);
+        assertThat(member.getPassword()).isEqualTo(Password.fromOAuth());
+        assertThat(member.getPassword()).isEqualTo(Password.fromOAuth());
+        assertThat(member.getAuthProvider()).isEqualTo(AuthProvider.NAVER);
     }
 }

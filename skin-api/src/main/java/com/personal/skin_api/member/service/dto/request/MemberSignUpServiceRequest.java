@@ -39,6 +39,7 @@ public class MemberSignUpServiceRequest {
                 .phone(phone)
                 .status(ACTIVE)
                 .role(GENERAL)
+                .provider("LOCAL")
                 .build();
     }
 }

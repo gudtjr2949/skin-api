@@ -106,6 +106,7 @@ public abstract class JpaAbstractIntegrationTest {
                 .phone(phone)
                 .status(MemberStatus.ACTIVE)
                 .role(MemberRole.GENERAL)
+                .provider("LOCAL")
                 .build());
     }
 
@@ -118,6 +119,7 @@ public abstract class JpaAbstractIntegrationTest {
                 .phone(phone)
                 .status(MemberStatus.ACTIVE)
                 .role(MemberRole.GENERAL)
+                .provider("LOCAL")
                 .build());
     }
 

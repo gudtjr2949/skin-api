@@ -11,7 +11,9 @@ public class Password {
     @Column(name = "PASSWORD")
     private String password;
 
-     private Password(final String password) {
+    private static final String OAUTH_PASSWORD_PLACEHOLDER = "OAUTH_MEMBER_NO_PASSWORD";
+
+    private Password(final String password) {
         this.password = password;
     }
 
@@ -22,6 +24,10 @@ public class Password {
 
     public static Password fromEncoded(final String encodedPassword) {
         return new Password(encodedPassword);
+    }
+
+    public static String fromOAuth() {
+         return OAUTH_PASSWORD_PLACEHOLDER;
     }
 
     private static void validate(final String password) {

@@ -161,6 +161,16 @@ class MemberServiceTest extends AbstractIntegrationTest {
         assertThat(loginMember.getMemberName()).isEqualTo(signUpRequest.getMemberName());
         assertThat(loginMember.getNickname()).isEqualTo(signUpRequest.getNickname());
     }
+    
+    @Test
+    void OAuth을_사용해_로그인을_진행한다() {
+        // given
+        
+
+        // when
+        
+        // then
+    }
 
     // TODO : sms 금액 충전 시 동작 가능
     /*@Test
