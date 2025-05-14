@@ -19,6 +19,7 @@ import com.personal.skin_api.product.service.dto.response.ProductListResponse;
 import com.personal.skin_api.product.service.dto.response.ProductResponse;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -74,6 +75,7 @@ public class ProductServiceImpl implements ProductService {
      * @return 제품 리스트
      */
     @Override
+    @Cacheable(value = "productList", key = "#request.toCacheKey()")
     public ProductListResponse findProducts(ProductFindListServiceRequest request) {
         List<Product> products = qProductRepository.findProducts(request.getProductId(), request.getSorter(), request.getKeyword(), request.getLastSortValue());
 

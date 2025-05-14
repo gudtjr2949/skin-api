@@ -21,4 +21,13 @@ public class ProductFindListServiceRequest {
         this.keyword = keyword;
         this.lastSortValue = lastSortValue;
     }
+
+    public String toCacheKey() {
+        return String.join(":",
+                String.valueOf(sorter),
+                String.valueOf(keyword),
+                String.valueOf(productId),
+                String.valueOf(lastSortValue)
+        );
+    }
 }

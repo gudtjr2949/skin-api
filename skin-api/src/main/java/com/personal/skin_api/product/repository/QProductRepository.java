@@ -23,7 +23,7 @@ public class QProductRepository {
 
     private final EntityManager em;
     private final JPAQueryFactory queryFactory;
-    public static final int PRODUCTS_PAGE_SIZE = 8;
+    public static final int PRODUCTS_PAGE_SIZE = 100;
 
     public QProductRepository(EntityManager em) {
         this.em = em;
